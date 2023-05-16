@@ -1,5 +1,7 @@
 #include <iostream>
 
+struct Limit;
+
 // doubly LL
 struct Order {
     int id_number;
@@ -10,7 +12,7 @@ struct Order {
     int event_time;
     Order* next;
     Order* prev;
-    // Limit* parentLimit; //how to add this to scope?
+    Limit* parentLimit; //how to add this to scope?
 };
 
 // Binary Search Tree

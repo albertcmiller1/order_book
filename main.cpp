@@ -3,6 +3,19 @@ using namespace std;
   
 int main()
 {
+    /* 
+        binary tree holds a tree of limit prices 
+        each node holds a LL of orders at that price 
+
+        when an order comes in 
+            > if price is in limt_map 
+                > go into it's LL and append 
+                > update tree node's volume 
+            > else
+                > create new tree node 
+                > create new LL on tree node 
+    */
+
     OrderBook ob;
     
     int order_id = 123456;
@@ -39,18 +52,18 @@ int main()
 
     // ob.order_map.erase(654321);
 
-    Limit *root = ob.insert_new_limit(nullptr, 12);
-    cout << root->limit_price << endl;
-    cout << root->left << endl;
-    cout << root->right << endl;
+    // Limit *root = ob.insert_new_limit(nullptr, 12);
+    // cout << root->limit_price << endl;
+    // cout << root->left << endl;
+    // cout << root->right << endl;
     
-    cout << "\n";
+    // cout << "\n";
 
-    root = ob.insert_new_limit(root, 14);
-    cout << root->limit_price << endl;
-    cout << root->left << endl;
-    cout << root->right << endl;
-    cout << root->right->limit_price << endl;
+    // root = ob.insert_new_limit(root, 14);
+    // cout << root->limit_price << endl;
+    // cout << root->left << endl;
+    // cout << root->right << endl;
+    // cout << root->right->limit_price << endl;
 
-    // cout << ob << endl;
+    cout << ob << endl;
 }

@@ -17,7 +17,8 @@ void OrderBook::add_order(
         int entry_time,
         int event_time
     ){
-    Order x = {
+
+    order_map[id_number] = Order {
         id_number,
         buy_sell,
         shares, 
@@ -25,7 +26,6 @@ void OrderBook::add_order(
         entry_time,
         event_time
     };
-    order_map[id_number] = x;
 };
 
 void OrderBook::add_limit(
@@ -34,13 +34,11 @@ void OrderBook::add_limit(
         int total_volume
     ){
 
-    Limit x = {
+    limit_map[limit_price] = Limit {
         limit_price,
         size,
         total_volume
     };
-
-    limit_map[limit_price] = x;
 }
 
 Limit* OrderBook::insert_new_limit(Limit *root, float price){
@@ -63,8 +61,6 @@ Limit* OrderBook::insert_new_limit(Limit *root, float price){
  
     return root;
 }
-
-
 
 std::ostream& operator<<(std::ostream& os, const OrderBook& book){
     if (book.order_map_is_empty()){
