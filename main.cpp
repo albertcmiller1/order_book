@@ -37,15 +37,20 @@ int main()
         event_time
     );
 
-    // cout << ob.order_map[123456].limit << endl;
-    // cout << ob.order_map[654321].limit << endl;
+    // ob.order_map.erase(654321);
 
-    for (auto i = ob.order_map.begin(); i != ob.order_map.end(); i++)
-        cout << i->first << "  " << i->second.id_number << endl;
+    Limit *root = ob.insert_new_limit(nullptr, 12);
+    cout << root->limit_price << endl;
+    cout << root->left << endl;
+    cout << root->right << endl;
+    
+    cout << "\n";
 
-    ob.order_map.erase(654321);
+    root = ob.insert_new_limit(root, 14);
+    cout << root->limit_price << endl;
+    cout << root->left << endl;
+    cout << root->right << endl;
+    cout << root->right->limit_price << endl;
 
-    for (auto i = ob.order_map.begin(); i != ob.order_map.end(); i++)
-        cout << i->first << "  " << i->second.id_number << endl;
-
+    // cout << ob << endl;
 }

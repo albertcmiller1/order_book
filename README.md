@@ -4,7 +4,9 @@ I found some info on what data structures to use [here](https://web.archive.org/
 
 
 ## todo 
-* implement trees
+* implement trees + DLL
+* implement spread check + erase after match
+* boto to post order to dynamodb
 * how do we allow other processes to connect? websockets? 
 * create simple multi threaded app to connect to process and simulate buys/sells
 * host on docker contain / aws ecs
