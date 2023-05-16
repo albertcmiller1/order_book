@@ -7,5 +7,6 @@ public:
     void add_bid(float price, int quantity);
     void add_ask(float price, int quantity);
 
+
     friend std::ostream& operator<<(std::ostream& os, const OrderBook& book);
 };

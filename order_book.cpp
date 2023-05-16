@@ -1,6 +1,5 @@
 #include "order_book.hpp" 
 
-// why is there 'const' at the end? 
 bool OrderBook::is_empty() const {
     return bids.empty() && asks.empty();
 }
@@ -19,15 +18,17 @@ std::ostream& operator<<(std::ostream& os, const OrderBook& book){
         return os;
     }
 
-    std::cout << "asks" << std::endl;
+    std::cout << "ask     qantity" << std::endl;
     for (auto it = book.asks.begin(); it != book.asks.end(); it++){
         os << it->first << "\t" << it->second << std::endl;
     }
+    
     std::cout << std::endl;
+
     for (auto it = book.bids.begin(); it != book.bids.end(); it++){
         os << it->first << "\t" << it->second << std::endl;
     }
-    std::cout << "bids" << std::endl;
+    std::cout << "bid     qantity" << std::endl;
 
     return os;
 }
