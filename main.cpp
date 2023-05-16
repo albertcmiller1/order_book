@@ -1,28 +1,22 @@
-#include "main.hpp" // use quotes to indicate this is one of our files
-using namespace std; // dont put this in header file
+#include "main.hpp"
+using namespace std; 
   
 // Driver Code
 int main()
 {
-    Linkedlist list;
-  
-    // Inserting nodes
-    list.insertNode(1);
-    list.insertNode(2);
-    list.insertNode(3);
-    list.insertNode(4);
-  
-    cout << "Elements of the list are: ";
-  
-    // Print the list
-    list.printList();
-    cout << endl;
-  
-    // Delete node at position 2.
-    list.deleteNode(2);
-  
-    cout << "Elements of the list are: ";
-    list.printList();
-    cout << endl;
-    return 0;
+    OrderBook ob;
+    
+    ob.add_ask(23.29, 1);
+    ob.add_ask(23.32, 1);
+    ob.add_ask(23.34, 1);
+    ob.add_ask(23.40, 1);
+    
+    ob.add_bid(23.25, 1);
+    ob.add_bid(23.26, 1);
+    ob.add_bid(23.27, 1);
+    ob.add_bid(23.28, 1);
+
+    
+
+    cout << ob << endl;
 }
