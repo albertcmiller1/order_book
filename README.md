@@ -10,6 +10,9 @@ blah blah blah blah blah blah blah blah blah blah blah blah
 ### connecting to the book
 blah blah blah blah blah blah blah blah blah blah blah blah 
 
+### infrastructure 
+blah blah blah blah blah blah blah blah blah blah blah blah 
+
 ## Todo 
 * implement trees + DLL
 * implement spread check + erase after match
