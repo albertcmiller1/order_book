@@ -3,9 +3,8 @@
 #include <string.h>
 using namespace std; 
 
-
-std::unordered_map<string, string> parse_args(int argc, char** argv){
-    std::unordered_map<string, string> arg_map = {};
+std::unordered_map<string, char*> parse_args(int argc, char** argv){
+    std::unordered_map<string, char*> arg_map = {};
     for (int i = 1; i < argc; ++i){
         if (!strcmp("--order_id", argv[i])){
             arg_map["order_id"] = argv[i+1];
@@ -14,7 +13,8 @@ std::unordered_map<string, string> parse_args(int argc, char** argv){
         } else if (!strcmp("--shares", argv[i])){
             arg_map["shares"] = argv[i+1];
         } else if (!strcmp("--buy_sell", argv[i])){
-            arg_map["buy_sell"] = argv[i+1];
+            // validate string == buy or sell 
+            arg_map["buy_sell"] =  argv[i+1];
         } else if (!strcmp("--event_time", argv[i])){
             arg_map["event_time"] = argv[i+1];
         } else if (!strcmp("--entry_time", argv[i])){
@@ -39,8 +39,8 @@ int main(int argc, char** argv){
                 > create new LL on tree node 
     */
     
-    std::unordered_map<string, string> arg_map = parse_args(argc, argv);
-    cout << "\n\n\n";
+    std::unordered_map<string, char*> arg_map = parse_args(argc, argv);
+    // cout << "\n\n\n";
 
     cout << arg_map["order_id"] << endl;
     cout << arg_map["limit"] << endl;
@@ -49,17 +49,34 @@ int main(int argc, char** argv){
     cout << arg_map["event_time"] << endl;
     cout << arg_map["entry_time"] << endl;
 
-    // OrderBook book;
+    // cout << "\n\nFUCK\n";
+    // cout << !strcmp("buy", arg_map["buy_sell"]) << endl; // buy=1/true, sell=0/false
+
+
+    OrderBook book;
+
+    int shares = atoi(arg_map["shares"]);
+
+    book.add_order(
+        atoi(arg_map["order_id"]),                  // int order_id
+        !strcmp("buy", arg_map["buy_sell"]),        // bool buy_sell
+        atoi(arg_map["shares"]),                    // int shares
+        std::stof(arg_map["limit"]),                // float limit
+        atoi(arg_map["entry_time"]),                // int entry_time
+        atoi(arg_map["event_time"])                 // int event_time
+    );
+
     // book = create_fake_orders(book);
-    // cout << book << endl;
+    cout << book << endl;
     return 0;
 }
 
 OrderBook create_fake_orders(OrderBook book){
     // book.order_map.erase(654321);
+
     book.add_order(
         123456,         // order_id
-        true,           // buy_sell
+        1,              // buy_sell
         1,              // shares
         23.42,          // limit
         983485,         // entry_time
