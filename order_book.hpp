@@ -33,8 +33,8 @@ public:
     Limit *limit_tree_head {nullptr};
     Order *order_ll_head {nullptr};
     Order *order_ll_tail {nullptr};
-    std::unordered_map<int, Order> order_map = {};
-    std::unordered_map<float, Limit> limit_map = {};
+    std::unordered_map<int, Order> order_map = {}; // key is id_number
+    std::unordered_map<float, Limit> limit_map = {}; // key is limit price
 
     void add_order(
         int id_number,
@@ -61,5 +61,5 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const OrderBook& book);
 };
 
-void print_tree(Limit* p, int indent);
+// void print_tree(std::string prefix, Limit* root, bool isLeft);
 
