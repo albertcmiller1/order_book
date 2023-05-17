@@ -18,6 +18,8 @@ void OrderBook::add_order(
         int event_time
     ){
 
+
+    // add new order to order_map
     order_map[id_number] = Order {
         id_number,
         buy_sell,
@@ -26,6 +28,20 @@ void OrderBook::add_order(
         entry_time,
         event_time
     };
+    // check if limit price is in limit_map
+    // if so, update tree (but faster)
+    
+    // update limit_tree
+    if (this->limit_tree_head){
+        Limit *root = this->OrderBook::insert_new_limit(this->limit_tree_head, limit);
+    } else {
+        Limit *root = this->OrderBook::insert_new_limit(nullptr, limit);
+        this->limit_tree_head=root;
+    }
+
+    // check if price is in binary tree
+    // if so, update LL
+    // if not, create LL
 };
 
 void OrderBook::add_limit(
@@ -42,7 +58,6 @@ void OrderBook::add_limit(
 }
 
 Limit* OrderBook::insert_new_limit(Limit *root, float price){
-
     if (!root) {
         root = new Limit;
         root->limit_price=price;
@@ -62,17 +77,38 @@ Limit* OrderBook::insert_new_limit(Limit *root, float price){
     return root;
 }
 
+void print_tree(Limit* p, int indent){
+    if(p != nullptr) {
+        if(p->right) {
+            print_tree(p->right, indent+4);
+        }
+        if (indent) {
+            std::cout << std::setw(indent) << ' ';
+        }
+        if (p->right) std::cout<<" /\n" << std::setw(indent) << ' ';
+        std::cout<< p->limit_price << "\n ";
+        if(p->left) {
+            std::cout << std::setw(indent) << ' ' <<" \\\n";
+            print_tree(p->left, indent+4);
+        }
+    }
+}
+
 std::ostream& operator<<(std::ostream& os, const OrderBook& book){
+    cout << "\n";
     if (book.order_map_is_empty()){
         os << "ORDER MAP EMPTY";
         return os;
     }
-
+    std::cout << "order_map: " << std::endl;
+    std::cout << "------------" << std::endl;
     std::cout << "order_id   limit  qantity" << std::endl;
     for (auto it = book.order_map.begin(); it != book.order_map.end(); it++){
         os << it->first << "\t   " << it->second.limit << "\t" << it->second.shares << std::endl;
     }
-    
+    std::cout << "\n\nlimit_tree: " << std::endl;
+    std::cout << "------------" << std::endl;
+    print_tree(book.limit_tree_head, 4);
     std::cout << std::endl;
     return os;
 }

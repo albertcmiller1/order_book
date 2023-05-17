@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 
 struct Limit;
 
@@ -10,9 +11,9 @@ struct Order {
     float limit;
     int entry_time;
     int event_time;
-    Order* next;
-    Order* prev;
-    Limit* parentLimit; //how to add this to scope?
+    Order* next {nullptr};
+    Order* prev {nullptr};
+    Limit* parent_limit {nullptr};
 };
 
 // Binary Search Tree
@@ -20,15 +21,18 @@ struct Limit {
     float limit_price;
     int size;
     int total_volume;
-    Limit *parent;
-    Limit *left;
-    Limit *right;
-    Order *head_order;
-    Order *tail_order;
+    Limit *parent {nullptr};
+    Limit *left {nullptr};
+    Limit *right {nullptr};
+    Order *head_order {nullptr};
+    Order *tail_order {nullptr};
 };
 
 class OrderBook {
 public:
+    Limit *limit_tree_head {nullptr};
+    Order *order_ll_head {nullptr};
+    Order *order_ll_tail {nullptr};
     std::unordered_map<int, Order> order_map = {};
     std::unordered_map<float, Limit> limit_map = {};
 
@@ -53,5 +57,9 @@ public:
     void insert_new_order();
     Limit* insert_new_limit(Limit *root, float value);
 
+    
     friend std::ostream& operator<<(std::ostream& os, const OrderBook& book);
 };
+
+void print_tree(Limit* p, int indent);
+

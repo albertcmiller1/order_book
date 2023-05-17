@@ -16,54 +16,39 @@ int main()
                 > create new LL on tree node 
     */
 
-    OrderBook ob;
-    
-    int order_id = 123456;
-    bool buy_sell = true;
-    int shares = 1;
-    float limit = 23.42;
-    int entry_time = 983485;
-    int event_time = 983485;
+    OrderBook book;
+    book = create_fake_orders(book);
+    cout << book << endl;
+}
 
-    ob.add_order(
-        order_id,
-        buy_sell,
-        shares,
-        limit,
-        entry_time,
-        event_time
+OrderBook create_fake_orders(OrderBook book){
+    // book.order_map.erase(654321);
+    book.add_order(
+        123456,         // order_id
+        true,           // buy_sell
+        1,              // shares
+        23.42,          // limit
+        983485,         // entry_time
+        983485          // event_time
     );
 
-    order_id = 654321;
-    buy_sell = false;
-    shares = 2;
-    limit = 23.44;
-    entry_time = 983485;
-    event_time = 983485;
-
-    ob.add_order(
-        order_id,
-        buy_sell,
-        shares,
-        limit,
-        entry_time,
-        event_time
+    book.add_order(
+        654321,         // order_id
+        true,           // buy_sell
+        1,              // shares
+        23.44,          // limit
+        983485,         // entry_time
+        983485          // event_time
     );
 
-    // ob.order_map.erase(654321);
+    book.add_order(
+        345252,         // order_id
+        true,           // buy_sell
+        1,              // shares
+        23.43,          // limit
+        983485,         // entry_time
+        983485          // event_time
+    );
 
-    // Limit *root = ob.insert_new_limit(nullptr, 12);
-    // cout << root->limit_price << endl;
-    // cout << root->left << endl;
-    // cout << root->right << endl;
-    
-    // cout << "\n";
-
-    // root = ob.insert_new_limit(root, 14);
-    // cout << root->limit_price << endl;
-    // cout << root->left << endl;
-    // cout << root->right << endl;
-    // cout << root->right->limit_price << endl;
-
-    cout << ob << endl;
+    return book;
 }
