@@ -14,7 +14,7 @@ To simulate market activity, 26 threads will continuously post buy and sell orde
 The orderbook will connect to a websocket hosted on AWS. The orderbook will broadcast to the socket any time an exchange occurs. The socket will be hosted with API Gateway, 4 lambda functions, and a dynamodb table.
 
 ### Price data API
-Each time an echange occurs, the book will post the transaction into a dynamodb table. Additionaly, Every 60 seconds the book will post the current price of each stock traded into a dynamodb table. This table will be accessable to users via an API hosted with AWS API Gateway + lambda.
+Each time an echange occurs, the book will post the transaction into a dynamodb table. Additionaly, Every 60 seconds the book will post the current price of each stock traded into a dynamodb table. This data will be accessable to users via an API hosted with AWS API Gateway + lambda.
 
 ### Infrastructure 
 The book, trading bot threads, and connection API will be apart of the same process. It will be running on a docker container hosted by AWS ECS. 
