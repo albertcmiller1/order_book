@@ -3,6 +3,19 @@
 #include <string.h>
 using namespace std; 
 
+/* 
+    binary tree holds a tree of limit prices 
+    each node holds a LL of orders at that price 
+
+    when an order comes in 
+        > if price in limt_map 
+            > go into it's LL and append 
+            > update tree node's volume 
+        > else
+            > create new tree node 
+            > create new LL on tree node 
+*/
+
 std::unordered_map<string, char*> parse_args(int argc, char** argv){
     std::unordered_map<string, char*> arg_map = {};
     for (int i = 1; i < argc; ++i){
@@ -21,42 +34,23 @@ std::unordered_map<string, char*> parse_args(int argc, char** argv){
             arg_map["entry_time"] = argv[i+1];
         }
     }
+
+    // cout << arg_map["order_id"] << endl;
+    // cout << arg_map["limit"] << endl;
+    // cout << arg_map["shares"] << endl;
+    // cout << arg_map["buy_sell"] << endl;
+    // cout << arg_map["event_time"] << endl;
+    // cout << arg_map["entry_time"] << endl;
+
     return arg_map;
 }
 
-  
 int main(int argc, char** argv){
-    /* 
-        binary tree holds a tree of limit prices 
-        each node holds a LL of orders at that price 
-
-        when an order comes in 
-            > if price in limt_map 
-                > go into it's LL and append 
-                > update tree node's volume 
-            > else
-                > create new tree node 
-                > create new LL on tree node 
-    */
     
     std::unordered_map<string, char*> arg_map = parse_args(argc, argv);
-    // cout << "\n\n\n";
-
-    cout << arg_map["order_id"] << endl;
-    cout << arg_map["limit"] << endl;
-    cout << arg_map["shares"] << endl;
-    cout << arg_map["buy_sell"] << endl;
-    cout << arg_map["event_time"] << endl;
-    cout << arg_map["entry_time"] << endl;
-
-    // cout << "\n\nFUCK\n";
-    // cout << !strcmp("buy", arg_map["buy_sell"]) << endl; // buy=1/true, sell=0/false
-
-
     OrderBook book;
 
-    int shares = atoi(arg_map["shares"]);
-
+    // only do this if arg_map is fully populated 
     book.add_order(
         atoi(arg_map["order_id"]),                  // int order_id
         !strcmp("buy", arg_map["buy_sell"]),        // bool buy_sell
@@ -66,7 +60,7 @@ int main(int argc, char** argv){
         atoi(arg_map["event_time"])                 // int event_time
     );
 
-    // book = create_fake_orders(book);
+    book = create_fake_orders(book);
     cout << book << endl;
     return 0;
 }
@@ -92,23 +86,23 @@ OrderBook create_fake_orders(OrderBook book){
         983485          // event_time
     );
 
-    book.add_order(
-        345252,         // order_id
-        true,           // buy_sell
-        1,              // shares
-        23.43,          // limit
-        983485,         // entry_time
-        983485          // event_time
-    );
+    // book.add_order(
+    //     345252,         // order_id
+    //     true,           // buy_sell
+    //     1,              // shares
+    //     23.43,          // limit
+    //     983485,         // entry_time
+    //     983485          // event_time
+    // );
 
-    book.add_order(
-        345257,         // order_id
-        true,           // buy_sell
-        1,              // shares
-        23.43,          // limit
-        983485,         // entry_time
-        983485          // event_time
-    );    
+    // book.add_order(
+    //     345257,         // order_id
+    //     true,           // buy_sell
+    //     1,              // shares
+    //     23.43,          // limit
+    //     983485,         // entry_time
+    //     983485          // event_time
+    // );    
     
     // book.add_order(
     //     355257,         // order_id

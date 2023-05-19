@@ -35,9 +35,9 @@ void OrderBook::add_order(
     } else {
         // this price is already in the limit_map. 
         auto it = limit_map.find(limit_price); 
-        std::cout << "found this price in limit_map:  " << std::endl;
-        std::cout << (*it).first << std::endl;
-        std::cout << (*it).second.size << std::endl;
+        // std::cout << "found this price in limit_map:  " << std::endl;
+        // std::cout << (*it).first << std::endl;
+        // std::cout << (*it).second.size << std::endl;
         // go into it's LL and append 
     }
     
