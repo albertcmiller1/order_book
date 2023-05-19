@@ -30,3 +30,4 @@ The book, trading bot threads, and connection API will be apart of the same proc
 * how to build a driver for much faster performance? 
 * other data structure ideas for the order book?
 * frontend to view the spread 
+* convert all lambdas to python
