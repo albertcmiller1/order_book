@@ -30,7 +30,7 @@ The book, trading bot threads, and connection API will be apart of the same proc
 ## Future ideas
 * how to build a driver for much faster performance? 
 * other data structure ideas for the order book?
-* frontend to view the spread 
+* frontend to view the spread [example](https://www.youtube.com/watch?v=hgOXY-r3xJM&ab_channel=ChadThackray)
 * convert all lambdas to python
 * only run the bots during market hours
 * maybe using an AWS SQS would be better for holding buy and sell orders? then we could have a more distrubuted matching service aka more scalable 

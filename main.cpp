@@ -35,6 +35,14 @@ std::unordered_map<string, char*> parse_args(int argc, char** argv){
         }
     }
 
+    /*
+    if (arg_map.find("order_id") == arg_map.end()) {
+        // this price is not in the limit map-- update limit_map. 
+    } else {
+        // this price is already in the limit_map. 
+    }
+    */
+
     // cout << arg_map["order_id"] << endl;
     // cout << arg_map["limit"] << endl;
     // cout << arg_map["shares"] << endl;
@@ -46,11 +54,20 @@ std::unordered_map<string, char*> parse_args(int argc, char** argv){
 }
 
 int main(int argc, char** argv){
-    
-    std::unordered_map<string, char*> arg_map = parse_args(argc, argv);
     OrderBook book;
+    book = create_fake_orders(book);
+    cout << book << endl;
+    return 0;
+}
+
+OrderBook create_fake_orders(OrderBook book){
+    
+    /*
+    // book.order_map.erase(654321);
+
 
     // only do this if arg_map is fully populated 
+    std::unordered_map<string, char*> arg_map = parse_args(argc, argv);
     book.add_order(
         atoi(arg_map["order_id"]),                  // int order_id
         !strcmp("buy", arg_map["buy_sell"]),        // bool buy_sell
@@ -59,14 +76,7 @@ int main(int argc, char** argv){
         atoi(arg_map["entry_time"]),                // int entry_time
         atoi(arg_map["event_time"])                 // int event_time
     );
-
-    book = create_fake_orders(book);
-    cout << book << endl;
-    return 0;
-}
-
-OrderBook create_fake_orders(OrderBook book){
-    // book.order_map.erase(654321);
+    */
 
     book.add_order(
         123456,         // order_id
@@ -86,32 +96,32 @@ OrderBook create_fake_orders(OrderBook book){
         983485          // event_time
     );
 
-    // book.add_order(
-    //     345252,         // order_id
-    //     true,           // buy_sell
-    //     1,              // shares
-    //     23.43,          // limit
-    //     983485,         // entry_time
-    //     983485          // event_time
-    // );
+    book.add_order(
+        345252,         // order_id
+        true,           // buy_sell
+        1,              // shares
+        23.43,          // limit
+        983485,         // entry_time
+        983485          // event_time
+    );
 
-    // book.add_order(
-    //     345257,         // order_id
-    //     true,           // buy_sell
-    //     1,              // shares
-    //     23.43,          // limit
-    //     983485,         // entry_time
-    //     983485          // event_time
-    // );    
+    book.add_order(
+        345555,         // order_id
+        true,           // buy_sell
+        1,              // shares
+        23.45,          // limit
+        983485,         // entry_time
+        983485          // event_time
+    );    
     
-    // book.add_order(
-    //     355257,         // order_id
-    //     true,           // buy_sell
-    //     1,              // shares
-    //     23.4,          // limit
-    //     983485,         // entry_time
-    //     983485          // event_time
-    // ); 
+    book.add_order(
+        355257,         // order_id
+        true,           // buy_sell
+        1,              // shares
+        23.41,          // limit
+        983485,         // entry_time
+        983485          // event_time
+    ); 
 
     return book;
 }
