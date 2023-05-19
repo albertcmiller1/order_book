@@ -1,0 +1,5 @@
+https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-private-integration.html
+
+https://towardsdatascience.com/how-to-deploy-a-flask-api-on-aws-ecs-part-3-c1ca552e65d
+
+https://blog.developer.adobe.com/deploy-microservices-using-aws-ecs-fargate-and-api-gateway-1b5e71129338
