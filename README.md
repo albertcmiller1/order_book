@@ -8,7 +8,7 @@ This repo simulates an order book using a binary tree, doubly linked list, and t
 The orderbook will host an API which will allow a user to post an order to buy or sell, cancel an order, and check the current price of the stock. note -> maybe should not include price check, instead leave it to the price data api.  
 
 ### Trading bots
-To simulate market activity, 26 threads will continuously post buy and sell orders at random prices (within a close range of the current price). This will stimulate the book enough for users to stream live prices, and enable a user to activly post buy and sell orders with paper stocks using the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository. 
+To simulate market activity, 26 threads will continuously post buy and sell orders at random prices. This will stimulate the book enough for users to stream live prices, and enable a user to activly post buy and sell orders with paper stocks using the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository. 
 
 ### Sockets
 The orderbook will connect to a websocket hosted on AWS. The orderbook will broadcast to the socket any time an exchange occurs. The socket will be hosted with API Gateway, 4 lambda functions, and a dynamodb table.
