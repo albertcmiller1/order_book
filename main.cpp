@@ -3,19 +3,6 @@
 #include <string.h>
 using namespace std; 
 
-/* 
-    binary tree holds a tree of limit prices 
-    each node holds a LL of orders at that price 
-
-    when an order comes in 
-        > if price in limt_map 
-            > go into it's LL and append 
-            > update tree node's volume 
-        > else
-            > create new tree node 
-            > create new LL on tree node 
-*/
-
 std::unordered_map<string, char*> parse_args(int argc, char** argv){
     std::unordered_map<string, char*> arg_map = {};
     for (int i = 1; i < argc; ++i){
@@ -63,9 +50,6 @@ int main(int argc, char** argv){
 OrderBook create_fake_orders(OrderBook book){
     
     /*
-    // book.order_map.erase(654321);
-
-
     // only do this if arg_map is fully populated 
     std::unordered_map<string, char*> arg_map = parse_args(argc, argv);
     book.add_order(
@@ -79,16 +63,16 @@ OrderBook create_fake_orders(OrderBook book){
     */
 
     book.add_order(
-        123456,         // order_id
+        000001,         // order_id
         1,              // buy_sell
         1,              // shares
-        23.42,          // limit
+        23.44,          // limit
         983485,         // entry_time
         983485          // event_time
     );
 
     book.add_order(
-        654321,         // order_id
+        000002,         // order_id
         true,           // buy_sell
         1,              // shares
         23.44,          // limit
@@ -97,10 +81,10 @@ OrderBook create_fake_orders(OrderBook book){
     );
 
     book.add_order(
-        345252,         // order_id
+        000003,         // order_id
         true,           // buy_sell
         1,              // shares
-        23.43,          // limit
+        23.44,          // limit
         983485,         // entry_time
         983485          // event_time
     );
@@ -118,7 +102,7 @@ OrderBook create_fake_orders(OrderBook book){
         355257,         // order_id
         true,           // buy_sell
         1,              // shares
-        23.41,          // limit
+        23.45,          // limit
         983485,         // entry_time
         983485          // event_time
     ); 

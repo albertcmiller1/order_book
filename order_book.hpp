@@ -12,6 +12,7 @@ struct Match {
 };
 
 // doubly LL
+// how to add constructors to structs 
 struct Order {
     int order_id;
     bool buy_sell;
@@ -21,31 +22,26 @@ struct Order {
     int event_time;
     Order* next {nullptr};
     Order* prev {nullptr};
-    Limit* parent_limit {nullptr};
+    // Limit* parent_limit {nullptr};
 };
 
-// Binary Search Tree
 struct Limit {
     float limit_price;
     int size;
     int total_volume;
-    Limit *parent {nullptr};
-    Limit *left {nullptr};
-    Limit *right {nullptr};
-    Order *head_order {nullptr};
-    Order *tail_order {nullptr};
+    Order *head_order; // constructor ? 
+    Order *tail_order;
 };
 
 class OrderBook {
 public:
-    Limit *limit_tree_head {nullptr};
-    Order *order_ll_head {nullptr};
-    Order *order_ll_tail {nullptr};
-    std::unordered_map<int, Order> order_map = {}; // key is order_id
     std::unordered_map<float, Limit> limit_map = {}; // key is limit price
+    std::unordered_map<int, Order> order_map = {}; // key is order_id
 
     bool order_map_is_empty() const;
     bool limit_map_is_empty() const;
+
+    void print_list(Order *n);
 
     void add_order(
         int order_id,
@@ -56,14 +52,13 @@ public:
         int event_time
     );
 
-    void insert_limit_map(
+    Limit& insert_limit_map(
         float limit_price,
         int size,
         int total_volume
     );
 
-
-    void insert_order_dll(Order order, Limit* parent_limit);
+    void insert_order_dll(Order order, Limit &limit_node);
     
     Limit* search_limit_tree(Limit *root, int limit_price);
     Limit* insert_limit_tree(Limit *root, float value);
