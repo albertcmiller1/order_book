@@ -1,14 +1,6 @@
 #include "order_book.hpp" 
 using namespace std; 
 
-bool OrderBook::order_map_is_empty() const {
-    return order_map.empty();
-}
-
-bool OrderBook::limit_map_is_empty() const {
-    return limit_map.empty();
-}
-
 void OrderBook::add_order(
         int order_id,
         bool buy_sell,
@@ -94,7 +86,7 @@ void OrderBook::print_list(Order *n) {
 
 std::ostream& operator<<(std::ostream& os, const OrderBook& book){
     cout << "\n";
-    if (book.order_map_is_empty()){
+    if (book.order_map.empty()){
         os << "ORDER MAP EMPTY";
         return os;
     }
