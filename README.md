@@ -5,7 +5,7 @@
 This repo simulates an order book using a doubly linked list and two hash maps. Each entry in the limit_map contains a unique limit price. Each of these entries has a pointer to a linked list containing orders. I found some information about how an order book may be designed [here](https://web.archive.org/web/20110219163448/http://howtohft.wordpress.com/2011/02/15/how-to-build-a-fast-limit-order-book/).
 
 ### Connecting to the book
-The orderbook will host an API which will allow a user to post an order, cancel an order, and check the current status of their order. This API will also allow an admin to list or delist a new stock at an "IPO" price.
+The orderbook will host a websocket which will allow a user to post an order, cancel an order, and check the current status of their order. This socket will also allow an admin to list or delist a new stock at an "IPO" price.
 
 ### Trading bots
 To simulate market activity, 26 threads will continuously post buy and sell orders at random prices. This will stimulate the book enough for users to stream live prices, and enable a user to activly post buy and sell orders with paper stocks using the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository. 
