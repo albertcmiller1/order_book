@@ -80,21 +80,10 @@ if(CROW_INSTALL)
   )
 endif()
 
-set(CPACK_GENERATOR "DEB")
-set(CPACK_PACKAGE_NAME "Crow")
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "CrowCpp")
-set(CPACK_PACKAGE_VENDOR "CrowCpp")
-set(CPACK_PACKAGE_DESCRIPTION "A Fast and Easy to use C++ microframework for the web.")
-set(CPACK_PACKAGE_HOMEPAGE_URL "https://crowcpp.org")
-set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "all")
-set(CPACK_DEBIAN_PACKAGE_DEBUG OFF)
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libasio-dev")
-set(CPACK_DEBIAN_PACKAGE_SECTION "libdevel")
-
 include(CPack)
 
-add_executable(example_websocket example_ws.cpp)
-target_link_libraries(example_websocket PUBLIC Crow::Crow)
+add_executable(socket socket.cpp)
+target_link_libraries(socket PUBLIC Crow::Crow)
 
 #####################################
 # Uninstall Files
