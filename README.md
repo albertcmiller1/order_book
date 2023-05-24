@@ -28,9 +28,10 @@ The book, trading bot threads, and connection API will be apart of the same proc
 * [stock exchange design](https://www.youtube.com/watch?v=XuKs2kWH0mQ&ab_channel=System-Design)
 
 ## Future ideas
+* not sure we can have both an API and a WS hosted as the same time. Instead, just use an ws to both brodcast info and accept incoming messages? 
 * how to build a driver for much faster performance? 
 * other data structure ideas for the order book?
-* frontend to view the spread [example](https://www.youtube.com/watch?v=hgOXY-r3xJM&ab_channel=ChadThackray)
+* frontend to view the spread. broadcast the needed info using socket [example](https://www.youtube.com/watch?v=hgOXY-r3xJM&ab_channel=ChadThackray)
 * convert all lambdas to python
 * only run the bots during market hours
 * maybe using an AWS SQS would be better for holding buy and sell orders? then we could have a more distrubuted matching service aka more scalable 
