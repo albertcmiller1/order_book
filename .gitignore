@@ -1,7 +1,7 @@
 build/
 logs/
 cmake/
-include/
+aws/
 
 # Prerequisites
 *.d
