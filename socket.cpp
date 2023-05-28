@@ -1,10 +1,36 @@
-#include "crow.h"
-#include <unordered_set>
-#include <mutex>
+#include "socket.hpp"
 
+std::unordered_map<std::string, char*> parse_args(int argc, char** argv){
+    std::unordered_map<std::string, char*> arg_map = {};
+    for (int i = 1; i < argc; ++i){
+        if (!strcmp("--order_id", argv[i])){
+            arg_map["order_id"] = argv[i+1];
+        } else if (!strcmp("--limit", argv[i])){
+            arg_map["limit"] = argv[i+1];
+        } else if (!strcmp("--shares", argv[i])){
+            arg_map["shares"] = argv[i+1];
+        } else if (!strcmp("--buy_sell", argv[i])){
+            // validate string == buy or sell 
+            arg_map["buy_sell"] =  argv[i+1];
+        } else if (!strcmp("--event_time", argv[i])){
+            arg_map["event_time"] = argv[i+1];
+        } else if (!strcmp("--entry_time", argv[i])){
+            arg_map["entry_time"] = argv[i+1];
+        }
+    }
 
-int main()
-{
+    /*
+    if (arg_map.find("order_id") == arg_map.end()) {
+        // this price is not in the limit map-- update limit_map. 
+    } else {
+        // this price is already in the limit_map. 
+    }
+    */
+
+    return arg_map;
+}
+
+void start_socket_server(OrderBook book){
     crow::SimpleApp app;
 
     std::mutex mtx;
@@ -23,12 +49,12 @@ int main()
       })
       .onmessage([&](crow::websocket::connection& /*conn*/, const std::string& data, bool is_binary) {
           std::lock_guard<std::mutex> _(mtx);
-          for (auto u : users)
+          for (auto user : users)
               if (is_binary)
-                  u->send_binary(data);
+                  user->send_binary(data);
               else {
                   std::cout << "data: " << data << std::endl;
-                  u->send_text(data);
+                  user->send_text(data);
               }
       });
 
@@ -39,4 +65,31 @@ int main()
     app.port(5001)
       .multithreaded()
       .run();
+}
+
+void trading_bot(OrderBook book){
+    while (true){
+        sleep(5);  
+        std::cout << "THREAD still working" << std::endl;
+       
+        // book.add_order(
+        //     000003,         // order_id
+        //     true,           // buy_sell
+        //     1,              // shares
+        //     23.44,          // limit
+        //     983485,         // entry_time
+        //     983485          // event_time
+        // );
+    }
+}
+
+int main(){
+    std::cout << "Hello order boook\n";
+    OrderBook book;
+
+    std::cout << "starting trading bot threads 1\n";
+    std::thread th1(trading_bot, book);
+
+    std::cout << "all bots up. starting webserver\n";
+    start_socket_server(book);
 }
