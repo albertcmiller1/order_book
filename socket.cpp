@@ -32,7 +32,11 @@ int main()
               }
       });
 
-    app.port(40080)
+    CROW_ROUTE(app, "/")([](){
+        return "Hello world\n";
+    });
+
+    app.port(5001)
       .multithreaded()
       .run();
 }
