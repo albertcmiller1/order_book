@@ -71,7 +71,7 @@ OrderBook create_fake_orders(OrderBook book){
     uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     book.add_order(
         order_id,           // order_id
-        "sell",              // buy_sell
+        "sell",             // buy_sell
         1,                  // shares
         23.49,              // limit
         curr_time,          // entry_time
@@ -84,7 +84,7 @@ OrderBook create_fake_orders(OrderBook book){
     curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     book.add_order(
         order_id,           // order_id
-        "sell",              // buy_sell
+        "sell",             // buy_sell
         1,                  // shares
         23.48,              // limit
         curr_time,          // entry_time
@@ -96,7 +96,7 @@ OrderBook create_fake_orders(OrderBook book){
     curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     book.add_order(
         order_id,           // order_id
-        "sell",              // buy_sell
+        "sell",             // buy_sell
         1,                  // shares
         23.47,              // limit
         curr_time,          // entry_time
@@ -108,7 +108,7 @@ OrderBook create_fake_orders(OrderBook book){
     curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     book.add_order(
         order_id,           // order_id
-        "sell",              // buy_sell
+        "sell",             // buy_sell
         1,                  // shares
         23.46,              // limit
         curr_time,          // entry_time
@@ -120,7 +120,7 @@ OrderBook create_fake_orders(OrderBook book){
     curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     book.add_order(
         order_id,           // order_id
-        "sell",              // buy_sell
+        "sell",             // buy_sell
         1,                  // shares
         23.45,              // limit
         curr_time,          // entry_time

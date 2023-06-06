@@ -14,11 +14,11 @@ struct Match {
 // doubly LL
 struct Order {
     int order_id;
-    bool buy_sell;
+    std::string buy_sell;
     int shares;
     float limit;
-    int entry_time;
-    int event_time;
+    unsigned long long entry_time;
+    unsigned long long event_time;
     Order* next {nullptr};
     Order* prev {nullptr};
 };
@@ -38,11 +38,11 @@ public:
 
     void add_order(
         int order_id,
-        bool buy_sell,
+        std::string buy_sell,
         int shares,
         float limit,
-        int entry_time,
-        int event_time
+        unsigned long long entry_time,
+        unsigned long long event_time
     );
 
     Limit& insert_limit_map(
@@ -50,6 +50,8 @@ public:
         int size,
         int total_volume
     );
+
+    void check_for_match();
 
     void insert_order_dll(Order order, Limit &limit_node);
     void print_list(Order *n);
