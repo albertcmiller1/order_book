@@ -1,10 +1,13 @@
 #include <iostream>
 #include <iomanip>
+#include <unistd.h>  
+#include <cstdlib>
+#include <chrono>
 
 struct Limit;
 
 struct Match {
-    std::string match_id;
+    int match_id;
     int buying_order_id;
     int selling_order_id;
     int sale_quantity;
@@ -36,6 +39,10 @@ public:
     std::unordered_map<float, Limit> limit_map = {};    // key is limit price
     std::unordered_map<int, Order> order_map = {};      // key is order_id
 
+    // can either be their price, or a pointer to the actual node
+    Limit lowest_buy_offer;
+    Limit highest_sell_offer;
+
     void add_order(
         int order_id,
         std::string buy_sell,
@@ -51,7 +58,7 @@ public:
         int total_volume
     );
 
-    void check_for_match();
+    void check_for_match(Order incomming_order, Limit &limit_node);
 
     void insert_order_dll(Order order, Limit &limit_node);
     void print_list(Order *n);

@@ -18,7 +18,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # endif()
 
 # Set required C++ standard
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 set(CMAKE_BUILD_TYPE "Release") # "debug"
@@ -82,7 +82,7 @@ endif()
 
 include(CPack)
 
-add_executable(socket socket.cpp)
+add_executable(socket socket.cpp order_book.cpp)
 target_link_libraries(socket PUBLIC Crow::Crow)
 
 #####################################

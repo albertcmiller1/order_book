@@ -43,7 +43,7 @@ std::unordered_map<string, char*> parse_args(int argc, char** argv){
 int main(int argc, char** argv){
     OrderBook book;
     book = create_fake_orders(book);
-    cout << book << endl;
+    std::cout << book << std::endl;
     return 0;
 }
 
@@ -189,6 +189,30 @@ OrderBook create_fake_orders(OrderBook book){
         curr_time           // event_time
     ); 
 
+    order_id = rand();
+    usleep(microseconds);
+    curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    book.add_order(
+        order_id,           // order_id
+        "buy",              // buy_sell
+        1,                  // shares
+        23.41,              // limit
+        curr_time,          // entry_time
+        curr_time           // event_time
+    ); 
+
+
+    order_id = rand();
+    usleep(microseconds);
+    curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    book.add_order(
+        order_id,           // order_id
+        "sell",             // buy_sell
+        1,                  // shares
+        23.41,              // limit
+        curr_time,          // entry_time
+        curr_time           // event_time
+    ); 
     
     return book;
 }
