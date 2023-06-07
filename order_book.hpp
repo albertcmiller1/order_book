@@ -37,6 +37,8 @@ struct Limit {
 class OrderBook {
 public:
     std::unordered_map<float, Limit> limit_map = {};    // key is limit price
+    
+    // TODO: would be cool if this was a pointer to the order instead 
     std::unordered_map<int, Order> order_map = {};      // key is order_id
 
     // can either be their price, or a pointer to the actual node

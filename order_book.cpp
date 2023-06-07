@@ -124,8 +124,10 @@ void OrderBook::check_for_match(Order incomming_order, Limit &limit_node){
             1,                          // sale_quantity;
             incomming_order.limit       // sale_price;
         };
-
+        std::cout << "new match: \n";
         std::cout << new_match.match_id << std::endl;
+        std::cout << new_match.buying_order_id << std::endl;
+        std::cout << new_match.selling_order_id << std::endl;
 
         // remove old (matched with) order from DLL
         // delete the order to save memroy 
