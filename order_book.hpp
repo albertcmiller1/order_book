@@ -39,7 +39,7 @@ public:
     std::unordered_map<float, Limit> limit_map = {};    // key is limit price
     
     // TODO: would be cool if this was a pointer to the order instead 
-    std::unordered_map<int, Order> order_map = {};      // key is order_id
+    std::unordered_map<int, Order*> order_map = {};      // key is order_id
 
     // can either be their price, or a pointer to the actual node
     Limit lowest_buy_offer;
@@ -60,9 +60,9 @@ public:
         int total_volume
     );
 
-    void check_for_match(Order incomming_order, Limit &limit_node);
+    void check_for_match(Order *incomming_order, Limit &limit_node);
 
-    void insert_order_dll(Order order, Limit &limit_node);
+    void insert_order_dll(Order *order, Limit &limit_node);
     void print_list(Order *n);
     friend std::ostream& operator<<(std::ostream& os, const OrderBook& book);
 };
