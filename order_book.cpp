@@ -3,7 +3,7 @@ using namespace std;
 
 void OrderBook::add_order(
         int order_id,
-        std::string buy_sell,
+        std::string order_type,
         int shares,
         float limit_price,
         unsigned long long entry_time,
@@ -11,16 +11,13 @@ void OrderBook::add_order(
     ){
 
     // add new order to order_map
-    
     Order *new_order_ptr = new Order {
         order_id,
-        buy_sell,
+        order_type,
         shares, 
         limit_price,
         entry_time,
         event_time
-        // nullptr,
-        // nullptr
     };
 
     order_map[order_id] = new_order_ptr;
@@ -40,10 +37,11 @@ void OrderBook::add_order(
         // if the incoming order is the opposite type of the current existing orders in the Limit's DLL, we can make a trade 
         // NOTE: also could make a trade if buy offer > sell offer ... but how do we know ? 
         this->check_for_match(new_order_ptr, limit_node);
-
+        
         // else we need to just append into DLL
         this->insert_order_dll(new_order_ptr, limit_node);
     }
+
 }
 
 void OrderBook::insert_order_dll(Order *order, Limit &limit_node){
@@ -52,7 +50,7 @@ void OrderBook::insert_order_dll(Order *order, Limit &limit_node){
         Order *new_node = new Order;
 
         new_node->order_id = order->order_id;
-        new_node->buy_sell = order->buy_sell;
+        new_node->order_type = order->order_type;
         new_node->shares = order->shares;
         new_node->limit = order->limit;
         new_node->entry_time = order->entry_time;
@@ -67,7 +65,7 @@ void OrderBook::insert_order_dll(Order *order, Limit &limit_node){
         Order *first_node = new Order;
         
         first_node->order_id = order->order_id;
-        first_node->buy_sell = order->buy_sell;
+        first_node->order_type = order->order_type;
         first_node->shares = order->shares;
         first_node->limit = order->limit;
         first_node->entry_time = order->entry_time;
@@ -93,27 +91,32 @@ Limit& OrderBook::insert_limit_map(float limit_price, int size, int total_volume
     return limit_map[limit_price];
 }
 
-void OrderBook::check_for_match(Order *incomming_order, Limit &limit_node){
-    std::cout << "checking for match\n";
-    std::cout << "incoming order's order_id: " << incomming_order->order_id << std::endl;
-    std::cout << "incoming order's order type: " << incomming_order->buy_sell << std::endl;
-    
-    std::cout << "existing limit_node's head order's order_type: " << limit_node.head_order->buy_sell << std::endl;
+void validate(){
+    // go through each limit price in limit_map
+    // make sure all orders attached at that price are of the same order_type. 
+}
 
+int OrderBook::check_for_match(Order *incomming_order, Limit &limit_node){
+    
+    // std::cout << "existing limit_node's head order's order_type: " << limit_node.head_order->order_type << std::endl;
 
     // compare against limit price's DLL
     // NOTE: this is only comparing against head order. i think sould be fine though. (all order of a Limit dll should have the same order type, and the DLL's head should always be the oldest order.)
-    if (incomming_order->buy_sell != limit_node.head_order->buy_sell){
+    Order *curr_old_order = limit_node.head_order;
+
+    std::cout << "checking for match...\n";
+
+    if (incomming_order->order_type != curr_old_order->order_type){
         std::cout << "MATCH ALERT!!!\n";
         int buyers_order_id {0};
         int sellers_order_id {0};
         srand((unsigned) time(NULL));
 
-        if (incomming_order->buy_sell == "buy"){
+        if (incomming_order->order_type == "buy"){
             buyers_order_id = incomming_order->order_id;
-            sellers_order_id = limit_node.head_order->order_id;
+            sellers_order_id = curr_old_order->order_id;
         } else {
-            buyers_order_id = limit_node.head_order->order_id;
+            buyers_order_id = curr_old_order->order_id;
             sellers_order_id = incomming_order->order_id;
         }
 
@@ -123,20 +126,46 @@ void OrderBook::check_for_match(Order *incomming_order, Limit &limit_node){
             buyers_order_id,            // buying_order_id;
             sellers_order_id,           // selling_order_id;
             1,                          // sale_quantity;
-            incomming_order->limit       // sale_price;
+            incomming_order->limit      // sale_price;
         };
+
         std::cout << "new match: \n";
         std::cout << new_match.match_id << std::endl;
         std::cout << new_match.buying_order_id << std::endl;
         std::cout << new_match.selling_order_id << std::endl;
+        std::cout << new_match.sale_quantity << std::endl;
 
-        // remove old (matched with) order from DLL
-        // delete the order to save memroy 
+        // if incomming_order.shares == curr_old_order.shares ... good to delete old and create match 
+
+        if (incomming_order->shares == curr_old_order->shares){
+            // remove old (matched with) order from DLL
+            std::cout << "gonna delete: " << curr_old_order->order_id << std::endl;
+
+            this->print_list(limit_node.head_order);
+
+            std::cout << "deleting first node... \n";
+            limit_node.head_order = curr_old_order->next;
+            limit_node.head_order->prev = nullptr;
+            // delete the order to save memroy 
+            delete curr_old_order;
+
+            this->print_list(limit_node.head_order);
+            return 0;
+
+        } else if (incomming_order->shares > curr_old_order->shares){
+            std::cout << "create match, delete curr_old_order, and continue trying to fill orders \n";
+            return 0;
+        } else {
+            // incomming_order->shares < curr_old_order->shares
+            std::cout << "create match, partially fill curr_old_order, update curr_old_order, delete incomming_order, return.\n";
+            return 0;
+        }
     }
 
     // TODO: compare against lowest_buy_offer and highest_sell_offer
 
     std::cout << "\n\n";
+    return 0;
 }
 
 
@@ -160,12 +189,12 @@ std::ostream& operator<<(std::ostream& os, const OrderBook& book){
     std::cout << "------------" << std::endl;
     std::cout << "order_id\t   limit        qantity\t\tbuy-sell" << std::endl;
     for (auto it = book.order_map.begin(); it != book.order_map.end(); it++){
-        os << it->first << "\t   " << it->second->limit << "\t" << it->second->shares << "\t\t" << it->second->buy_sell << std::endl;
+        os << it->first << "\t   " << it->second->limit << "\t" << it->second->shares << "\t\t" << it->second->order_type << std::endl;
     }
 
     std::cout << "\n\nlimit_map: " << std::endl;
     std::cout << "------------" << std::endl;
-    std::cout << "price      volume       orders" << std::endl;
+    std::cout << "price      volume       num_orders \t order_ids" << std::endl;
     for (auto it = book.limit_map.begin(); it != book.limit_map.end(); it++){
         // this is O(n) -- instead, just keep a new field on Limit.num_orders
         int num_orders_at_limit_price {0};
@@ -173,8 +202,16 @@ std::ostream& operator<<(std::ostream& os, const OrderBook& book){
         while (curr != nullptr) {
             num_orders_at_limit_price++;
             curr = curr->next;
-        }
-        os << it->first << "\t   " << it->second.total_volume << "\t\t"  << num_orders_at_limit_price << std::endl;
+        };
+
+        std::string s = " ";
+        Order *n = it->second.head_order;
+        while (n != nullptr) {
+                s = s + std::to_string(n->order_id) + " ";
+                n = n->next;
+        };
+
+        os << it->first << "\t   " << it->second.total_volume << "\t\t"  << num_orders_at_limit_price << "\t\t" << s << std::endl;
     }
 
     return os;
