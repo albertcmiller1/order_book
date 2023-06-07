@@ -42,8 +42,8 @@ public:
     std::unordered_map<int, Order*> order_map = {};      // key is order_id
 
     // can either be their price, or a pointer to the actual node
-    Limit lowest_buy_offer;
-    Limit highest_sell_offer;
+    Limit *lowest_buy_offer {nullptr};
+    Limit *highest_sell_offer {nullptr};
 
     void add_order(
         int order_id,

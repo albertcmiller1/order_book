@@ -26,7 +26,7 @@ void OrderBook::add_order(
         // this price doesnt exist in limit map yet. create new limit node and add to limit_map. 
         Limit& limit_node = this->insert_limit_map(limit_price, shares, shares);
 
-        // add the incoming order to new limit node. 
+        // add the first order to new limit node. 
         this->insert_order_dll(new_order_ptr, limit_node);
     } else {
         // price exists in limit map, find it 
@@ -45,7 +45,7 @@ void OrderBook::add_order(
 }
 
 void OrderBook::insert_order_dll(Order *order, Limit &limit_node){
-    // O(1) insertion and should also guarantee the LL is ordererd from newest to oldest 
+    // O(1) insertion and should also guarantee the LL is ordererd from oldest to newest
     if (limit_node.head_order) {
         Order *new_node = new Order;
 
@@ -81,12 +81,24 @@ void OrderBook::insert_order_dll(Order *order, Limit &limit_node){
 
 Limit& OrderBook::insert_limit_map(float limit_price, int size, int total_volume){
     // TODO: update lowest_buy_offer and highest_sell_offer
+    // if (this->lowest_buy_offer){
+        
+    // } else {
+    //     this->lowest_buy_offer = limit_price;
+    // }
 
+    // NOTE: no need to update head_order or tail_order 
     limit_map[limit_price] = Limit {
         limit_price,
         size,
         total_volume
     };
+
+    // limit_map[limit_price] = Limit {
+    //     limit_price,
+    //     size,
+    //     total_volume
+    // };
 
     return limit_map[limit_price];
 }
@@ -167,7 +179,6 @@ int OrderBook::check_for_match(Order *incomming_order, Limit &limit_node){
     std::cout << "\n\n";
     return 0;
 }
-
 
 void OrderBook::print_list(Order *n) {
     cout << "\nPrinting list..." << endl;

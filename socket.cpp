@@ -49,13 +49,19 @@ void start_socket_server(OrderBook book){
       })
       .onmessage([&](crow::websocket::connection& /*conn*/, const std::string& data, bool is_binary) {
           std::lock_guard<std::mutex> _(mtx);
-          for (auto user : users)
-              if (is_binary)
-                  user->send_binary(data);
-              else {
-                  std::cout << "data: " << data << std::endl;
-                  user->send_text(data);
-              }
+        
+            // parse message and create order  
+            // parse_args()
+            // book.add_order()
+
+            // broadcast message to all connectued users 
+            for (auto user : users)
+                if (is_binary)
+                    user->send_binary(data);
+                else {
+                    std::cout << "data: " << data << std::endl;
+                    user->send_text(data);
+                }
       });
 
     CROW_ROUTE(app, "/")([](){
