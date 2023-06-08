@@ -74,3 +74,22 @@ struct Match {
     float sale_price;
 }
 ```
+
+
+23.41 buy 
+23.42 buy 
+23.43 buy 
+23.44 buy 
+SPREAD
+23.46 sell
+23.47 sell
+23.48 sell
+23.49 sell
+
+Right now, if I post a buy order for 23.50, ill get a crossed the spread message
+but if I post a buy order for 23.49, it will match up both buyer and seller at 23.49, when it probably should match up the 23.49 buyer with the 23.46 seller. 
+
+to help solve this, we need to have a list/tree/array of the limit nodes, and keep this list sorted. 
+
+
+

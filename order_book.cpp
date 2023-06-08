@@ -10,6 +10,26 @@ void OrderBook::add_order(
         unsigned long long event_time
     ){
 
+    // this is the wrong place to do this
+    if (order_type == "buy"){
+        if (this->highest_buy_offer){
+            if (limit_price > this->highest_buy_offer){
+                this->highest_buy_offer = limit_price;
+            }        
+        } else {
+            this->highest_buy_offer = limit_price;
+        }
+    }
+    if (order_type == "sell"){
+        if (this->lowest_sell_offer){
+            if (limit_price < this->lowest_sell_offer){
+                this->lowest_sell_offer = limit_price;
+            }        
+        } else {
+            this->lowest_sell_offer = limit_price;
+        }    
+    }
+
     // add new order to order_map
     Order *new_order_ptr = new Order {
         order_id,
@@ -26,22 +46,22 @@ void OrderBook::add_order(
         // this price doesnt exist in limit map yet. create new limit node and add to limit_map. 
         Limit& limit_node = this->insert_limit_map(limit_price, shares, shares);
 
-        // add the first order to new limit node. 
+        // check if new limit price crosses the spread 
+        this->check_for_match(new_order_ptr, limit_node);
+
+        // add the first order to new limit node. [only do this if a match was not made.]
         this->insert_order_dll(new_order_ptr, limit_node);
     } else {
         // price exists in limit map, find it 
         auto it = limit_map.find(limit_price); 
         Limit &limit_node = it->second;  
 
-
         // if the incoming order is the opposite type of the current existing orders in the Limit's DLL, we can make a trade 
-        // NOTE: also could make a trade if buy offer > sell offer ... but how do we know ? 
         this->check_for_match(new_order_ptr, limit_node);
         
         // else we need to just append into DLL
         this->insert_order_dll(new_order_ptr, limit_node);
     }
-
 }
 
 void OrderBook::insert_order_dll(Order *order, Limit &limit_node){
@@ -80,25 +100,12 @@ void OrderBook::insert_order_dll(Order *order, Limit &limit_node){
 }
 
 Limit& OrderBook::insert_limit_map(float limit_price, int size, int total_volume){
-    // TODO: update lowest_buy_offer and highest_sell_offer
-    // if (this->lowest_buy_offer){
-        
-    // } else {
-    //     this->lowest_buy_offer = limit_price;
-    // }
-
     // NOTE: no need to update head_order or tail_order 
     limit_map[limit_price] = Limit {
         limit_price,
         size,
         total_volume
     };
-
-    // limit_map[limit_price] = Limit {
-    //     limit_price,
-    //     size,
-    //     total_volume
-    // };
 
     return limit_map[limit_price];
 }
@@ -118,8 +125,10 @@ int OrderBook::check_for_match(Order *incomming_order, Limit &limit_node){
 
     std::cout << "checking for match...\n";
 
-    if (incomming_order->order_type != curr_old_order->order_type){
-        std::cout << "MATCH ALERT!!!\n";
+    if (curr_old_order && incomming_order->order_type != curr_old_order->order_type){
+        // TODO: need some kinda if here to also ensure this section of logic only get hit
+        // if the spread hasnt been crossed. 
+
         int buyers_order_id {0};
         int sellers_order_id {0};
         srand((unsigned) time(NULL));
@@ -133,50 +142,56 @@ int OrderBook::check_for_match(Order *incomming_order, Limit &limit_node){
         }
 
         // create a new match 
-        Match new_match = Match {
-            rand(),                     // match_id
-            buyers_order_id,            // buying_order_id;
-            sellers_order_id,           // selling_order_id;
-            1,                          // sale_quantity;
-            incomming_order->limit      // sale_price;
-        };
-
-        std::cout << "new match: \n";
-        std::cout << new_match.match_id << std::endl;
-        std::cout << new_match.buying_order_id << std::endl;
-        std::cout << new_match.selling_order_id << std::endl;
-        std::cout << new_match.sale_quantity << std::endl;
-
-        // if incomming_order.shares == curr_old_order.shares ... good to delete old and create match 
+        // Match new_match = Match {
+        //     rand(),                     // match_id
+        //     buyers_order_id,            // buying_order_id;
+        //     sellers_order_id,           // selling_order_id;
+        //     1,                          // sale_quantity;
+        //     incomming_order->limit      // sale_price;
+        // };
 
         if (incomming_order->shares == curr_old_order->shares){
             // remove old (matched with) order from DLL
-            std::cout << "gonna delete: " << curr_old_order->order_id << std::endl;
+            std::cout << "perfect match between buyer and seller" << std::endl;
 
-            this->print_list(limit_node.head_order);
+            // std::cout << "gonna delete: " << curr_old_order->order_id << std::endl;
+            // this->print_list(limit_node.head_order);
 
-            std::cout << "deleting first node... \n";
-            limit_node.head_order = curr_old_order->next;
-            limit_node.head_order->prev = nullptr;
-            // delete the order to save memroy 
-            delete curr_old_order;
+            // std::cout << "deleting first node... \n";
+            // limit_node.head_order = curr_old_order->next;
+            // limit_node.head_order->prev = nullptr;
+            // // delete the order to save memroy 
+            // delete curr_old_order;
 
-            this->print_list(limit_node.head_order);
+            // this->print_list(limit_node.head_order);
             return 0;
 
         } else if (incomming_order->shares > curr_old_order->shares){
-            std::cout << "create match, delete curr_old_order, and continue trying to fill orders \n";
+            std::cout << "incoming order wants to buy/sell more orders than the curr_old_order has. create match, delete curr_old_order, and continue trying to fill orders \n";
+            std::cout << "\n\n";
             return 0;
         } else {
             // incomming_order->shares < curr_old_order->shares
-            std::cout << "create match, partially fill curr_old_order, update curr_old_order, delete incomming_order, return.\n";
+            std::cout << "incoming order does not have enough shares to completely fill curr_old_order. create match, partially fill curr_old_order, update curr_old_order, delete incomming_order, return.\n";
+            std::cout << "\n\n";
             return 0;
         }
+    } else if (incomming_order->order_type == "buy" && incomming_order->limit > this->lowest_sell_offer){
+        std::cout << "new buy order has crossed the spread ...";
+        // this should only happen if the limit node associated with the new order has an empty DLL
+        return 0;
+    } else if (incomming_order->order_type == "sell" && incomming_order->limit < this->highest_buy_offer){
+        std::cout << "new sell order has crossed the spread ...";
+        // this should only happen if the limit node associated with the new order has an empty DLL
+        return 0;
+    } else {
+        std::cout << "no match here\n";
+        std::cout << "\n\n";
+        return 0;
     }
+}
 
-    // TODO: compare against lowest_buy_offer and highest_sell_offer
-
-    std::cout << "\n\n";
+int OrderBook::cancel_order(){
     return 0;
 }
 
@@ -195,10 +210,12 @@ std::ostream& operator<<(std::ostream& os, const OrderBook& book){
         os << "ORDER MAP EMPTY";
         return os;
     }
+    std::cout << "HIGHEST BUY OFFER: " << book.highest_buy_offer << std::endl;
+    std::cout << "LOWEST SELL OFFER: " << book.lowest_sell_offer << std::endl;
 
-    std::cout << "order_map: " << std::endl;
+    std::cout << "\norder_map: " << std::endl;
     std::cout << "------------" << std::endl;
-    std::cout << "order_id\t   limit        qantity\t\tbuy-sell" << std::endl;
+    std::cout << "order_id\t   limit        qantity\t\torder_type" << std::endl;
     for (auto it = book.order_map.begin(); it != book.order_map.end(); it++){
         os << it->first << "\t   " << it->second->limit << "\t" << it->second->shares << "\t\t" << it->second->order_type << std::endl;
     }
