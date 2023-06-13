@@ -90,6 +90,6 @@ Right now, if I post a buy order for 23.50, ill get a crossed the spread message
 but if I post a buy order for 23.49, it will match up both buyer and seller at 23.49, when it probably should match up the 23.49 buyer with the 23.46 seller. 
 
 to help solve this, we need to have a list/tree/array of the limit nodes, and keep this list sorted. 
-
+this will allow us to move up and down the list when an order is completly filled but sill has more potential to create transactions 
 
 

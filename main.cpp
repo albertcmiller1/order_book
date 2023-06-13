@@ -244,8 +244,8 @@ int main(int argc, char** argv){
     OrderBook book;
     book = create_fake_orders_1(book);
     std::cout << book << std::endl;
-    std::cout << "\n\n<--------------------------------------------->\n\n";
-    book = create_fake_orders_2(book);
-    std::cout << book << std::endl;
+    // std::cout << "\n\n<--------------------------------------------->\n\n";
+    // book = create_fake_orders_2(book);
+    // std::cout << book << std::endl;
     return 0;
 }
