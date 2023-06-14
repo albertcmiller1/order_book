@@ -31,6 +31,7 @@ struct Limit {
     float limit_price;
     int size;
     int total_volume;
+    int num_orders;
     Order *head_order; 
     Order *tail_order;
     Limit *next;
@@ -67,8 +68,7 @@ public:
     int create_match(Order *incomming_order, Limit &limit_node);
 
     int insert_limit_dll(Limit *new_limit);
-    int check_for_spread_cross(Order *incomming_order, Limit &limit_node);
-    int check_for_limit_match(Order *incomming_order, Limit &limit_node);
+    bool check_for_spread_cross(Order *incomming_order, Limit &limit_node);
     int cancel_order();
     void insert_order_dll(Order *order, Limit &limit_node);
     void print_list(Order *n);

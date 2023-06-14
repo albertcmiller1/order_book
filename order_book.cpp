@@ -41,11 +41,11 @@ void OrderBook::add_order(
         auto it = limit_map.find(limit_price); 
         Limit &limit_node = it->second;  
 
-        // if the incoming order is the opposite type of the current existing orders in the Limit's DLL, we can make a trade 
-        this->check_for_spread_cross(new_order_ptr, limit_node);
-        
-        // else we need to just append into DLL
-        this->insert_order_dll(new_order_ptr, limit_node);
+        if (this->check_for_spread_cross(new_order_ptr, limit_node)){
+            std::cout << "match has been created \n";
+        } else {
+            this->insert_order_dll(new_order_ptr, limit_node);
+        }
         
         // this is the wrong place to do this
         this->update_limit_spread(limit_node, new_order_ptr->order_type);
@@ -115,6 +115,7 @@ Limit& OrderBook::insert_limit_map(float limit_price, int size, int total_volume
         limit_price,
         size,
         total_volume,
+        1,
         nullptr, 
         nullptr, 
         nullptr, 
@@ -168,36 +169,38 @@ int OrderBook::validate(){
     return 0;
 }
 
-int OrderBook::check_for_spread_cross(Order *incomming_order, Limit &limit_node){
+bool OrderBook::check_for_spread_cross(Order *incomming_order, Limit &limit_node){
     
     // compare against limit price's DLL
     // NOTE: this is only comparing against head order. i think sould be fine though. (all order of a Limit dll should have the same order type, and the DLL's head should always be the oldest order.)
-    Order *curr_old_order = limit_node.head_order;
+    Order *old_order = limit_node.head_order;
 
     if (!this->lowest_sell_limit || !this->highest_buy_limit){
         // cant compare this buy/sell order bc we dont have both buy and sell orders yet
-        return 0;
+        return false;
     } else if (incomming_order->order_type == "buy" && incomming_order->limit >= this->lowest_sell_limit->limit_price){
         // this should only happen if the limit node associated with the new order has an empty DLL
         std::cout << "new buy order has crossed the spread ...\n";
         this->create_match(incomming_order, limit_node);
-        return 0;
+        std::cout << "TEST ...\n";
+        this->print_list(limit_node.head_order);
+        return true;
     } else if (incomming_order->order_type == "sell" && incomming_order->limit <= this->highest_buy_limit->limit_price){
         std::cout << "new sell order has crossed the spread ...\n";
         this->create_match(incomming_order, limit_node);
         // this should only happen if the limit node associated with the new order has an empty DLL
-        return 0;
+        return true;
     } else {
         // new order did not cross the spread
-        return 0;
+        return false;
     }
 }
 
 int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
     std::cout << "creating match...\n";
-    Order *curr_old_order = limit_node.head_order;
+    Order *old_order = limit_node.head_order;
 
-    if (curr_old_order && incomming_order->order_type != curr_old_order->order_type){
+    if (old_order && incomming_order->order_type != old_order->order_type){
         int buyers_order_id {0};
         int sellers_order_id {0};
         srand((unsigned) time(NULL));
@@ -205,13 +208,13 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
         // set buyer and seller
         if (incomming_order->order_type == "buy"){
             buyers_order_id = incomming_order->order_id;
-            sellers_order_id = curr_old_order->order_id;
+            sellers_order_id = old_order->order_id;
         } else {
-            buyers_order_id = curr_old_order->order_id;
+            buyers_order_id = old_order->order_id;
             sellers_order_id = incomming_order->order_id;
         }
 
-        if (incomming_order->shares == curr_old_order->shares){
+        if (incomming_order->shares == old_order->shares){
             // remove old (matched with) order from DLL
             std::cout << "perfect match between buyer (" << buyers_order_id << ") and seller (" << sellers_order_id << ")"  << std::endl;
 
@@ -224,41 +227,36 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
                 incomming_order->limit      // sale_price;
             };
 
-            // delete curr_old_order
-            std::cout << "deleting old order... \n";
-            limit_node.head_order = curr_old_order->next;
-            limit_node.head_order->prev = nullptr;
-            delete curr_old_order;
-
+            // delete head 
+            std::cout << "deleting old order..." << old_order->order_id << std::endl;
+            limit_node.head_order = limit_node.head_order->next;
+            if (limit_node.head_order) { limit_node.head_order->prev=nullptr; }
+            this->order_map.erase(old_order->order_id);
+            delete old_order;
 
             // delete incomming_order.
-            std::cout << "deleting incoming order... \n";
+            std::cout << "deleting incoming order... " << incomming_order->order_id << std::endl;
             this->order_map.erase(incomming_order->order_id);
-            incomming_order->prev->next = incomming_order->next;
-            incomming_order->next->prev = incomming_order->prev;
             delete incomming_order;
 
-
-            
             if (!limit_node.head_order){
                 // if limit has no orders, delete it!
                 std::cout << "DELETING ORDER\n";
                 limit_node.prev->next = limit_node.next;
                 limit_node.next->prev = limit_node.prev;
                 this->limit_map.erase(limit_node.limit_price);
-                delete &limit_node;
+                // delete &limit_node; // dont need to delete bc limit_node is on stack? 
             }
-
 
             return 0;
 
-        } else if (incomming_order->shares > curr_old_order->shares){
-            std::cout << "incoming order wants to buy/sell more orders than the curr_old_order has. create match, delete curr_old_order, and continue trying to fill orders \n";
+        } else if (incomming_order->shares > old_order->shares){
+            std::cout << "incoming order wants to buy/sell more orders than the old_order has. create match, delete old_order, and continue trying to fill orders \n";
             std::cout << "\n\n";
             return 0;
         } else {
-            // incomming_order->shares < curr_old_order->shares
-            std::cout << "incoming order does not have enough shares to completely fill curr_old_order. create match, partially fill curr_old_order, update curr_old_order, delete incomming_order, return.\n";
+            // incomming_order->shares < old_order->shares
+            std::cout << "incoming order does not have enough shares to completely fill old_order. create match, partially fill old_order, update old_order, delete incomming_order, return.\n";
             std::cout << "\n\n";
             return 0;
         }
@@ -269,70 +267,6 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
 
 }
 
-
-int OrderBook::check_for_limit_match(Order *incomming_order, Limit &limit_node){
-    
-    // compare against limit price's DLL
-    // NOTE: this is only comparing against head order. i think sould be fine though. (all order of a Limit dll should have the same order type, and the DLL's head should always be the oldest order.)
-    Order *curr_old_order = limit_node.head_order;
-
-
-    // while (incomming_order->order_type != curr_old_order->order_type && )
-
-    if (curr_old_order && incomming_order->order_type != curr_old_order->order_type){
-        int buyers_order_id {0};
-        int sellers_order_id {0};
-        srand((unsigned) time(NULL));
-
-        if (incomming_order->order_type == "buy"){
-            buyers_order_id = incomming_order->order_id;
-            sellers_order_id = curr_old_order->order_id;
-        } else {
-            buyers_order_id = curr_old_order->order_id;
-            sellers_order_id = incomming_order->order_id;
-        }
-
-        // create a new match 
-        // Match new_match = Match {
-        //     rand(),                     // match_id
-        //     buyers_order_id,            // buying_order_id;
-        //     sellers_order_id,           // selling_order_id;
-        //     1,                          // sale_quantity;
-        //     incomming_order->limit      // sale_price;
-        // };
-
-        if (incomming_order->shares == curr_old_order->shares){
-            // remove old (matched with) order from DLL
-            std::cout << "perfect match between buyer and seller" << std::endl;
-
-            // std::cout << "gonna delete: " << curr_old_order->order_id << std::endl;
-            // this->print_list(limit_node.head_order);
-
-            // std::cout << "deleting first node... \n";
-            // limit_node.head_order = curr_old_order->next;
-            // limit_node.head_order->prev = nullptr;
-            // // delete the order to save memroy 
-            // delete curr_old_order;
-
-            // this->print_list(limit_node.head_order);
-            return 0;
-
-        } else if (incomming_order->shares > curr_old_order->shares){
-            std::cout << "incoming order wants to buy/sell more orders than the curr_old_order has. create match, delete curr_old_order, and continue trying to fill orders \n";
-            std::cout << "\n\n";
-            return 0;
-        } else {
-            // incomming_order->shares < curr_old_order->shares
-            std::cout << "incoming order does not have enough shares to completely fill curr_old_order. create match, partially fill curr_old_order, update curr_old_order, delete incomming_order, return.\n";
-            std::cout << "\n\n";
-            return 0;
-        }
-    } else {
-        std::cout << "no match here\n";
-        std::cout << "\n\n";
-        return 0;
-    }
-}
 
 int OrderBook::cancel_order(){
     return 0;
