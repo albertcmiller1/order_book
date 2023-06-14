@@ -44,11 +44,10 @@ public:
     
     Limit *sorted_limit_prices_head {nullptr};
     Limit *sorted_limit_prices_tail {nullptr};
-    int num_limit_prices {0}; 
+    int num_limit_nodes {0}; 
 
-    // can either be their price, or a pointer to the actual node
-    float highest_buy_offer {0.00}; // could just be an int of the index of the sorted_limit_prices vector 
-    float lowest_sell_offer {0.00};
+    Limit *highest_buy_limit {nullptr}; 
+    Limit *lowest_sell_limit {nullptr};
 
     void add_order(
         int order_id,
@@ -64,6 +63,8 @@ public:
         int size,
         int total_volume
     );
+    
+    int create_match(Order *incomming_order, Limit &limit_node);
 
     int insert_limit_dll(Limit *new_limit);
     int check_for_spread_cross(Order *incomming_order, Limit &limit_node);
@@ -72,7 +73,7 @@ public:
     void insert_order_dll(Order *order, Limit &limit_node);
     void print_list(Order *n);
     int validate();
-    void update_best_offers(Order &order);
+    void update_limit_spread(Limit &limit, std::string order_type);
     friend std::ostream& operator<<(std::ostream& os, const OrderBook& book);
 };
 

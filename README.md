@@ -93,3 +93,6 @@ to help solve this, we need to have a list/tree/array of the limit nodes, and ke
 this will allow us to move up and down the list when an order is completly filled but sill has more potential to create transactions 
 
 
+ways a match can occur: 
+> new order comes in much higher or lower than the spread 
+> new order comes in at an exact match 
