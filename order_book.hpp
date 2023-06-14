@@ -33,13 +33,18 @@ struct Limit {
     int total_volume;
     Order *head_order; 
     Order *tail_order;
+    Limit *next;
+    Limit *prev;
 };
 
 class OrderBook {
 public:
     std::unordered_map<float, Limit> limit_map = {};    // key is limit price
     std::unordered_map<int, Order*> order_map = {};     // key is order_id
-    std::vector <Limit> sorted_limit_prices;
+    
+    Limit *sorted_limit_prices_head {nullptr};
+    Limit *sorted_limit_prices_tail {nullptr};
+    int num_limit_prices {0}; 
 
     // can either be their price, or a pointer to the actual node
     float highest_buy_offer {0.00}; // could just be an int of the index of the sorted_limit_prices vector 
@@ -60,9 +65,9 @@ public:
         int total_volume
     );
 
-    int insert_limit_array(Limit new_limit);
-    int check_for_match_1(Order *incomming_order, Limit &limit_node);
-    int check_for_match_2(Order *incomming_order, Limit &limit_node);
+    int insert_limit_dll(Limit *new_limit);
+    int check_for_spread_cross(Order *incomming_order, Limit &limit_node);
+    int check_for_limit_match(Order *incomming_order, Limit &limit_node);
     int cancel_order();
     void insert_order_dll(Order *order, Limit &limit_node);
     void print_list(Order *n);

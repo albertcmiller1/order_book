@@ -44,7 +44,7 @@ std::unordered_map<string, char*> parse_args(int argc, char** argv){
 
 
 
-OrderBook create_fake_orders_1(OrderBook book){
+void create_fake_orders_1(OrderBook &book){
     
     /*
     // only do this if arg_map is fully populated 
@@ -95,7 +95,7 @@ OrderBook create_fake_orders_1(OrderBook book){
         order_id,           // order_id
         "sell",             // order_type
         1,                  // shares
-        23.47,              // limit
+        23.51,              // limit
         curr_time,          // entry_time
         curr_time           // event_time
     );
@@ -169,7 +169,7 @@ OrderBook create_fake_orders_1(OrderBook book){
         order_id,           // order_id
         "buy",              // order_type
         1,                  // shares
-        23.41,              // limit
+        23.47,              // limit
         curr_time,          // entry_time
         curr_time           // event_time
     ); 
@@ -212,11 +212,11 @@ OrderBook create_fake_orders_1(OrderBook book){
     //     curr_time           // event_time
     // ); 
     
-    return book;
+    // return book;
 }
 
 
-OrderBook create_fake_orders_2(OrderBook book){
+void create_fake_orders_2(OrderBook &book){
     
     srand((unsigned) time(NULL));
     int order_id = rand();
@@ -230,22 +230,23 @@ OrderBook create_fake_orders_2(OrderBook book){
         order_id,           // order_id
         "sell",              // order_type
         1,                  // shares
-        23.42,              // limit
+        23.45,              // limit
         curr_time,          // entry_time
         curr_time           // event_time
     );
 
-    return book;
+    // return book;
 }
 
 
 
 int main(int argc, char** argv){
     OrderBook book;
-    book = create_fake_orders_1(book);
+    create_fake_orders_1(book);
     std::cout << book << std::endl;
-    // std::cout << "\n\n<--------------------------------------------->\n\n";
-    // book = create_fake_orders_2(book);
+    // std::cout << "\n\n<--------------------------------------------->\n";
+    // std::cout << "<--------------------------------------------->\n\n";
+    // create_fake_orders_2(book);
     // std::cout << book << std::endl;
     return 0;
 }
