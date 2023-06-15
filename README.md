@@ -96,3 +96,21 @@ this will allow us to move up and down the list when an order is completly fille
 ways a match can occur: 
 > new order comes in much higher or lower than the spread 
 > new order comes in at an exact match 
+
+
+> 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.45/sell/1 23.46/sell/1 23.47/sell/1
+> order to buy 2 shares @23.46 --> cross over to next limit node
+
+
+> 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.45/sell/1 23.46/sell/1 23.46/sell/1 23.47/sell/1
+> order to buy 2 shares @23.46 --> travers DLL
+
+> 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.46/sell/1 
+> order to buy 2 shares @23.46 --> what do we do with 23.46 limit node? 
+
+
+
+> 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.45/sell/1 23.46/sell/3 23.46/sell/1 23.47/sell/1
+> order to buy 2 shares @23.46 --> travers DLL
+
+

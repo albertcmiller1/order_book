@@ -137,6 +137,19 @@ void create_fake_orders_1(OrderBook &book){
         curr_time           // event_time
     ); 
 
+
+    order_id = rand();
+    usleep(microseconds);
+    curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    book.add_order(
+        order_id,           // order_id
+        "sell",             // order_type
+        1,                  // shares
+        23.46,              // limit
+        curr_time,          // entry_time
+        curr_time           // event_time
+    ); 
+
     // SPREAD
 
     order_id = rand();
@@ -240,9 +253,9 @@ void create_fake_orders_2(OrderBook &book){
     usleep(microseconds);
     curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     book.add_order(
-        1111111111,           // order_id
+        1111111111,         // order_id
         "buy",              // order_type
-        1,                  // shares
+        5,                  // shares
         23.46,              // limit
         curr_time,          // entry_time
         curr_time           // event_time

@@ -19,6 +19,7 @@ struct Match {
 struct Order {
     int order_id;
     std::string order_type;
+    // int customer_id;
     int shares;
     float limit;
     unsigned long long entry_time;
@@ -47,6 +48,7 @@ public:
     Limit *sorted_limit_prices_tail {nullptr};
     int num_limit_nodes {0}; 
 
+    // instead of having these, we could insert a dummy "spread" limit node between best buy and best sell
     Limit *highest_buy_limit {nullptr}; 
     Limit *lowest_sell_limit {nullptr};
 
@@ -66,9 +68,8 @@ public:
     );
     
     int create_match(Order *incomming_order, Limit &limit_node);
-
     int insert_limit_dll(Limit *new_limit);
-    bool check_for_spread_cross(Order *incomming_order, Limit &limit_node);
+    bool order_crossed_spread(Order *incomming_order, Limit &limit_node);
     int cancel_order();
     void insert_order_dll(Order *order, Limit &limit_node);
     void print_list(Order *n);
