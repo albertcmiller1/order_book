@@ -9,9 +9,9 @@ std::unordered_map<std::string, char*> parse_args(int argc, char** argv){
             arg_map["limit"] = argv[i+1];
         } else if (!strcmp("--shares", argv[i])){
             arg_map["shares"] = argv[i+1];
-        } else if (!strcmp("--buy_sell", argv[i])){
+        } else if (!strcmp("--order_type", argv[i])){
             // validate string == buy or sell 
-            arg_map["buy_sell"] =  argv[i+1];
+            arg_map["order_type"] =  argv[i+1];
         } else if (!strcmp("--event_time", argv[i])){
             arg_map["event_time"] = argv[i+1];
         } else if (!strcmp("--entry_time", argv[i])){
@@ -49,13 +49,19 @@ void start_socket_server(OrderBook book){
       })
       .onmessage([&](crow::websocket::connection& /*conn*/, const std::string& data, bool is_binary) {
           std::lock_guard<std::mutex> _(mtx);
-          for (auto user : users)
-              if (is_binary)
-                  user->send_binary(data);
-              else {
-                  std::cout << "data: " << data << std::endl;
-                  user->send_text(data);
-              }
+        
+            // parse message and create order  
+            // parse_args()
+            // book.add_order()
+
+            // broadcast message to all connectued users 
+            for (auto user : users)
+                if (is_binary)
+                    user->send_binary(data);
+                else {
+                    std::cout << "data: " << data << std::endl;
+                    user->send_text(data);
+                }
       });
 
     CROW_ROUTE(app, "/")([](){
@@ -74,7 +80,7 @@ void trading_bot(OrderBook book){
        
         // book.add_order(
         //     000003,         // order_id
-        //     true,           // buy_sell
+        //     true,           // order_type
         //     1,              // shares
         //     23.44,          // limit
         //     983485,         // entry_time
