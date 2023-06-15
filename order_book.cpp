@@ -31,11 +31,13 @@ void OrderBook::add_order(
         // check if new limit price crosses the spread 
         this->order_crossed_spread(new_order_ptr, limit_node);
 
+        // prob need to do something similar as below 
         // add the first order to new limit node. [only do this if a match was not made.]
         this->insert_order_dll(new_order_ptr, limit_node);
 
         // this is the wrong place to do this
-        this->update_limit_spread(limit_node, new_order_ptr->order_type);
+        // this->update_limit_spread(limit_node, new_order_ptr->order_type);
+        this->update_limit_spread_new();
     } else {
         // price exists in limit map, find it 
         auto it = limit_map.find(limit_price); 
@@ -43,14 +45,67 @@ void OrderBook::add_order(
 
         if (!this->order_crossed_spread(new_order_ptr, limit_node)){
             this->insert_order_dll(new_order_ptr, limit_node);
-        } else {
-            std::cout << "match has been created \n";
-        }
+        } 
         
         // this is the wrong place to do this
-        this->update_limit_spread(limit_node, new_order_ptr->order_type);
+        // this->update_limit_spread(limit_node, new_order_ptr->order_type);
+        this->update_limit_spread_new();
     }
 }
+
+void OrderBook::update_limit_spread_new(){
+
+    Limit *curr = this->sorted_limit_prices_head;
+
+    while (curr != nullptr) {
+        // loop over all limits 
+        Order *n = curr->head_order;
+
+        bool all_same = true;
+        std::string first_order_type = n->order_type;
+
+        while (n != nullptr) {
+            // loop over limit's orders from oldest to newest 
+            if (n->order_type != first_order_type){
+                all_same = false;
+            }
+            n = n->next;
+        };
+
+        if (!all_same){
+            cout << "??????AGGHH\n" << endl;
+
+        } else if (this->highest_buy_limit == nullptr && curr->head_order->order_type == "buy"){
+            this->highest_buy_limit = curr;
+        
+        } else if (this->lowest_sell_limit == nullptr && curr->head_order->order_type == "sell"){
+            this->lowest_sell_limit = curr;
+
+        } else if (curr->head_order->order_type == "buy" && curr->limit_price > this->highest_buy_limit->limit_price) {
+            this->highest_buy_limit = curr;
+
+        } else if (curr->head_order->order_type == "sell" && curr->limit_price < this->lowest_sell_limit->limit_price){
+            this->lowest_sell_limit = curr;
+
+        } else {
+            cout << "when should this happen? should only occur if the spread cant be updated\n";
+            // if (this->highest_buy_limit){
+            //     cout << " >> this->highest_buy_limit->limit_price: " << this->highest_buy_limit->limit_price << endl;
+            // } else {
+            //     cout << " >> highest_buy_limit hasnt been set yet\n";
+            // }
+            // if (this->lowest_sell_limit){
+            //     cout << " >> this->lowest_sell_limit->limit_price: " << this->lowest_sell_limit->limit_price << endl;
+            // } else {
+            //     cout << " >> lowest_sell_limit hasnt been set yet\n";
+            // }
+            // cout << endl;
+        }
+
+        curr = curr->next;
+    }
+}
+
 
 void OrderBook::update_limit_spread(Limit &limit, std::string order_type){
     if (order_type == "buy"){
@@ -179,12 +234,10 @@ bool OrderBook::order_crossed_spread(Order *incomming_order, Limit &limit_node){
         return false;
     } else if (incomming_order->order_type == "buy" && incomming_order->limit >= this->lowest_sell_limit->limit_price){
         std::cout << "new buy order has crossed the spread ...\n";
-        // what to do if order has a very different limit price and we need to adjust the limit_node? 
         this->create_match(incomming_order, limit_node);
         return true;
     } else if (incomming_order->order_type == "sell" && incomming_order->limit <= this->highest_buy_limit->limit_price){
         std::cout << "new sell order has crossed the spread ...\n";
-        // what to do if order has a very different limit price and we need to adjust the limit_node? 
         this->create_match(incomming_order, limit_node);
         return true;
     } else {
@@ -193,8 +246,11 @@ bool OrderBook::order_crossed_spread(Order *incomming_order, Limit &limit_node){
     }
 }
 
+
 int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
     std::cout << "attempting to create a match...\n";
+    Limit *tmp_prev = limit_node.prev;
+    Limit *tmp_next = limit_node.next;
 
     if (limit_node.head_order && incomming_order->order_type != limit_node.head_order->order_type){
         int buyers_order_id {0};
@@ -203,6 +259,7 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
 
         // set buyer and seller
         if (incomming_order->order_type == "buy"){
+            bool is_buy = true;
             buyers_order_id = incomming_order->order_id;
             sellers_order_id = limit_node.head_order->order_id;
         } else {
@@ -214,7 +271,7 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
             // remove old (matched with) order from DLL
             std::cout << "perfect match between buyer (" << buyers_order_id << ") and seller (" << sellers_order_id << ")"  << std::endl;
 
-            this->print_list(limit_node.head_order);
+            // this->print_list(limit_node.head_order);
 
             // create a new match 
             Match new_match = Match {
@@ -242,14 +299,31 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
 
             if (!limit_node.head_order){
                 // if limit has no orders, delete it
-                std::cout << "DELETING LIMIT NODE\n";
-                limit_node.prev->next = limit_node.next;
-                limit_node.next->prev = limit_node.prev;
-                this->limit_map.erase(limit_node.limit_price);
+                std::cout << "\nLIMIT NODE is all out of orders!\n";
+                std::cout << "\nDELETING LIMIT NODE\n";
+
+                if (limit_node.prev && limit_node.next){
+                    limit_node.prev->next = limit_node.next;
+                    limit_node.next->prev = limit_node.prev;
+                    this->limit_map.erase(limit_node.limit_price);
+                } else if (limit_node.prev && !limit_node.next){
+                    // tail 
+                    limit_node.prev->next = nullptr;
+                    this->limit_map.erase(limit_node.limit_price);
+                }
+                
+
+
+                
+                // reset spread 
+                std::cout << "\nresetting best buy/sell\n";
+                this->highest_buy_limit = nullptr;
+                this->lowest_sell_limit = nullptr;
+                this->update_limit_spread_new();
                 // delete &limit_node; // dont need to delete bc limit_node is on stack? 
             }
 
-            this->print_list(limit_node.head_order);
+            // this->print_list(limit_node.head_order);
             return 0;
 
         } else if (incomming_order->shares > limit_node.head_order->shares){
@@ -282,6 +356,10 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
 
                 // update the incoming order (subtract the shares)
                 incomming_order->shares -= limit_node.head_order->shares;
+                if (incomming_order->shares < 0){
+                    cout << "SOMETHING VERY BAD HAS HAPPENED!!\n";
+                }
+
 
                 std::cout << "_____original incoming order after update____" << std::endl;
                 std::cout << "shares: " << incomming_order->shares << std::endl;
@@ -319,18 +397,36 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
             
 
             if (incomming_order->shares == 0){
+                // incoming order has been completley filled 
                 std::cout << "deleting order: " << incomming_order->order_id << std::endl;
                 this->order_map.erase(incomming_order->order_id);
                 delete incomming_order;
             } else {
-                // change limit nodes and keep going 
-                std::cout << "changing limit nodes and trying again\n" << std::endl;
-                // this->create_match(incomming_order, *limit_node.next);
+                // change limit nodes and keep trying to fill order 
+                std::cout << "\nchanging limit nodes and trying again\n" << std::endl;
+                if (incomming_order->order_type == "buy") {
+                    // std::cout << "\nCURRENT LIMIT: " << limit_node.limit_price << std::endl;
+                    std::cout << "\ntrying again with: " << tmp_prev->limit_price << std::endl;
+                    this->create_match(incomming_order, *tmp_prev);
+                } else {
+                    std::cout << "\ntrying again with: " << tmp_prev->limit_price << std::endl;
+                    this->create_match(incomming_order, *tmp_next);
+                }
             }
 
+            std::cout << "PASTTTT!\n" << std::endl;
+            if (incomming_order->shares > 0){
+                // if after all this the order still persits, we need to create it a limit node. 
+                std::cout << "incoming order still has shares to buy/sell!\n" << std::endl;
+                // TODO: add lefter order to DLL/map and ensure it has a limit node
+            } else if (incomming_order->shares == 0){
+                std::cout << "incoming order has been fully filled!\n" << std::endl;
+                // move best/worst limits
+            } else {
+                std::cout << "BAD NEW BEARS\n" << std::endl;
+            }
 
-            // if after all this the order still persits, we need to create it a limit node. 
-            // i think this should only happen if the initial order was massive and eats up all the others 
+            this->update_limit_spread_new();
 
             std::cout << "\n\n";
             return 0;
@@ -361,13 +457,25 @@ void OrderBook::print_list(Order *n) {
 } 
 
 std::ostream& operator<<(std::ostream& os, const OrderBook& book){
+
+
     cout << "\n";
     if (book.order_map.empty()){
         os << "ORDER MAP EMPTY";
         return os;
     }
-    std::cout << "HIGHEST BUY OFFER: " << book.highest_buy_limit->limit_price << std::endl;
-    std::cout << "LOWEST SELL OFFER: " << book.lowest_sell_limit->limit_price << std::endl;
+
+    if (book.highest_buy_limit){
+        std::cout << "HIGHEST BUY OFFER: " << book.highest_buy_limit->limit_price << std::endl;
+    } else {
+        std::cout << "NO BUY OFFERS YET: " << std::endl;
+    }
+
+    if (book.lowest_sell_limit){
+        std::cout << "LOWEST SELL OFFER: " << book.lowest_sell_limit->limit_price << std::endl;
+    } else {
+        std::cout << "NO SELL OFFERS YET: " << std::endl;
+    }
 
     std::cout << "\norder_map: " << std::endl;
     std::cout << "------------" << std::endl;
@@ -398,10 +506,17 @@ std::ostream& operator<<(std::ostream& os, const OrderBook& book){
         os << it->first << "\t   " << it->second.total_volume << "\t\t"  << num_orders_at_limit_price << "\t\t" << s << std::endl;
     }
 
-    std::cout << "\n\nSORTED LIMIT ARRAY: \n";
+    cout << "\nPrinting list NEW..." << endl;
     Limit *curr = book.sorted_limit_prices_head;
     while (curr != nullptr) {
-        cout << curr->limit_price << " ";
+        std::string s = " ";
+        Order *n = curr->head_order;
+        while (n != nullptr) {
+
+            s = s + std::to_string(n->order_id) + "/" + n->order_type + "/" + std::to_string(n->shares) + "/" + std::to_string(n->limit) + " ";
+            n = n->next;
+        };
+        cout << curr->limit_price << ": " << s << endl;
         curr = curr->next;
     }
 

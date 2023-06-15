@@ -102,14 +102,18 @@ ways a match can occur:
 > order to buy 2 shares @23.46 --> cross over to next limit node
 
 
+> 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.45/sell/1 23.46/sell/1 23.47/sell/1
+> order to buy 3 shares @23.46 --> cross over to next limit node
+
 > 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.45/sell/1 23.46/sell/1 23.46/sell/1 23.47/sell/1
 > order to buy 2 shares @23.46 --> travers DLL
 
+
 > 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.46/sell/1 
-> order to buy 2 shares @23.46 --> what do we do with 23.46 limit node? 
+> order to buy 2 shares @23.46 --> complete 1 order, delete limit node, create new limit node, update spread 
 
 
-
+# this works
 > 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.45/sell/1 23.46/sell/3 23.46/sell/1 23.47/sell/1
 > order to buy 2 shares @23.46 --> travers DLL
 

@@ -67,6 +67,7 @@ public:
         int total_volume
     );
     
+    void update_limit_spread_new();
     int create_match(Order *incomming_order, Limit &limit_node);
     int insert_limit_dll(Limit *new_limit);
     bool order_crossed_spread(Order *incomming_order, Limit &limit_node);
