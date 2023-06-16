@@ -19,7 +19,13 @@ void OrderBook::add_order(
         event_time
     };
 
-
+    // std::cout << "_________incoming order____________" << std::endl;
+    // std::cout << "shares: " << new_order_ptr->shares << std::endl;
+    // std::cout << "order_type: " << new_order_ptr->order_type << std::endl;
+    // std::cout << "limit: " << new_order_ptr->limit << std::endl;
+    // std::cout << "order_id: " << new_order_ptr->order_id << std::endl;
+    // std::cout << "_______________________________" << std::endl;
+    
     // add new order to order_map
     order_map[order_id] = new_order_ptr;
 
@@ -54,7 +60,9 @@ void OrderBook::add_order(
 }
 
 void OrderBook::update_limit_spread_new(){
-
+    // this is very inificent (but safe)
+    this->highest_buy_limit = nullptr;
+    this->lowest_sell_limit = nullptr;
     Limit *curr = this->sorted_limit_prices_head;
 
     while (curr != nullptr) {
@@ -88,7 +96,7 @@ void OrderBook::update_limit_spread_new(){
             this->lowest_sell_limit = curr;
 
         } else {
-            cout << "when should this happen? should only occur if the spread cant be updated\n";
+            // cout << "when should this happen? should only occur if the spread cant be updated\n";
             // if (this->highest_buy_limit){
             //     cout << " >> this->highest_buy_limit->limit_price: " << this->highest_buy_limit->limit_price << endl;
             // } else {
@@ -105,7 +113,6 @@ void OrderBook::update_limit_spread_new(){
         curr = curr->next;
     }
 }
-
 
 void OrderBook::update_limit_spread(Limit &limit, std::string order_type){
     if (order_type == "buy"){
@@ -246,7 +253,6 @@ bool OrderBook::order_crossed_spread(Order *incomming_order, Limit &limit_node){
     }
 }
 
-
 int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
     std::cout << "attempting to create a match...\n";
     Limit *tmp_prev = limit_node.prev;
@@ -270,8 +276,6 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
         if (incomming_order->shares == limit_node.head_order->shares){
             // remove old (matched with) order from DLL
             std::cout << "perfect match between buyer (" << buyers_order_id << ") and seller (" << sellers_order_id << ")"  << std::endl;
-
-            // this->print_list(limit_node.head_order);
 
             // create a new match 
             Match new_match = Match {
@@ -299,8 +303,7 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
 
             if (!limit_node.head_order){
                 // if limit has no orders, delete it
-                std::cout << "\nLIMIT NODE is all out of orders!\n";
-                std::cout << "\nDELETING LIMIT NODE\n";
+                std::cout << "\nlimit node is all out of orders! DELETING LIMIT NODE\n";
 
                 if (limit_node.prev && limit_node.next){
                     limit_node.prev->next = limit_node.next;
@@ -312,33 +315,17 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
                     this->limit_map.erase(limit_node.limit_price);
                 }
                 
-
-
-                
-                // reset spread 
-                std::cout << "\nresetting best buy/sell\n";
-                this->highest_buy_limit = nullptr;
-                this->lowest_sell_limit = nullptr;
                 this->update_limit_spread_new();
                 // delete &limit_node; // dont need to delete bc limit_node is on stack? 
             }
 
-            // this->print_list(limit_node.head_order);
             return 0;
 
         } else if (incomming_order->shares > limit_node.head_order->shares){
             std::cout << "incoming order wants to " << incomming_order->order_type << " more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders \n";
 
-            std::cout << "_________original incoming order____________" << std::endl;
-            std::cout << "shares: " << incomming_order->shares << std::endl;
-            std::cout << "order_type: " << incomming_order->order_type << std::endl;
-            std::cout << "limit: " << incomming_order->limit << std::endl;
-            std::cout << "order_id: " << incomming_order->order_id << std::endl;
-            std::cout << "_______________________________" << std::endl;
-
+            std::cout << "STARTING traversing limit node (" << limit_node.limit_price << ") orders to create matches.\n" << std::endl;
             while (limit_node.head_order && incomming_order->shares > 0){
-                std::cout << "STARTING LOOP\n" << std::endl;
-                
                 // create a new order which will match the quantity of the limit_node.head_order 
                 srand((unsigned) time(NULL));
                 int order_id = rand();
@@ -360,75 +347,48 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
                     cout << "SOMETHING VERY BAD HAS HAPPENED!!\n";
                 }
 
-
-                std::cout << "_____original incoming order after update____" << std::endl;
-                std::cout << "shares: " << incomming_order->shares << std::endl;
-                std::cout << "order_type: " << incomming_order->order_type << std::endl;
-                std::cout << "limit: " << incomming_order->limit << std::endl;
-                std::cout << "order_id: " << incomming_order->order_id << std::endl;
-                std::cout << "_______________________________" << std::endl;
-
-
-                std::cout << "_____new branched order from incoming order____" << std::endl;
-                std::cout << "shares: " << new_order_ptr->shares << std::endl;
-                std::cout << "order_type: " << new_order_ptr->order_type << std::endl;
-                std::cout << "limit: " << new_order_ptr->limit << std::endl;
-                std::cout << "order_id: " << new_order_ptr->order_id << std::endl;
-                std::cout << "_______________________________" << std::endl;
-                
-                
                 // recursion to create match 
-                std::cout << "... starting recursion ....\n";
                 this->create_match(new_order_ptr, limit_node);
-                std::cout << "... past recursion ....\n";
-
-                std::cout << "ENDING LOOP\n\n\n\n\n" << std::endl;
             }
-            
-            std::cout << "OUTSIDE LOOP\n\n\n\n\n" << std::endl;
-
-
-            std::cout << "_____original incoming order after update____" << std::endl;
-            std::cout << "shares: " << incomming_order->shares << std::endl;
-            std::cout << "order_type: " << incomming_order->order_type << std::endl;
-            std::cout << "limit: " << incomming_order->limit << std::endl;
-            std::cout << "order_id: " << incomming_order->order_id << std::endl;
-            std::cout << "_______________________________" << std::endl;
-            
+            std::cout << "DONE traversing limit node's orders.\n" << std::endl;
 
             if (incomming_order->shares == 0){
-                // incoming order has been completley filled 
+                std::cout << "incoming order has been completley filled :)\n";
                 std::cout << "deleting order: " << incomming_order->order_id << std::endl;
                 this->order_map.erase(incomming_order->order_id);
                 delete incomming_order;
             } else {
                 // change limit nodes and keep trying to fill order 
-                std::cout << "\nchanging limit nodes and trying again\n" << std::endl;
+                std::cout << "\nchanging limit nodes and "; 
                 if (incomming_order->order_type == "buy") {
-                    // std::cout << "\nCURRENT LIMIT: " << limit_node.limit_price << std::endl;
-                    std::cout << "\ntrying again with: " << tmp_prev->limit_price << std::endl;
+                    std::cout << "trying again with: " << tmp_prev->limit_price << std::endl;
                     this->create_match(incomming_order, *tmp_prev);
                 } else {
-                    std::cout << "\ntrying again with: " << tmp_prev->limit_price << std::endl;
+                    std::cout << "trying again with: " << tmp_next->limit_price << std::endl;
                     this->create_match(incomming_order, *tmp_next);
                 }
             }
 
-            std::cout << "PASTTTT!\n" << std::endl;
+
             if (incomming_order->shares > 0){
-                // if after all this the order still persits, we need to create it a limit node. 
-                std::cout << "incoming order still has shares to buy/sell!\n" << std::endl;
-                // TODO: add lefter order to DLL/map and ensure it has a limit node
+                std::cout << "incoming order still has shares to buy/sell! creating it a limit node.\n" << std::endl;
+
+                if (this->limit_map.find(incomming_order->limit) == this->limit_map.end()) {
+                    Limit& limit_node = this->insert_limit_map(incomming_order->limit, incomming_order->shares, incomming_order->shares);
+                    this->insert_limit_dll(&limit_node);
+                    this->insert_order_dll(incomming_order, limit_node);
+                } else {
+                    std::cout << "Limit node already exists ???\n" << std::endl;
+                }
+
+                this->update_limit_spread_new();
+
             } else if (incomming_order->shares == 0){
                 std::cout << "incoming order has been fully filled!\n" << std::endl;
-                // move best/worst limits
             } else {
                 std::cout << "BAD NEW BEARS\n" << std::endl;
             }
 
-            this->update_limit_spread_new();
-
-            std::cout << "\n\n";
             return 0;
         } else {
             // incomming_order->shares < limit_node.head_order->shares
@@ -437,7 +397,7 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
             return 0;
         }
     } else {
-        std::cout << "this should never happen! ???\n";
+        std::cout << "this should only happen if we are trying to match a buyer with a buyer or the limit node we have doesnt have any orders.\n";
         return 0;
     }
 }

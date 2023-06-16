@@ -118,3 +118,10 @@ ways a match can occur:
 > order to buy 2 shares @23.46 --> travers DLL
 
 
+23.41:  346716994/buy/1/23.410000 
+23.42:  1727002778/buy/1/23.420000 
+23.43:  1419918206/buy/1/23.430000 
+23.44:  1279988315/buy/1/23.440001 
+23.47:  1111111111/buy/1/23.469999 
+
+> then a sell order for 2 shares at 23.44
