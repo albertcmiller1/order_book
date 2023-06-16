@@ -371,14 +371,20 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
 
 
             if (incomming_order->shares > 0){
-                std::cout << "incoming order still has shares to buy/sell! creating it a limit node.\n" << std::endl;
-
+                std::cout << "\nincoming order still has shares to buy/sell! " << std::endl;
                 if (this->limit_map.find(incomming_order->limit) == this->limit_map.end()) {
+                    std::cout << ">> creating it a limit node: ";
+
                     Limit& limit_node = this->insert_limit_map(incomming_order->limit, incomming_order->shares, incomming_order->shares);
                     this->insert_limit_dll(&limit_node);
                     this->insert_order_dll(incomming_order, limit_node);
+                    
+                    std::cout << limit_node.limit_price << std::endl;
                 } else {
-                    std::cout << "Limit node already exists ???\n" << std::endl;
+                    std::cout << ">> limit node already exists ???: ";
+                    auto it = limit_map.find(incomming_order->limit); 
+                    Limit &limit_node = it->second;  
+                    std::cout << limit_node.limit_price;
                 }
 
                 this->update_limit_spread_new();
