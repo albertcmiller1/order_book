@@ -74,7 +74,7 @@ void create_fake_orders_1(OrderBook &book){
     book.add_order(
         order_id,           // order_id
         "sell",             // order_type
-        1,                  // shares
+        3,                  // shares
         23.47,              // limit
         curr_time,          // entry_time
         curr_time           // event_time
@@ -124,7 +124,7 @@ void create_fake_orders_1(OrderBook &book){
     book.add_order(
         order_id,           // order_id
         "sell",             // order_type
-        1,                  // shares
+        3,                  // shares
         23.46,              // limit
         curr_time,          // entry_time
         curr_time           // event_time
@@ -136,7 +136,7 @@ void create_fake_orders_1(OrderBook &book){
     book.add_order(
         order_id,           // order_id
         "sell",             // order_type
-        1,                  // shares
+        3,                  // shares
         23.46,              // limit
         curr_time,          // entry_time
         curr_time           // event_time
@@ -148,7 +148,7 @@ void create_fake_orders_1(OrderBook &book){
     book.add_order(
         order_id,           // order_id
         "sell",             // order_type
-        1,                  // shares
+        3,                  // shares
         23.45,              // limit
         curr_time,          // entry_time
         curr_time           // event_time
@@ -162,7 +162,7 @@ void create_fake_orders_1(OrderBook &book){
     book.add_order(
         order_id,           // order_id
         "buy",              // order_type
-        1,                  // shares
+        3,                  // shares
         23.44,              // limit
         curr_time,          // entry_time
         curr_time           // event_time
@@ -174,7 +174,7 @@ void create_fake_orders_1(OrderBook &book){
     book.add_order(
         order_id,           // order_id
         "buy",              // order_type
-        1,                  // shares
+        3,                  // shares
         23.43,              // limit
         curr_time,          // entry_time
         curr_time           // event_time
@@ -186,7 +186,7 @@ void create_fake_orders_1(OrderBook &book){
     book.add_order(
         order_id,           // order_id
         "buy",              // order_type
-        1,                  // shares
+        3,                  // shares
         23.42,              // limit
         curr_time,          // entry_time
         curr_time           // event_time
@@ -199,14 +199,11 @@ void create_fake_orders_1(OrderBook &book){
     book.add_order(
         order_id,           // order_id
         "buy",              // order_type
-        1,                  // shares
+        3,                  // shares
         23.41,              // limit
         curr_time,          // entry_time
         curr_time           // event_time
     ); 
-
-
-
 }
 
 
@@ -223,13 +220,12 @@ void create_fake_orders_2(OrderBook &book){
     book.add_order(
         1111111111,         // order_id
         "buy",              // order_type
-        5,                  // shares
+        7,                  // shares
         23.47,              // limit
         curr_time,          // entry_time
         curr_time           // event_time
     );
 }
-
 
 
 int main(int argc, char** argv){

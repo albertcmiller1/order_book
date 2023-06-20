@@ -342,9 +342,9 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
                 order_map[order_id] = new_order_ptr;
 
                 // update the incoming order (subtract the shares)
-                incomming_order->shares -= limit_node.head_order->shares;
+                incomming_order->shares -= limit_node.head_order->shares; // BUG
                 if (incomming_order->shares < 0){
-                    cout << "SOMETHING VERY BAD HAS HAPPENED!!\n";
+                    cout << "SOMETHING VERY BAD HAS HAPPENED 1!!\n";
                 }
 
                 // recursion to create match 
@@ -398,16 +398,40 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
             return 0;
         } else {
             // incomming_order->shares < limit_node.head_order->shares
-            std::cout << "incoming order does not have enough shares to completely fill limit_node.head_order. create match, partially fill limit_node.head_order, update limit_node.head_order, delete incomming_order, return.\n";
+            std::cout << "incoming " << incomming_order->order_type << " order does not have enough shares to completely fill limit_node.head_order. create match, partially fill limit_node.head_order, update limit_node.head_order, delete incomming_order, return.\n";
+
+            srand((unsigned) time(NULL));
+            int order_id = rand();
+            Order *new_order_ptr = new Order {
+                order_id,                                   // order_id
+                limit_node.head_order->order_type,          // order_type
+                incomming_order->shares,                    // shares
+                limit_node.head_order->limit,               // limit
+                limit_node.head_order->entry_time,          // entry_time
+                limit_node.head_order->event_time           // event_time
+            };
+
+            limit_node.head_order->shares -= incomming_order->shares;
+            if (limit_node.head_order->shares < 0){
+                cout << "SOMETHING VERY BAD HAS HAPPENED 2!!\n";
+            }
+
+            new_order_ptr->next = limit_node.head_order;
+            limit_node.head_order = new_order_ptr;
+
+            this->create_match(incomming_order, limit_node);
+
             std::cout << "\n\n";
             return 0;
         }
     } else {
         std::cout << "this should only happen if we are trying to match a buyer with a buyer or the limit node we have doesnt have any orders.\n";
+        std::cout << "  >> limit_node.head_order->order_type: " << limit_node.head_order->order_type << std::endl;
+        std::cout << "  >> incomming_order->order_type: " << incomming_order->order_type << std::endl;
+        std::cout << "  >> limit_node.head_order: " << limit_node.head_order << std::endl;
         return 0;
     }
 }
-
 
 int OrderBook::cancel_order(){
     return 0;
@@ -416,7 +440,7 @@ int OrderBook::cancel_order(){
 void OrderBook::print_list(Order *n) {
     cout << "\nPrinting list..." << endl;
     while (n != nullptr) {
-        cout << n->order_id << " ";
+        cout << n->order_id << "/" << n->limit << "/" << n->order_type << "/" << n->shares << " ";
         n = n->next;
     }
     cout << "done...\n\n" << endl;

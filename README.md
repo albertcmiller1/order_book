@@ -93,35 +93,26 @@ to help solve this, we need to have a list/tree/array of the limit nodes, and ke
 this will allow us to move up and down the list when an order is completly filled but sill has more potential to create transactions 
 
 
-ways a match can occur: 
-> new order comes in much higher or lower than the spread 
-> new order comes in at an exact match 
-
-
-> 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.45/sell/1 23.46/sell/1 23.47/sell/1
-> order to buy 2 shares @23.46 --> cross over to next limit node
-
-
-> 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.45/sell/1 23.46/sell/1 23.47/sell/1
-> order to buy 3 shares @23.46 --> cross over to next limit node
-
+! this works 
 > 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.45/sell/1 23.46/sell/1 23.46/sell/1 23.47/sell/1
 > order to buy 2 shares @23.46 --> travers DLL
 
 
+!this works
 > 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.46/sell/1 
 > order to buy 2 shares @23.46 --> complete 1 order, delete limit node, create new limit node, update spread 
 
 
-# this works
-> 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.45/sell/1 23.46/sell/3 23.46/sell/1 23.47/sell/1
-> order to buy 2 shares @23.46 --> travers DLL
+! this works
+> 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.45/sell/1 23.46/sell/1 23.47/sell/1
+> order to buy 2 shares @23.46 --> change limit nodes
 
 
-23.41:  346716994/buy/1/23.410000 
-23.42:  1727002778/buy/1/23.420000 
-23.43:  1419918206/buy/1/23.430000 
-23.44:  1279988315/buy/1/23.440001 
-23.47:  1111111111/buy/1/23.469999 
+incoming order does not have enough shares to completely fill limit_node.head_order. create match, partially fill limit_node.head_order, update limit_node.head_order, delete incomming_order, return.
+> 23.41/buy/5 23.42/buy/5 23.43/buy/5     23.45/sell/5 23.46/sell/5 23.47/sell/5
+> order to buy 2 shares @23.46 --> change limit nodes
 
+
+
+> 23.41/buy/1 23.42/buy/1 23.43/buy/1 23.44/buy/1     
 > then a sell order for 2 shares at 23.44
