@@ -67,6 +67,8 @@ public:
         int total_volume
     );
     
+    bool logging {false};
+
     void update_limit_spread_new();
     int create_match(Order *incomming_order, Limit &limit_node);
     int insert_limit_dll(Limit *new_limit);
@@ -78,4 +80,3 @@ public:
     void update_limit_spread(Limit &limit, std::string order_type);
     friend std::ostream& operator<<(std::ostream& os, const OrderBook& book);
 };
-
