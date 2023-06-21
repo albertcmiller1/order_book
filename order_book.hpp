@@ -5,7 +5,7 @@
 #include <chrono>
 #include <vector> 
 
-struct Limit;
+// struct Limit;
 
 struct Match {
     int match_id;
@@ -60,15 +60,10 @@ public:
         unsigned long long entry_time,
         unsigned long long event_time
     );
-
-    Limit& insert_limit_map(
-        float limit_price,
-        int size,
-        int total_volume
-    );
     
     bool logging {false};
 
+    Limit& insert_limit_map(float limit_price, int size, int total_volume);
     void update_limit_spread_new();
     int create_match(Order *incomming_order, Limit &limit_node);
     int insert_limit_dll(Limit *new_limit);

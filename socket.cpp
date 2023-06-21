@@ -38,11 +38,52 @@ std::unordered_map<std::string, char*> parse_args(int argc, char** argv){
     return arg_map;
 }
 
-void start_socket_server(OrderBook book){
-    crow::SimpleApp app;
 
+std::unordered_set<crow::websocket::connection*> users;
+
+void trading_bot(OrderBook book){
+    while (true){
+        sleep(5);  
+        std::cout << "THREAD still working" << std::endl;
+
+
+        for (auto user : users)
+            // std::cout << "data: " << data << std::endl;
+            user->send_text("THREAD still working");
+       
+        // book.add_order(
+        //     000003,         // order_id
+        //     true,           // order_type
+        //     1,              // shares
+        //     23.44,          // limit
+        //     983485,         // entry_time
+        //     983485          // event_time
+        // );
+
+
+        /*
+        // only do this if arg_map is fully populated 
+        std::unordered_map<string, char*> arg_map = parse_args(argc, argv);
+        book.add_order(
+            atoi(arg_map["order_id"]),                  // int order_id
+            !strcmp("buy", arg_map["order_type"]),      // bool order_type
+            atoi(arg_map["shares"]),                    // int shares
+            std::stof(arg_map["limit"]),                // float limit
+            atoi(arg_map["entry_time"]),                // int entry_time
+            atoi(arg_map["event_time"])                 // int event_time
+        );
+        */
+    }
+}
+
+void start_socket_server(OrderBook book){
+
+    crow::SimpleApp app;
     std::mutex mtx;
-    std::unordered_set<crow::websocket::connection*> users;
+
+
+
+
 
     CROW_WEBSOCKET_ROUTE(app, "/ws")
       .onopen([&](crow::websocket::connection& conn) {
@@ -72,51 +113,27 @@ void start_socket_server(OrderBook book){
                 }
       });
 
+
     CROW_ROUTE(app, "/")([](){
         return "Hello world\n";
     });
 
+    std::cout << "starting api + websocket...\n";
     app.port(5001)
       .multithreaded()
       .run();
 }
 
-void trading_bot(OrderBook book){
-    while (true){
-        sleep(5);  
-        std::cout << "THREAD still working" << std::endl;
-       
-        // book.add_order(
-        //     000003,         // order_id
-        //     true,           // order_type
-        //     1,              // shares
-        //     23.44,          // limit
-        //     983485,         // entry_time
-        //     983485          // event_time
-        // );
 
-        /*
-        // only do this if arg_map is fully populated 
-        std::unordered_map<string, char*> arg_map = parse_args(argc, argv);
-        book.add_order(
-            atoi(arg_map["order_id"]),                  // int order_id
-            !strcmp("buy", arg_map["order_type"]),        // bool order_type
-            atoi(arg_map["shares"]),                    // int shares
-            std::stof(arg_map["limit"]),                // float limit
-            atoi(arg_map["entry_time"]),                // int entry_time
-            atoi(arg_map["event_time"])                 // int event_time
-        );
-        */
-    }
-}
 
 int main(){
-    std::cout << "Hello order boook\n";
+    std::cout << "Hello order book\n";
     OrderBook book;
 
-    std::cout << "starting trading bot threads 1\n";
+    std::cout << "starting trading bot thread 1\n";
     std::thread th1(trading_bot, book);
+    std::cout << "thread 1 is up and running\n";
 
-    std::cout << "all bots up. starting webserver\n";
+    std::cout << "starting webserver\n";
     start_socket_server(book);
 }
