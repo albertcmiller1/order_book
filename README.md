@@ -116,3 +116,16 @@ incoming order does not have enough shares to completely fill limit_node.head_or
 
 > 23.41/buy/1 23.42/buy/1 23.43/buy/1 23.44/buy/1     
 > then a sell order for 2 shares at 23.44
+
+
+
+existing: 
+23.41:  1018663624/buy/3/23.410000 
+23.42:  1162029806/buy/3/23.420000 
+23.43:  2016074196/buy/3/23.430000 
+23.44:  2048834942/buy/3/23.440001 
+23.45:  801515218/sell/3/23.450001 
+23.46:  2072714208/sell/3/23.459999 1775455869/sell/3/23.459999 
+23.47:  1235562093/sell/3/23.469999 
+incoming: 
+buy 10 @ 23.46

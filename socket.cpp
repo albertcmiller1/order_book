@@ -27,6 +27,14 @@ std::unordered_map<std::string, char*> parse_args(int argc, char** argv){
     }
     */
 
+
+    // cout << arg_map["order_id"] << endl;
+    // cout << arg_map["limit"] << endl;
+    // cout << arg_map["shares"] << endl;
+    // cout << arg_map["order_type"] << endl;
+    // cout << arg_map["event_time"] << endl;
+    // cout << arg_map["entry_time"] << endl;
+
     return arg_map;
 }
 
@@ -86,6 +94,19 @@ void trading_bot(OrderBook book){
         //     983485,         // entry_time
         //     983485          // event_time
         // );
+
+        /*
+        // only do this if arg_map is fully populated 
+        std::unordered_map<string, char*> arg_map = parse_args(argc, argv);
+        book.add_order(
+            atoi(arg_map["order_id"]),                  // int order_id
+            !strcmp("buy", arg_map["order_type"]),        // bool order_type
+            atoi(arg_map["shares"]),                    // int shares
+            std::stof(arg_map["limit"]),                // float limit
+            atoi(arg_map["entry_time"]),                // int entry_time
+            atoi(arg_map["event_time"])                 // int event_time
+        );
+        */
     }
 }
 

@@ -19,12 +19,12 @@ void OrderBook::add_order(
         event_time
     };
 
-    // std::cout << "_________incoming order____________" << std::endl;
-    // std::cout << "shares: " << new_order_ptr->shares << std::endl;
-    // std::cout << "order_type: " << new_order_ptr->order_type << std::endl;
-    // std::cout << "limit: " << new_order_ptr->limit << std::endl;
-    // std::cout << "order_id: " << new_order_ptr->order_id << std::endl;
-    // std::cout << "_______________________________" << std::endl;
+    if (this->logging) std::cout << "_________incoming order____________" << std::endl;
+    if (this->logging) std::cout << "shares: " << new_order_ptr->shares << std::endl;
+    if (this->logging) std::cout << "order_type: " << new_order_ptr->order_type << std::endl;
+    if (this->logging) std::cout << "limit: " << new_order_ptr->limit << std::endl;
+    if (this->logging) std::cout << "order_id: " << new_order_ptr->order_id << std::endl;
+    if (this->logging) std::cout << "_______________________________" << std::endl;
     
     // add new order to order_map
     order_map[order_id] = new_order_ptr;
@@ -48,19 +48,19 @@ void OrderBook::add_order(
         // price exists in limit map, find it 
         auto it = limit_map.find(limit_price); 
         Limit &limit_node = it->second;  
-
         if (!this->order_crossed_spread(new_order_ptr, limit_node)){
             this->insert_order_dll(new_order_ptr, limit_node);
         } 
-        
+
         // this is the wrong place to do this
         // this->update_limit_spread(limit_node, new_order_ptr->order_type);
         this->update_limit_spread_new();
     }
+
 }
 
 void OrderBook::update_limit_spread_new(){
-    // this is very inificent (but safe)
+    // this is very inificent 
     this->highest_buy_limit = nullptr;
     this->lowest_sell_limit = nullptr;
     Limit *curr = this->sorted_limit_prices_head;
@@ -228,6 +228,7 @@ int OrderBook::insert_limit_dll(Limit *new_limit){
 int OrderBook::validate(){
     // go through each limit price in limit_map
     // make sure all orders attached at that price are of the same order_type. 
+    // would be also good to check that there are no limit nodes with empty orders (could be a memory leak)
     return 0;
 }
 
@@ -235,6 +236,8 @@ bool OrderBook::order_crossed_spread(Order *incomming_order, Limit &limit_node){
     
     // compare against limit price's DLL
     // NOTE: this is only comparing against head order. i think sould be fine though. (all order of a Limit dll should have the same order type, and the DLL's head should always be the oldest order.)
+    
+
 
     if (!this->lowest_sell_limit || !this->highest_buy_limit){
         // cant compare this buy/sell order bc we dont have both buy and sell orders yet
@@ -257,6 +260,7 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
     if (this->logging) std::cout << "attempting to create a match...\n";
     Limit *tmp_prev = limit_node.prev;
     Limit *tmp_next = limit_node.next;
+
 
     if (limit_node.head_order && incomming_order->order_type != limit_node.head_order->order_type){
         int buyers_order_id {0};
@@ -287,7 +291,7 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
 
             // delete head 
             if (this->logging) std::cout << "deleting old order..." << limit_node.head_order->order_id << std::endl;
-            Order *tmp = limit_node.head_order;
+            Order *tmp = limit_node.head_order; // TODO: i think this is a memory leak 
             limit_node.head_order = limit_node.head_order->next;
             if (limit_node.head_order) { 
                 limit_node.head_order->prev=nullptr; 
@@ -305,23 +309,33 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
                 if (this->logging) std::cout << "\nlimit node is all out of orders! DELETING LIMIT NODE\n";
 
                 if (limit_node.prev && limit_node.next){
+                    // middle of limit_dll
+                    // memory leak? 
                     limit_node.prev->next = limit_node.next;
                     limit_node.next->prev = limit_node.prev;
                     this->limit_map.erase(limit_node.limit_price);
                 } else if (limit_node.prev && !limit_node.next){
-                    // tail 
+                    // tail of limit_dll
+                    // memory leak? 
                     limit_node.prev->next = nullptr;
                     this->limit_map.erase(limit_node.limit_price);
+                } else if (limit_node.next && !limit_node.prev){
+                    // head of limit_dll
+                    this->sorted_limit_prices_head = this->sorted_limit_prices_head->next;
+                    limit_node.next->prev = nullptr;
+                    this->limit_map.erase(limit_node.limit_price);
+                } else {
+                    std::cout << "??????" << endl;
                 }
                 
-                this->update_limit_spread_new();
+                // this->update_limit_spread_new();
                 // delete &limit_node; // dont need to delete bc limit_node is on stack? 
             }
 
             return 0;
 
         } else if (incomming_order->shares > limit_node.head_order->shares){
-            if (this->logging) std::cout << "incoming order wants to " << incomming_order->order_type << " more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders \n";
+            if (this->logging) std::cout << "incoming order (" << incomming_order->limit <<  ") wants to " << incomming_order->order_type << " more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders \n";
 
             if (this->logging) std::cout << "STARTING traversing limit node (" << limit_node.limit_price << ") orders to create matches.\n" << std::endl;
             while (limit_node.head_order && incomming_order->shares > limit_node.head_order->shares){
@@ -440,10 +454,19 @@ int OrderBook::cancel_order(){
     return 0;
 }
 
-void OrderBook::print_list(Order *n) {
+void OrderBook::print_orders_dll(Order *n) {
     cout << "\nPrinting list..." << endl;
     while (n != nullptr) {
         cout << n->order_id << "/" << n->limit << "/" << n->order_type << "/" << n->shares << " ";
+        n = n->next;
+    }
+    cout << "done...\n\n" << endl;
+} 
+
+void OrderBook::print_limits_dll(Limit *n) {
+    cout << "\nPrinting list..." << endl;
+    while (n != nullptr) {
+        cout << n->limit_price << "/" << " ";
         n = n->next;
     }
     cout << "done...\n\n" << endl;
