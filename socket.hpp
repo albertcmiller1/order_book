@@ -6,6 +6,9 @@
 #include <iostream>
 #include <thread>
 #include <unistd.h>  
+#include <sstream>
+#include <string> 
+#include <vector> 
 
 int main();
 

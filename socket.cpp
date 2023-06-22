@@ -1,39 +1,25 @@
 #include "socket.hpp"
+using namespace std;
 
-std::unordered_map<std::string, char*> parse_args(int argc, char** argv){
-    std::unordered_map<std::string, char*> arg_map = {};
-    for (int i = 1; i < argc; ++i){
-        if (!strcmp("--order_id", argv[i])){
-            arg_map["order_id"] = argv[i+1];
-        } else if (!strcmp("--limit", argv[i])){
-            arg_map["limit"] = argv[i+1];
-        } else if (!strcmp("--shares", argv[i])){
-            arg_map["shares"] = argv[i+1];
-        } else if (!strcmp("--order_type", argv[i])){
-            // validate string == buy or sell 
-            arg_map["order_type"] =  argv[i+1];
-        } else if (!strcmp("--event_time", argv[i])){
-            arg_map["event_time"] = argv[i+1];
-        } else if (!strcmp("--entry_time", argv[i])){
-            arg_map["entry_time"] = argv[i+1];
+std::unordered_map<std::string, std::string> parse_args(vector <std::string> v){
+    std::unordered_map<std::string, std::string> arg_map = {};
+
+    for (int i = 0; i < v.size(); i++){
+        if (v[i] == "--limit"){
+            arg_map["limit"] = v[i+1];
+        } else if (v[i] == "--user_id") {
+            arg_map["user_id"] = v[i+1];
+        } else if (v[i] == "--shares") {
+            arg_map["shares"] = v[i+1];
+        } else if (v[i] == "--order_type") {
+            arg_map["order_type"] = v[i+1];
         }
     }
 
-    /*
-    if (arg_map.find("order_id") == arg_map.end()) {
-        // this price is not in the limit map-- update limit_map. 
-    } else {
-        // this price is already in the limit_map. 
-    }
-    */
-
-
-    // cout << arg_map["order_id"] << endl;
-    // cout << arg_map["limit"] << endl;
-    // cout << arg_map["shares"] << endl;
-    // cout << arg_map["order_type"] << endl;
-    // cout << arg_map["event_time"] << endl;
-    // cout << arg_map["entry_time"] << endl;
+    cout << arg_map["limit"] << endl;
+    cout << arg_map["user_id"] << endl;
+    cout << arg_map["shares"] << endl;
+    cout << arg_map["order_type"] << endl;
 
     return arg_map;
 }
@@ -81,10 +67,6 @@ void start_socket_server(OrderBook book){
     crow::SimpleApp app;
     std::mutex mtx;
 
-
-
-
-
     CROW_WEBSOCKET_ROUTE(app, "/ws")
       .onopen([&](crow::websocket::connection& conn) {
           CROW_LOG_INFO << "new websocket connection from " << conn.get_remote_ip();
@@ -100,19 +82,32 @@ void start_socket_server(OrderBook book){
           std::lock_guard<std::mutex> _(mtx);
         
             // parse message and create order  
-            // parse_args()
-            // book.add_order()
+            vector<std::string> V; 
+            istringstream iss(data);   
+            string word;
+            while(iss>>word){V.push_back(word);}
+            std::unordered_map<std::string, std::string> arg_map = parse_args(V);
+
+            book.add_order(
+                11111111,                                   // int order_id
+                arg_map["order_type"],                      // bool order_type
+                stoi(arg_map["shares"]),                    // int shares
+                stof(arg_map["limit"]),                     // float limit
+                66666666,                                   // int entry_time
+                99999999                                    // int event_time
+            );
+
+            std::cout << book << std::endl;
 
             // broadcast message to all connectued users 
-            for (auto user : users)
-                if (is_binary)
-                    user->send_binary(data);
-                else {
-                    std::cout << "data: " << data << std::endl;
-                    user->send_text(data);
-                }
+            // for (auto user : users)
+            //     if (is_binary)
+            //         user->send_binary(data);
+            //     else {
+            //         std::cout << "data: " << data << std::endl;
+            //         user->send_text(data);
+            //     }
       });
-
 
     CROW_ROUTE(app, "/")([](){
         return "Hello world\n";
@@ -130,10 +125,23 @@ int main(){
     std::cout << "Hello order book\n";
     OrderBook book;
 
-    std::cout << "starting trading bot thread 1\n";
-    std::thread th1(trading_bot, book);
-    std::cout << "thread 1 is up and running\n";
+    // std::cout << "starting trading bot thread 1\n";
+    // std::thread th1(trading_bot, book);
+    // std::cout << "thread 1 is up and running\n";
 
     std::cout << "starting webserver\n";
     start_socket_server(book);
+
+    // vector<std::string> V; 
+    // std::string s = "--limit 23.42 --shares 3 --order_type buy --user_id albert";
+    // istringstream iss(s);   
+    // string word;
+    // while(iss>>word){V.push_back(word);}
+    // parse_args(V);
+
+
+    return 0;
+
+    // std::unordered_map<std::string, char*> arg_map = parse_args(11, shit);
+
 }
