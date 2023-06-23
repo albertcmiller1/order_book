@@ -10,5 +10,9 @@
 #include <string> 
 #include <vector> 
 
-int main();
 
+// std::unordered_set<crow::websocket::connection*> users;
+// std::unordered_map<std::string, std::string> parse_args(std::vector <std::string> v);
+// void trading_bot(OrderBook &book);
+// void start_socket_server(OrderBook &book);
+// int main();

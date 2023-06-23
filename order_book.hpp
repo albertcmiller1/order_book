@@ -5,8 +5,6 @@
 #include <chrono>
 #include <vector> 
 
-// struct Limit;
-
 struct Match {
     int match_id;
     int buying_order_id;
@@ -15,7 +13,6 @@ struct Match {
     float sale_price;
 };
 
-// doubly LL
 struct Order {
     int order_id;
     std::string order_type;
@@ -43,6 +40,8 @@ class OrderBook {
 public:
     std::unordered_map<float, Limit> limit_map = {};    // key is limit price
     std::unordered_map<int, Order*> order_map = {};     // key is order_id
+
+    float most_recent_trade_price;
     
     Limit *sorted_limit_prices_head {nullptr};
     Limit *sorted_limit_prices_tail {nullptr};

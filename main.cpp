@@ -136,7 +136,6 @@ void create_fake_orders_2(OrderBook &book){
     );
 }
 
-
 int main(int argc, char** argv){
     OrderBook book;
     create_fake_orders_(book);
@@ -145,9 +144,6 @@ int main(int argc, char** argv){
     create_fake_orders_2(book);
     std::cout << book << std::endl;
     return 0;
-
-
-
 
     // what happens if we have a ll
 

@@ -24,45 +24,38 @@ std::unordered_map<std::string, std::string> parse_args(vector <std::string> v){
     return arg_map;
 }
 
-
 std::unordered_set<crow::websocket::connection*> users;
 
-void trading_bot(OrderBook book){
+void trading_bot(OrderBook &book){
     while (true){
         sleep(5);  
         std::cout << "THREAD still working" << std::endl;
-
 
         for (auto user : users)
             // std::cout << "data: " << data << std::endl;
             user->send_text("THREAD still working");
        
-        // book.add_order(
-        //     000003,         // order_id
-        //     true,           // order_type
-        //     1,              // shares
-        //     23.44,          // limit
-        //     983485,         // entry_time
-        //     983485          // event_time
-        // );
+        srand((unsigned) time(NULL));
+        int order_id = rand();
+        unsigned int microseconds {10000};
 
+        uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-        /*
-        // only do this if arg_map is fully populated 
-        std::unordered_map<string, char*> arg_map = parse_args(argc, argv);
+        order_id = rand();
+        usleep(microseconds);
+        curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         book.add_order(
-            atoi(arg_map["order_id"]),                  // int order_id
-            !strcmp("buy", arg_map["order_type"]),      // bool order_type
-            atoi(arg_map["shares"]),                    // int shares
-            std::stof(arg_map["limit"]),                // float limit
-            atoi(arg_map["entry_time"]),                // int entry_time
-            atoi(arg_map["event_time"])                 // int event_time
+            order_id,           // order_id
+            "sell",             // order_type
+            3,                  // shares
+            23.47,              // limit
+            curr_time,          // entry_time
+            curr_time           // event_time
         );
-        */
     }
 }
 
-void start_socket_server(OrderBook book){
+void start_socket_server(OrderBook &book){
 
     crow::SimpleApp app;
     std::mutex mtx;
@@ -98,6 +91,7 @@ void start_socket_server(OrderBook book){
             );
 
             std::cout << book << std::endl;
+            std::cout << "----------------------------------------------------\n\n";
 
             // broadcast message to all connectued users 
             // for (auto user : users)
@@ -119,29 +113,17 @@ void start_socket_server(OrderBook book){
       .run();
 }
 
-
-
 int main(){
-    std::cout << "Hello order book\n";
     OrderBook book;
 
-    // std::cout << "starting trading bot thread 1\n";
+    // std::cout << "starting trading bot threads...\n";
     // std::thread th1(trading_bot, book);
-    // std::cout << "thread 1 is up and running\n";
+    // std::cout << "all threads up and running.\n";
 
-    std::cout << "starting webserver\n";
+    // wscat -c ws://0.0.0.0:5001/ws
+    // --limit 23.42 --shares 3 --order_type buy --user_id albert
+    std::cout << "starting webserver...\n";
     start_socket_server(book);
 
-    // vector<std::string> V; 
-    // std::string s = "--limit 23.42 --shares 3 --order_type buy --user_id albert";
-    // istringstream iss(s);   
-    // string word;
-    // while(iss>>word){V.push_back(word);}
-    // parse_args(V);
-
-
     return 0;
-
-    // std::unordered_map<std::string, char*> arg_map = parse_args(11, shit);
-
 }

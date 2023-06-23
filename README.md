@@ -129,3 +129,10 @@ existing:
 23.47:  1235562093/sell/3/23.469999 
 incoming: 
 buy 10 @ 23.46
+
+
+would be cool to be able to connect to a sepearte web socket (python) which broadcasted the amount of memeory used / abalibale by the running orderboook
+
+create a map <std::string ticker, OrderBook book> to hold all a unique book for each unique ticker 
+create api endpoint to IPO a stock, submit an order, cancel an order, check properties of the book
+socket should broadcast all trades, and the current state of the spread, and the limit dll
