@@ -8,7 +8,7 @@ This repo simulates an order book using a doubly linked list of unique limit pri
 The orderbook hosts an api, made with [crow](https://crowcpp.org/master/), which will allow a user to post an order, cancel an order, and check the current status of their order. This api will also allow an admin to list or delist a new stock at an 'IPO' price.
 
 ### Streaming data from the book 
-The orderbook hosts a websocket, also made with [crow](https://crowcpp.org/master/). The socket will broadcast to each connected user any time a match is created. This socket will boradcast the prices of the 10 highest buy limits and the 10 lowest sell limits surrounding the spread. This data will be used to create an 'order book vizualizer' made in the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository. 
+The orderbook hosts a websocket, also made with [crow](https://crowcpp.org/master/). The socket will broadcast to each connected user any time a match is created. This socket will also continuously boradcast the prices of the 10 highest buy limits and the 10 lowest sell limits surrounding the spread. This data will be used to create an 'order book vizualizer' made in the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository. 
 
 ### Trading bots
 To simulate market activity, 10 threads will continuously post buy and sell orders at random prices for each stock listed. This will stimulate the book enough for users to stream live prices, and enable a user to activly post buy and sell orders with paper stocks using the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository. 
@@ -17,7 +17,7 @@ To simulate market activity, 10 threads will continuously post buy and sell orde
 Every 60 seconds the book will post the current price of each stock traded into a dynamodb table. This information will be accessable to users via an API hosted with AWS API Gateway + lambda created with the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository.
 
 ### Infrastructure 
-The book, trading bot threads, and connection websocket will be apart of the same process. It will be running on an AWS EC2 instance. 
+The book, trading bot threads, api, and websocket will be apart of the same process. It will be running on an AWS EC2 instance. 
 
 ## Todo 
 * api 
@@ -95,7 +95,6 @@ would be cool to be able to connect to a sepearte web socket (python) which broa
 create a map <std::string ticker, OrderBook book> to hold all a unique book for each unique ticker 
 create api endpoint to IPO a stock, submit an order, cancel an order, check properties of the book
 socket should broadcast all trades, and the current state of the spread, and the limit dll
-
 
 
 need to figure out how to create a post api rout to 
