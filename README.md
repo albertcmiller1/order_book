@@ -2,78 +2,38 @@
 
 ## Overview 
 ### Book
-This repo simulates an order book using a doubly linked list and two hash maps. Each entry in the limit_map contains a unique limit price. Each of these entries has a pointer to a linked list containing orders. I found some information about how an order book may be designed [here](https://web.archive.org/web/20110219163448/http://howtohft.wordpress.com/2011/02/15/how-to-build-a-fast-limit-order-book/).
+This repo simulates an order book using a doubly linked list of unique limit prices, a doubly linked list of orders at each limit price nide, and two hash maps - one of all limits and one of all orders. I found some information about how an order book may be designed [here](https://web.archive.org/web/20110219163448/http://howtohft.wordpress.com/2011/02/15/how-to-build-a-fast-limit-order-book/). This repo is intended to be used in conjunction with the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository. 
 
 ### Connecting to the book
-The orderbook hosts a websocket, made with [crow](https://crowcpp.org/master/), which will allow a user to post an order, cancel an order, and check the current status of their order. This socket will also allow an admin to list or delist a new stock at an "IPO" price. Finally, the orderbook will broadcast to the socket any time an exchange occurs.
+The orderbook hosts an api, made with [crow](https://crowcpp.org/master/), which will allow a user to post an order, cancel an order, and check the current status of their order. This api will also allow an admin to list or delist a new stock at an 'IPO' price.
+
+### Streaming data from the book 
+The orderbook hosts a websocket, also made with [crow](https://crowcpp.org/master/). The socket will broadcast to each connected user any time a match is created. This socket will boradcast the prices of the 10 highest buy limits and the 10 lowest sell limits surrounding the spread. This data will be used to create an 'order book vizualizer' made in the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository. 
 
 ### Trading bots
-To simulate market activity, 26 threads will continuously post buy and sell orders at random prices. This will stimulate the book enough for users to stream live prices, and enable a user to activly post buy and sell orders with paper stocks using the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository. 
+To simulate market activity, 10 threads will continuously post buy and sell orders at random prices for each stock listed. This will stimulate the book enough for users to stream live prices, and enable a user to activly post buy and sell orders with paper stocks using the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository. 
 
 ### Price data API
-Every 60 seconds the book will post the current price of each stock traded into a dynamodb table. This information will be accessable to users via an API hosted with AWS API Gateway + lambda.
+Every 60 seconds the book will post the current price of each stock traded into a dynamodb table. This information will be accessable to users via an API hosted with AWS API Gateway + lambda created with the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository.
 
 ### Infrastructure 
-The book, trading bot threads, and connection websocket will be apart of the same process. It will be running on a docker container hosted by AWS ECS. 
+The book, trading bot threads, and connection websocket will be apart of the same process. It will be running on an AWS EC2 instance. 
 
 ## Todo 
-* implement trees + DLL
-* implement spread check + erase after match
+* api 
+* tests
 * logic to retract from queue 
-* who get's priority in queue? time dependent? what about partial ability to complete transactions due to volume differences 
-* boto to post transaction (updated price) to dynamodb
+* botoCpp to post transaction (updated price) to dynamodb
 * [stock exchange design](https://www.youtube.com/watch?v=XuKs2kWH0mQ&ab_channel=System-Design)
 
 ## Future ideas
-* not sure we can have both an API and a WS hosted as the same time. Instead, just use an ws to both brodcast info and accept incoming messages? 
-* how to build a driver for much faster performance? 
+* how to build a driver/buffer for much faster performance? 
 * other data structure ideas for the order book?
 * frontend to view the spread. broadcast the needed info using socket [example](https://www.youtube.com/watch?v=hgOXY-r3xJM&ab_channel=ChadThackray)
-* convert all lambdas to python
 * only run the bots during market hours
 * maybe using an AWS SQS would be better for holding buy and sell orders? then we could have a more distrubuted matching service aka more scalable 
+* would be cool to host a small websocket (python) on the EC2 to show how much memory the server has used / CPU 
 
-## Schemas 
-
-Order Doubly Linked List
-```
-struct Order {
-    int order_id;
-    bool buy_sell;
-    int shares;
-    float limit;
-    string ticker;
-    int entry_time;
-    <!-- int event_time; -->
-    string status; -> in-progress, failed, filled, partially-filled
-    Order* next {nullptr};
-    Order* prev {nullptr};
-    Limit* parent_limit {nullptr};
-};
-```
-Limit Binary Search Tree
-```
-struct Limit {
-    float limit_price;
-    int size;
-    int total_volume;
-    Limit *parent {nullptr};
-    Limit *left {nullptr};
-    Limit *right {nullptr};
-    Order *head_order {nullptr};
-    Order *tail_order {nullptr};
-};
-```
-Matched Orders 
-```
-struct Match {
-    string match_id;
-    int buying_order_id;
-    int selling_order_id;
-    int sale_quantity;
-    float sale_price;
-}
-```
 
 
 23.41 buy 
@@ -118,7 +78,6 @@ incoming order does not have enough shares to completely fill limit_node.head_or
 > then a sell order for 2 shares at 23.44
 
 
-
 existing: 
 23.41:  1018663624/buy/3/23.410000 
 23.42:  1162029806/buy/3/23.420000 
@@ -136,3 +95,12 @@ would be cool to be able to connect to a sepearte web socket (python) which broa
 create a map <std::string ticker, OrderBook book> to hold all a unique book for each unique ticker 
 create api endpoint to IPO a stock, submit an order, cancel an order, check properties of the book
 socket should broadcast all trades, and the current state of the spread, and the limit dll
+
+
+
+need to figure out how to create a post api rout to 
+1. post an order
+2. cancel an order 
+3. check current price 
+
+

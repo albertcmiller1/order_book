@@ -16,6 +16,13 @@ std::unordered_map<std::string, std::string> parse_args(vector <std::string> v){
         }
     }
 
+    srand((unsigned) time(NULL));
+    int order_id = rand();
+    uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+    arg_map["order_id"] = to_string(order_id);
+    arg_map["entry_time"] = curr_time;
+
     cout << arg_map["limit"] << endl;
     cout << arg_map["user_id"] << endl;
     cout << arg_map["shares"] << endl;
@@ -24,27 +31,40 @@ std::unordered_map<std::string, std::string> parse_args(vector <std::string> v){
     return arg_map;
 }
 
+bool validate_args(std::unordered_map<std::string, std::string> arg_map){
+
+    // std::string s = arg_map["limit"];
+    // for( int i = 0; i < s.length(); i++ ) {
+    //     if( !isdigit( s[i] ) !=) {
+    //         return false;
+    //     }
+    // }
+
+    return true;
+}
+
+
 std::unordered_set<crow::websocket::connection*> users;
 
-void trading_bot(OrderBook &book){
+void trading_bot(OrderBook *book){
     while (true){
-        sleep(5);  
         std::cout << "THREAD still working" << std::endl;
 
-        for (auto user : users)
+        for (auto user : users){
             // std::cout << "data: " << data << std::endl;
             user->send_text("THREAD still working");
+        }
        
         srand((unsigned) time(NULL));
         int order_id = rand();
         unsigned int microseconds {10000};
 
         uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-
         order_id = rand();
-        usleep(microseconds);
+
+        // usleep(microseconds);
         curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        book.add_order(
+        book->add_order(
             order_id,           // order_id
             "sell",             // order_type
             3,                  // shares
@@ -52,10 +72,14 @@ void trading_bot(OrderBook &book){
             curr_time,          // entry_time
             curr_time           // event_time
         );
+
+        std::cout << *book << std::endl;
+        std::cout << "----------------------------------------------------\n\n";
+        sleep(15);  
     }
 }
 
-void start_socket_server(OrderBook &book){
+void start_socket_server(OrderBook *book){
 
     crow::SimpleApp app;
     std::mutex mtx;
@@ -79,19 +103,36 @@ void start_socket_server(OrderBook &book){
             istringstream iss(data);   
             string word;
             while(iss>>word){V.push_back(word);}
+
+            for (auto i : V){
+                std::cout << i << endl;
+            }
+
             std::unordered_map<std::string, std::string> arg_map = parse_args(V);
 
-            book.add_order(
-                11111111,                                   // int order_id
-                arg_map["order_type"],                      // bool order_type
-                stoi(arg_map["shares"]),                    // int shares
-                stof(arg_map["limit"]),                     // float limit
-                66666666,                                   // int entry_time
-                99999999                                    // int event_time
-            );
+            if (validate_args(arg_map)){
+                book->add_order(
+                    11111111,                                   // int order_id
+                    arg_map["order_type"],                      // bool order_type
+                    stoi(arg_map["shares"]),                    // int shares
+                    stof(arg_map["limit"]),                     // float limit
+                    66666666,                                   // int entry_time
+                    99999999                                    // int event_time
+                );
+            } else {
+                std::cout << "invalid input" << endl;
+            }
 
-            std::cout << book << std::endl;
-            std::cout << "----------------------------------------------------\n\n";
+            // std::cout << 11111111               << endl;                   
+            // std::cout << arg_map["order_type"]  << endl;                   
+            // std::cout << stoi(arg_map["shares"]) << endl;                   
+            // std::cout << stof(arg_map["limit"]) << endl;                   
+            // std::cout << 66666666               << endl;                   
+            // std::cout << 99999999                << endl;                   
+
+
+            // std::cout << *book << std::endl;
+            // std::cout << "BOOOG----------------------------------------------------GIIIIE\n\n";
 
             // broadcast message to all connectued users 
             // for (auto user : users)
@@ -114,7 +155,7 @@ void start_socket_server(OrderBook &book){
 }
 
 int main(){
-    OrderBook book;
+    OrderBook *book = new OrderBook;
 
     // std::cout << "starting trading bot threads...\n";
     // std::thread th1(trading_bot, book);

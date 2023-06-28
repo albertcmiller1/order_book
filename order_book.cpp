@@ -291,7 +291,7 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
 
             // delete head 
             if (this->logging) std::cout << "deleting old order..." << limit_node.head_order->order_id << std::endl;
-            Order *tmp = limit_node.head_order; // TODO: i think this is a memory leak 
+            Order *tmp = limit_node.head_order; // TODO: i think this is a memory leak ?
             limit_node.head_order = limit_node.head_order->next;
             if (limit_node.head_order) { 
                 limit_node.head_order->prev=nullptr; 
@@ -473,7 +473,6 @@ void OrderBook::print_limits_dll(Limit *n) {
 } 
 
 std::ostream& operator<<(std::ostream& os, const OrderBook& book){
-
 
     cout << "\n";
     if (book.order_map.empty()){
