@@ -20,10 +20,11 @@ Every 60 seconds the book will post the current price of each stock traded into 
 The book, trading bot threads, api, and websocket will be apart of the same process. It will be running on an AWS EC2 instance. 
 
 ## Todo 
-* api with crow
+* api with crow (post order, cancel order, check current price)
 * validate inputs 
 * broadcast to socket
 * tests (all tests should be independent of one another)
+* limit should hold the total volume of num shares contained in its order dll
 * logic to retract from queue 
 * botoCpp to post transaction (updated price) to dynamodb
 
@@ -55,24 +56,7 @@ to help solve this, we need to have a list/tree/array of the limit nodes, and ke
 this will allow us to move up and down the list when an order is completly filled but sill has more potential to create transactions 
 
 
-! this works 
-> 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.45/sell/1 23.46/sell/1 23.46/sell/1 23.47/sell/1
-> order to buy 2 shares @23.46 --> travers DLL
 
-
-!this works
-> 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.46/sell/1 
-> order to buy 2 shares @23.46 --> complete 1 order, delete limit node, create new limit node, update spread 
-
-
-! this works
-> 23.41/buy/1 23.42/buy/1 23.43/buy/1     23.45/sell/1 23.46/sell/1 23.47/sell/1
-> order to buy 2 shares @23.46 --> change limit nodes
-
-
-incoming order does not have enough shares to completely fill limit_node.head_order. create match, partially fill limit_node.head_order, update limit_node.head_order, delete incomming_order, return.
-> 23.41/buy/5 23.42/buy/5 23.43/buy/5     23.45/sell/5 23.46/sell/5 23.47/sell/5
-> order to buy 2 shares @23.46 --> change limit nodes
 
 
 
@@ -97,11 +81,4 @@ would be cool to be able to connect to a sepearte web socket (python) which broa
 create a map <std::string ticker, OrderBook book> to hold all a unique book for each unique ticker 
 create api endpoint to IPO a stock, submit an order, cancel an order, check properties of the book
 socket should broadcast all trades, and the current state of the spread, and the limit dll
-
-
-need to figure out how to create a post api rout to 
-1. post an order
-2. cancel an order 
-3. check current price 
-
 

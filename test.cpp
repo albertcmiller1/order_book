@@ -125,15 +125,12 @@ public:
         if (book->highest_buy_limit || book->lowest_sell_limit){ 
             cout << "3.1 failed." << endl; return false;
         } 
-
         if (!doubles_are_same(book->most_recent_trade_price, 23.47)){ 
             cout << "3.2 failed." << endl; return false;
         }
-
         if (book->limit_map.size() != 0){ 
             cout << "3.3 failed." << endl; return false;
         }
-
         if (book->order_map.size() != 0){ 
             cout << "3.4 failed." << endl; return false;
         }
@@ -175,7 +172,7 @@ public:
     bool test_5(){
         if (this->logging) std::cout << "<-----------------------[ test_5 starting ]------------------------------->\n";
         /* 
-            prove the orderbook can create a match when a big sell order comes in to match with lots of buy orders 
+            prove the orderbook can create a match when a big sell order comes in to match with all of buy orders 
             note: the logic assumes most_recent_trade_price is that of the big order that came in, not that of the order it had to adjust to. 
         */
         OrderBook *book = new OrderBook;
@@ -209,7 +206,7 @@ public:
     bool test_6(){
         if (this->logging) std::cout << "<-----------------------[ test_6 starting ]------------------------------->\n";
         /* 
-            prove the orderbook can create a match when a big buy order comes in to match with lots of sell orders 
+            prove the orderbook can create a match when a big buy order comes in to match with alls of sell orders 
             note: the logic assumes most_recent_trade_price is that of the big order that came in, not that of the order it had to adjust to. 
         */
         OrderBook *book = new OrderBook;
@@ -222,13 +219,13 @@ public:
         int order_id_5 = this->create_order(book, "buy", 4, 23.45);
 
         if (book->highest_buy_limit || book->lowest_sell_limit){ 
-            cout << "5.1 failed." << endl; return false;
+            cout << "6.1 failed." << endl; return false;
         } else if (book->limit_map.size() != 0){ 
-            cout << "5.2 failed." << endl; return false;
+            cout << "6.2 failed." << endl; return false;
         } else if (book->order_map.size() != 0){ 
-            cout << "5.3 failed." << endl; return false;
+            cout << "6.3 failed." << endl; return false;
         } else if (!doubles_are_same(book->most_recent_trade_price, 23.45)){ 
-            cout << "5.4 failed." << endl; return false;
+            cout << "6.4 failed." << endl; return false;
         }
 
         if (this->logging) std::cout << *book << std::endl;
@@ -236,4 +233,52 @@ public:
         this->clean_up(book);
         return true;
     }
+
+    bool test_7(){
+        if (this->logging) std::cout << "<-----------------------[ test_7 starting ]------------------------------->\n";
+        /* 
+            prove the orderbook can create a match when a big buy order comes in to match with lots of sell orders 
+        */
+        OrderBook *book = new OrderBook;
+
+        int order_id_1 = this->create_order(book, "sell", 100, 23.45);
+        int order_id_2 = this->create_order(book, "sell", 100, 23.44); 
+        int order_id_3 = this->create_order(book, "sell", 100, 23.43);
+        int order_id_4 = this->create_order(book, "sell", 100, 23.42);
+        // SPREAD
+        if (this->logging) std::cout << *book << std::endl;
+
+        int order_id_5 = this->create_order(book, "buy", 350, 23.45);
+
+        cout << "AFTER\n";
+        if (this->logging) std::cout << *book << std::endl;
+
+
+        if (book->highest_buy_limit){ 
+            cout << "7.1 failed." << endl; return false;
+        } 
+        if (!book->lowest_sell_limit){ 
+            cout << "7.2 failed." << endl; return false;
+        } 
+        if (book->limit_map.size() != 1){ 
+            cout << "7.2 failed." << endl; return false;
+        } 
+        if (book->order_map.size() != 1){ 
+            cout << "7.3 failed." << endl; return false;
+        } 
+        if (!doubles_are_same(book->most_recent_trade_price, 23.45)){ 
+            cout << "7.4 failed." << endl; return false;
+        }
+        if (book->lowest_sell_limit->head_order->shares != 50){ 
+            cout << "7.5 failed." << endl; return false;
+        } 
+
+        // FALSE SUCCESS! 
+        if (this->logging) std::cout << *book << std::endl;
+        if (this->logging) std::cout << "\n<-----------------------[ test_7 complete ]------------------------------->\n";
+        this->clean_up(book);
+        return true;
+    }
+
+
 };

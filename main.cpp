@@ -12,7 +12,8 @@ int main(int argc, char** argv){
             // tests.test_3() &&
             // tests.test_4() &&
             // tests.test_5() && 
-            tests.test_6()
+            // tests.test_6() &&
+            tests.test_7()
         ){ cout << "<--all tests passed-->" << endl;} else {cout << "failure." << endl;}
 
     return 0;
