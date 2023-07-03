@@ -135,14 +135,12 @@ using namespace std;
 
 int main(int argc, char** argv){
     OrderBook *book = new OrderBook;
+    Testing tests = Testing();
     if (
-            test_1(book) &&
-            test_2(book)
-        ){
-            cout << "<--all tests passed-->" << endl;
-    } else {
-        cout << "failure." << endl;
-    }
+            tests.test_1(book) &&
+            tests.test_2(book) &&
+            tests.test_3(book) 
+        ){ cout << "<--all tests passed-->" << endl;} else {cout << "failure." << endl;}
 
     return 0;
 }
