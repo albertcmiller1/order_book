@@ -10,7 +10,7 @@ struct Match {
     int buying_order_id;
     int selling_order_id;
     int sale_quantity;
-    float sale_price;
+    double sale_price;
 };
 
 struct Order {
@@ -18,7 +18,7 @@ struct Order {
     std::string order_type;
     // int customer_id;
     int shares;
-    float limit;
+    double limit;
     unsigned long long entry_time;
     unsigned long long event_time;
     Order* next {nullptr};
@@ -26,7 +26,7 @@ struct Order {
 };
 
 struct Limit {
-    float limit_price;
+    double limit_price;
     int size;
     int total_volume;
     int num_orders;
@@ -38,11 +38,11 @@ struct Limit {
 
 class OrderBook {
 public:
-    std::unordered_map<float, Limit> limit_map = {};    // key is limit price
+    std::unordered_map<double, Limit> limit_map = {};    // key is limit price
     std::unordered_map<int, Order*> order_map = {};     // key is order_id
 
-    float most_recent_trade_price;
-    bool logging {false};
+    double most_recent_trade_price;
+    bool logging {true};
     
     Limit *sorted_limit_prices_head {nullptr};
     Limit *sorted_limit_prices_tail {nullptr};
@@ -56,12 +56,12 @@ public:
         int order_id,
         std::string order_type,
         int shares,
-        float limit,
+        double limit,
         unsigned long long entry_time,
         unsigned long long event_time
     );
 
-    Limit& insert_limit_map(float limit_price, int size, int total_volume);
+    Limit& insert_limit_map(double limit_price, int size, int total_volume);
     void update_limit_spread_new();
     int create_match(Order *incomming_order, Limit &limit_node);
     int insert_limit_dll(Limit *new_limit);

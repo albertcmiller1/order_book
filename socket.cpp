@@ -115,7 +115,7 @@ void start_socket_server(OrderBook *book){
                     11111111,                                   // int order_id
                     arg_map["order_type"],                      // bool order_type
                     stoi(arg_map["shares"]),                    // int shares
-                    stof(arg_map["limit"]),                     // float limit
+                    stof(arg_map["limit"]),                     // double limit
                     66666666,                                   // int entry_time
                     99999999                                    // int event_time
                 );

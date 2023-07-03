@@ -23,8 +23,7 @@ The book, trading bot threads, api, and websocket will be apart of the same proc
 * api with crow
 * validate inputs 
 * broadcast to socket
-* how to fix floating points 
-* tests 
+* tests (all tests should be independent of one another)
 * logic to retract from queue 
 * botoCpp to post transaction (updated price) to dynamodb
 

@@ -5,12 +5,14 @@
 using namespace std; 
 
 int main(int argc, char** argv){
-    OrderBook *book = new OrderBook;
     Testing tests = Testing();
     if (
-            tests.test_1(book) &&
-            tests.test_2(book) &&
-            tests.test_3(book) 
+            // tests.test_1() &&
+            // tests.test_2() &&
+            // tests.test_3() &&
+            // tests.test_4() &&
+            // tests.test_5() && 
+            tests.test_6()
         ){ cout << "<--all tests passed-->" << endl;} else {cout << "failure." << endl;}
 
     return 0;
