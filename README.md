@@ -20,11 +20,12 @@ Every 60 seconds the book will post the current price of each stock traded into 
 The book, trading bot threads, api, and websocket will be apart of the same process. It will be running on an AWS EC2 instance. 
 
 ## Todo 
-* api 
-* tests
+* api with crow
+* validate inputs 
+* broadcast to socket
+* tests 
 * logic to retract from queue 
 * botoCpp to post transaction (updated price) to dynamodb
-* [stock exchange design](https://www.youtube.com/watch?v=XuKs2kWH0mQ&ab_channel=System-Design)
 
 ## Future ideas
 * how to build a driver/buffer for much faster performance? 
@@ -33,6 +34,7 @@ The book, trading bot threads, api, and websocket will be apart of the same proc
 * only run the bots during market hours
 * maybe using an AWS SQS would be better for holding buy and sell orders? then we could have a more distrubuted matching service aka more scalable 
 * would be cool to host a small websocket (python) on the EC2 to show how much memory the server has used / CPU 
+* [stock exchange design](https://www.youtube.com/watch?v=XuKs2kWH0mQ&ab_channel=System-Design)
 
 
 
