@@ -56,7 +56,6 @@ void OrderBook::add_order(
         // this->update_limit_spread(limit_node, new_order_ptr->order_type);
         this->update_limit_spread_new();
     }
-
 }
 
 void OrderBook::update_limit_spread_new(){
@@ -288,6 +287,9 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
                 1,                          // sale_quantity;
                 incomming_order->limit      // sale_price;
             };
+
+            // update this->most_recent_trade_price
+            this->most_recent_trade_price = incomming_order->limit;
 
             // delete head 
             if (this->logging) std::cout << "deleting old order..." << limit_node.head_order->order_id << std::endl;

@@ -42,6 +42,7 @@ public:
     std::unordered_map<int, Order*> order_map = {};     // key is order_id
 
     float most_recent_trade_price;
+    bool logging {false};
     
     Limit *sorted_limit_prices_head {nullptr};
     Limit *sorted_limit_prices_tail {nullptr};
@@ -59,8 +60,6 @@ public:
         unsigned long long entry_time,
         unsigned long long event_time
     );
-    
-    bool logging {false};
 
     Limit& insert_limit_map(float limit_price, int size, int total_volume);
     void update_limit_spread_new();
