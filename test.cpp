@@ -397,9 +397,156 @@ public:
         return true;
     }
 
+    bool test_11(){
+        if (this->logging) std::cout << "<-----------------------[ test_11 starting ]------------------------------->\n";
+        /* 
+            prove a buy order can be filled when it crosses the spread at a new, very high limit price
+        */
+        OrderBook *book = new OrderBook;
+
+        int order_id_1 = this->create_order(book, "buy", 10, 4.00);
+        int order_id_2 = this->create_order(book, "buy", 10, 5.00);
+        int order_id_3 = this->create_order(book, "buy", 10, 6.00);
+        // SPREAD
+        int order_id_4 = this->create_order(book, "sell", 10, 7.00);
+        // TRIGGER 
+        int order_id_5 = this->create_order(book, "buy", 10, 9.00);
+
+        if (!book->highest_buy_limit){ 
+            cout << "11.1 failed." << endl; return false;
+        } 
+        if (book->lowest_sell_limit){ 
+            cout << "11.2 failed." << endl; return false;
+        } 
+        if (book->limit_map.size() != 3){ 
+            cout << "11.3 failed." << endl; return false;
+        } 
+        if (book->order_map.size() != 3){ 
+            cout << "11.4 failed." << endl; return false;
+        } 
+        if (!doubles_are_same(book->most_recent_trade_price, 9.00)){ 
+            cout << "11.5 failed." << endl; return false;
+        }
+        if (book->highest_buy_limit->head_order->shares != 10){ 
+            cout << "11.6 failed." << endl; return false;
+        } 
+        if (book->order_map.at(book->highest_buy_limit->head_order->order_id)->shares != 10){
+            cout << "11.7 failed." << endl; return false;
+        }
+
+        if (this->logging) std::cout << *book << std::endl;
+        if (this->logging) std::cout << "\n<-----------------------[ test_11 complete ]------------------------------->\n";
+        this->clean_up(book); 
+        return true;
+    }
+
+    bool test_12(){
+        if (this->logging) std::cout << "<-----------------------[ test_12 starting ]------------------------------->\n";
+        /* 
+            prove a sell order can be filled when it crosses the spread at a new, very low limit price
+        */
+        OrderBook *book = new OrderBook;
+
+        int order_id_1 = this->create_order(book, "buy", 10, 6.00);
+        // SPREAD
+        int order_id_2 = this->create_order(book, "sell", 10, 7.00);
+        int order_id_3 = this->create_order(book, "sell", 10, 8.00);
+        int order_id_4 = this->create_order(book, "sell", 10, 9.00);
+        // TRIGGER 
+        int order_id_5 = this->create_order(book, "sell", 10, 5.00);
+
+        if (book->highest_buy_limit){ 
+            cout << "12.1 failed." << endl; return false;
+        } 
+        if (!book->lowest_sell_limit){ 
+            cout << "12.2 failed." << endl; return false;
+        } 
+        if (book->limit_map.size() != 3){ 
+            cout << "12.3 failed." << endl; return false;
+        } 
+        if (book->order_map.size() != 3){ 
+            cout << "12.4 failed." << endl; return false;
+        } 
+        if (!doubles_are_same(book->most_recent_trade_price, 5.00)){ 
+            cout << "12.5 failed." << endl; return false;
+        }
+        if (book->lowest_sell_limit->head_order->shares != 10){ 
+            cout << "12.6 failed." << endl; return false;
+        } 
+        if (book->order_map.at(book->lowest_sell_limit->head_order->order_id)->shares != 10){
+            cout << "12.7 failed." << endl; return false;
+        }
+
+        if (this->logging) std::cout << *book << std::endl;
+        if (this->logging) std::cout << "\n<-----------------------[ test_12 complete ]------------------------------->\n";
+        this->clean_up(book); 
+        return true;
+    }
 
 
 
-    // test to traverse multiple limit nodes 
-    // test to do both of the above 
 };
+
+
+
+/*
+HIGHEST BUY OFFER: 8
+LOWEST SELL OFFER: 100
+
+order_map: 
+------------
+order_id	   limit        qantity		order_type
+156288720	   0	         10	    	buy
+1930150786	   0.06	         10	    	buy
+1481299816	   6	         10	    	buy
+1970383738	   8	         10	    	buy
+2041647826	   6	         10	    	buy
+1140563598	   8	         10	    	buy
+1622650073	   100	         10	    	sell
+282475249	   100	         10	    	sell
+
+
+limit_map: 
+------------
+price      volume       num_orders 	 order_ids
+0	        10		        1		 156288720 
+0.06	    10		        1		 1930150786 
+8	        10		        2		 1140563598 1970383738 
+6	        10		        2		 2041647826 1481299816 
+100	        10		        2		 282475249 1622650073 
+
+Printing list NEW...
+0:          156288720/buy/10/0.000000 
+0.06:       1930150786/buy/10/0.060000 
+6:          2041647826/buy/10/6.000000 1481299816/buy/10/6.000000 
+8:          1140563598/buy/10/8.000000 1970383738/buy/10/8.000000 
+100:        282475249/sell/10/100.000000 1622650073/sell/10/100.000000 
+
+----------------------------------------------------
+
+----------------
+order_id: 372016759
+order_type: sell
+shares: 59
+bid_price: 0.09
+curr_time: 1688510543852
+----------------
+_________incoming order________
+| shares: 10
+| order_type: sell
+| limit: 0.09
+| order_id: 372016759
+
+new sell order has crossed the spread ...
+attempting to create a match...
+incoming sell order crossed the spread, but doesnt have a limit to create matches with.
+deleting head limit node @ price: 0.09
+changing limit node and trying again...
+attempting to create a match...
+perfect match between buyer (2041647826) and seller (372016759)
+deleting old order...2041647826
+deleting incoming order... 372016759
+[1]    65354 segmentation fault  ./socket
+
+
+*/ 

@@ -47,39 +47,60 @@ std::unordered_set<crow::websocket::connection*> users;
 
 void trading_bot(OrderBook *book){
     while (true){
-        std::cout << "THREAD still working" << std::endl;
+        sleep(3);  
 
-        for (auto user : users){
-            // std::cout << "data: " << data << std::endl;
-            user->send_text("THREAD still working");
-        }
+        // std::cout << "THREAD still working" << std::endl;
+        // for (auto user : users){
+        //     // std::cout << "data: " << data << std::endl;
+        //     user->send_text("THREAD still working");
+        // }
        
-        srand((unsigned) time(NULL));
-        int order_id = rand();
-        unsigned int microseconds {10000};
-
+        // srand((unsigned) time(NULL));
         uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        order_id = rand();
+        int order_id = rand();
+        
+        std::string order_type;
+        if (order_id %2){
+            order_type = "sell";
+        } else {
+            order_type = "buy";
+        }
 
-        // usleep(microseconds);
+        double bid_price;
+        if (book->most_recent_trade_price){
+            bid_price = book->most_recent_trade_price * (order_id % 10)/100;
+        } else {
+            bid_price = 100;
+        }
+
+        int shares = order_id%100;
+
         curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+        cout << "----------------\n";
+        cout << "order_id: "    << order_id << endl;
+        cout << "order_type: "  << order_type << endl;
+        cout << "shares: "      << shares << endl;
+        cout << "bid_price: "   << bid_price << endl;
+        cout << "curr_time: "   << curr_time << endl;
+        cout << "----------------\n";
+
+
         book->add_order(
             order_id,           // order_id
-            "sell",             // order_type
-            3,                  // shares
-            23.47,              // limit
+            order_type,         // order_type
+            10,                 // shares
+            bid_price,                // limit
             curr_time,          // entry_time
             curr_time           // event_time
         );
 
         std::cout << *book << std::endl;
         std::cout << "----------------------------------------------------\n\n";
-        sleep(15);  
     }
 }
 
 void start_socket_server(OrderBook *book){
-
     crow::SimpleApp app;
     std::mutex mtx;
 
@@ -156,14 +177,16 @@ void start_socket_server(OrderBook *book){
 int main(){
     OrderBook *book = new OrderBook;
 
-    // std::cout << "starting trading bot threads...\n";
-    // std::thread th1(trading_bot, book);
-    // std::cout << "all threads up and running.\n";
+    std::cout << "starting trading bot threads...\n";
+    std::thread th1(trading_bot, book);
+    std::cout << "all threads up and running.\n";
+
+
 
     // wscat -c ws://0.0.0.0:5001/ws
     // --limit 23.42 --shares 3 --order_type buy --user_id albert
     std::cout << "starting webserver...\n";
     start_socket_server(book);
 
-    return 0;
+    return 0; 
 }

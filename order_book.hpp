@@ -42,7 +42,7 @@ public:
     std::unordered_map<int, Order*> order_map = {};     // key is order_id
 
     double most_recent_trade_price;
-    bool logging {false};
+    bool logging {true};
     
     Limit *sorted_limit_prices_head {nullptr};
     Limit *sorted_limit_prices_tail {nullptr};

@@ -237,14 +237,14 @@ bool OrderBook::order_crossed_spread(Order *incomming_order, Limit &limit_node){
         return false;
     } else if (this->lowest_sell_limit && !this->highest_buy_limit){
         if (incomming_order->order_type == "buy" && incomming_order->limit >= this->lowest_sell_limit->limit_price){
-            if (this->logging) std::cout << "new buy order has crossed the spread ...\n";
+            if (this->logging) std::cout << "new (first and only) buy order has crossed the spread ...\n";
             this->create_match(incomming_order, limit_node);
             return true;
         } 
         return false;
     } else if (!this->lowest_sell_limit && this->highest_buy_limit){
         if (incomming_order->order_type == "sell" && incomming_order->limit <= this->highest_buy_limit->limit_price){
-            if (this->logging) std::cout << "new sell order has crossed the spread ...\n";
+            if (this->logging) std::cout << "new (first and only) sell order has crossed the spread ...\n";
             this->create_match(incomming_order, limit_node);
             return true;
         }
@@ -284,6 +284,8 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
         if (incomming_order->shares == limit_node.head_order->shares){
             // remove old (matched with) order from DLL
             if (this->logging) std::cout << "perfect match between buyer (" << buyers_order_id << ") and seller (" << sellers_order_id << ")"  << std::endl;
+
+            //TODO: make sure the price is appropriate ... 
 
             // create a new match 
             Match new_match = Match {
@@ -453,10 +455,42 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
             if (this->logging) std::cout << "\n\n";
             return 0;
         }
+    
+    
     } else {
+        // if limit nodes were pointers, this could cause a memory leak.
+        if (!limit_node.head_order){
+            if (this->logging) std::cout << "incoming " << incomming_order->order_type << " order crossed the spread, but doesnt have a limit to create matches with." << std::endl;
+            if (incomming_order->order_type == "buy"){
+                
+                if (this->logging) std::cout << "deleting tail limit node @ price: " << limit_node.limit_price << std::endl;    
+                // delete tail
+                limit_node.prev->next = nullptr;
+                this->limit_map.erase(limit_node.limit_price);
+
+                if (this->logging) std::cout << "changing limit node and trying again..." << std::endl;
+                this->create_match(incomming_order, *tmp_prev);
+                return 0;
+            } else if (incomming_order->order_type == "sell"){
+                
+                if (this->logging) std::cout << "deleting head limit node @ price: " << limit_node.limit_price << std::endl;    
+                // delete head
+                this->sorted_limit_prices_head = this->sorted_limit_prices_head->next;
+                limit_node.next->prev = nullptr;
+                this->limit_map.erase(limit_node.limit_price);
+                
+                if (this->logging) std::cout << "changing limit node and trying again..." << std::endl;
+                this->create_match(incomming_order, *tmp_next);
+                return 0;
+            } else {
+                std::cout << "????\n";
+            }
+        }
+
+
         if (this->logging) std::cout << "this should only happen if we are trying to match a buyer with a buyer or the limit node we have doesnt have any orders.\n";
-        if (this->logging) std::cout << "  >> limit_node.head_order->order_type: " << limit_node.head_order->order_type << std::endl;
         if (this->logging) std::cout << "  >> incomming_order->order_type: " << incomming_order->order_type << std::endl;
+        if (this->logging) std::cout << "  >> limit_node.head_order->order_type: " << limit_node.head_order->order_type << std::endl;
         if (this->logging) std::cout << "  >> limit_node.head_order: " << limit_node.head_order << std::endl;
         return 0;
     }
