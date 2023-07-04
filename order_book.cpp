@@ -23,7 +23,7 @@ void OrderBook::add_order(
     if (this->logging) std::cout << "| shares: " << new_order_ptr->shares << std::endl;
     if (this->logging) std::cout << "| order_type: " << new_order_ptr->order_type << std::endl;
     if (this->logging) std::cout << "| limit: " << new_order_ptr->limit << std::endl;
-    if (this->logging) std::cout << "| order_id: " << new_order_ptr->order_id << std::endl;
+    if (this->logging) std::cout << "| order_id: " << new_order_ptr->order_id << std::endl << std::endl;
     
     // add new order to order_map
     order_map[order_id] = new_order_ptr;
@@ -233,7 +233,6 @@ bool OrderBook::order_crossed_spread(Order *incomming_order, Limit &limit_node){
     // compare against limit price's DLL
     // NOTE: this is only comparing against head order. i think sould be fine though. (all order of a Limit dll should have the same order type, and the DLL's head should always be the oldest order.)
 
-
     if (!this->lowest_sell_limit && !this->highest_buy_limit){
         return false;
     } else if (this->lowest_sell_limit && !this->highest_buy_limit){
@@ -267,7 +266,6 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
     if (this->logging) std::cout << "attempting to create a match...\n";
     Limit *tmp_prev = limit_node.prev;
     Limit *tmp_next = limit_node.next;
-
 
     if (limit_node.head_order && incomming_order->order_type != limit_node.head_order->order_type){
         int buyers_order_id {0};
@@ -351,7 +349,7 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
             if (this->logging) std::cout << "incoming order (" << incomming_order->limit <<  ") wants to " << incomming_order->order_type << " more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders \n";
 
             if (this->logging) std::cout << "STARTING traversing limit node (" << limit_node.limit_price << ") orders to create matches.\n" << std::endl;
-            while (limit_node.head_order && incomming_order->shares > limit_node.head_order->shares){
+            while (limit_node.head_order && incomming_order->shares >= limit_node.head_order->shares){
                 // create a new order which will match the quantity of the limit_node.head_order 
                 srand((unsigned) time(NULL));
                 int order_id = rand();
@@ -399,7 +397,6 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
                 }
             }
 
-
             if (incomming_order->shares > 0){
                 if (this->logging) std::cout << "\nincoming order still has shares to buy/sell! " << std::endl;
                 if (this->limit_map.find(incomming_order->limit) == this->limit_map.end()) {
@@ -441,6 +438,8 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
                 limit_node.head_order->event_time           // event_time
             };
 
+            Order *order = this->order_map.at(limit_node.head_order->order_id); // why do i have to do this ??? 
+            order->shares -= incomming_order->shares;
             limit_node.head_order->shares -= incomming_order->shares;
             if (limit_node.head_order->shares < 0){
                 cout << "SOMETHING VERY BAD HAS HAPPENED 2!!\n";
@@ -485,7 +484,7 @@ void OrderBook::print_limits_dll(Limit *n) {
     cout << "done...\n\n" << endl;
 } 
 
-std::ostream& operator<<(std::ostream& os, const OrderBook& book){
+std::ostream& operator<<(std::ostream& os, const OrderBook &book){
 
     cout << "\n";
 

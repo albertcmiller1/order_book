@@ -17,26 +17,29 @@ To simulate market activity, 10 threads will continuously post buy and sell orde
 Every 60 seconds the book will post the current price of each stock traded into a dynamodb table. This information will be accessable to users via an API hosted with AWS API Gateway + lambda created with the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository.
 
 ### Infrastructure 
-The book, trading bot threads, api, and websocket will be apart of the same process. It will be running on an AWS EC2 instance. 
+The book, trading bot threads, api, and websocket will be apart of the same process which will be running on an AWS EC2 instance. 
 
 ## Todo 
-* api with crow (post order, cancel order, check current price)
+* tests
+* api (post order, cancel order, check current price)
 * validate inputs 
 * broadcast to socket
-* tests (all tests should be independent of one another)
+* convert Limit nodes to pointers 
 * limit should hold the total volume of num shares contained in its order dll
 * logic to retract from queue 
 * botoCpp to post transaction (updated price) to dynamodb
+* remove total_volume and num_limit_nodes ?
+* convert limit nodes to be pointers? 
+
 
 ## Future ideas
 * how to build a driver/buffer for much faster performance? 
-* other data structure ideas for the order book?
+* other data structure ideas for the order book? increase speed? 
 * frontend to view the spread. broadcast the needed info using socket [example](https://www.youtube.com/watch?v=hgOXY-r3xJM&ab_channel=ChadThackray)
 * only run the bots during market hours
 * maybe using an AWS SQS would be better for holding buy and sell orders? then we could have a more distrubuted matching service aka more scalable 
-* would be cool to host a small websocket (python) on the EC2 to show how much memory the server has used / CPU 
+* would be cool to host a small websocket (python) on the EC2 to show how much memory/cpu the server has used 
 * [stock exchange design](https://www.youtube.com/watch?v=XuKs2kWH0mQ&ab_channel=System-Design)
-
 
 
 23.41 buy 
@@ -51,13 +54,6 @@ SPREAD
 
 Right now, if I post a buy order for 23.50, ill get a crossed the spread message
 but if I post a buy order for 23.49, it will match up both buyer and seller at 23.49, when it probably should match up the 23.49 buyer with the 23.46 seller. 
-
-to help solve this, we need to have a list/tree/array of the limit nodes, and keep this list sorted. 
-this will allow us to move up and down the list when an order is completly filled but sill has more potential to create transactions 
-
-
-
-
 
 
 > 23.41/buy/1 23.42/buy/1 23.43/buy/1 23.44/buy/1     
@@ -75,8 +71,6 @@ existing:
 incoming: 
 buy 10 @ 23.46
 
-
-would be cool to be able to connect to a sepearte web socket (python) which broadcasted the amount of memeory used / abalibale by the running orderboook
 
 create a map <std::string ticker, OrderBook book> to hold all a unique book for each unique ticker 
 create api endpoint to IPO a stock, submit an order, cancel an order, check properties of the book

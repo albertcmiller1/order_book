@@ -43,7 +43,6 @@ bool validate_args(std::unordered_map<std::string, std::string> arg_map){
     return true;
 }
 
-
 std::unordered_set<crow::websocket::connection*> users;
 
 void trading_bot(OrderBook *book){

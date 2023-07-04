@@ -3,8 +3,8 @@ using namespace std;
 
 class Testing{
 public: 
-    bool logging {true};
     unsigned int microseconds {10000};
+    bool logging = true;
 
     void clean_up(OrderBook *book){
         // delete all order pointers 
@@ -43,22 +43,21 @@ public:
     bool test_1(){
         if (this->logging) std::cout << "<-----------------------[ test_1 starting ]------------------------------->\n";
         /* 
-            prove the orderbook can add a sell order. 
+            prove the orderbook can add a buy order 
         */
         OrderBook *book = new OrderBook;
+        int order_id = this->create_order(book, "buy", 1, 23.46);
 
-        int order_id = this->create_order(book, "sell", 1, 23.47);
-
-        if (book->highest_buy_limit){ 
+        if (!book->highest_buy_limit){ 
             cout << "1.1 failed." << endl; return false;
         } 
-        if (!book->lowest_sell_limit){ 
+        if (book->lowest_sell_limit){ 
             cout << "1.2 failed." << endl; return false;
         } 
-        if (book->lowest_sell_limit->head_order != book->lowest_sell_limit->tail_order){ 
+        if (book->highest_buy_limit->head_order != book->highest_buy_limit->tail_order){ 
             cout << "1.3 failed." << endl; return false;
         }
-        if (book->lowest_sell_limit->head_order->order_id != order_id){ 
+        if (book->highest_buy_limit->head_order->order_id != order_id){ 
             cout << "1.4 failed." << endl; return false;
         }
         if (book->most_recent_trade_price){ 
@@ -80,21 +79,22 @@ public:
     bool test_2(){
         if (this->logging) std::cout << "<-----------------------[ test_2 starting ]------------------------------->\n";
         /* 
-            prove the orderbook can add a buy order. 
+            prove the orderbook can add a sell order 
         */
         OrderBook *book = new OrderBook;
-        int order_id = this->create_order(book, "buy", 1, 23.46);
 
-        if (!book->highest_buy_limit){ 
+        int order_id = this->create_order(book, "sell", 1, 23.47);
+
+        if (book->highest_buy_limit){ 
             cout << "2.1 failed." << endl; return false;
         } 
-        if (book->lowest_sell_limit){ 
+        if (!book->lowest_sell_limit){ 
             cout << "2.2 failed." << endl; return false;
         } 
-        if (book->highest_buy_limit->head_order != book->highest_buy_limit->tail_order){ 
+        if (book->lowest_sell_limit->head_order != book->lowest_sell_limit->tail_order){ 
             cout << "2.3 failed." << endl; return false;
         }
-        if (book->highest_buy_limit->head_order->order_id != order_id){ 
+        if (book->lowest_sell_limit->head_order->order_id != order_id){ 
             cout << "2.4 failed." << endl; return false;
         }
         if (book->most_recent_trade_price){ 
@@ -116,14 +116,14 @@ public:
     bool test_3(){
         if (this->logging) std::cout << "<-----------------------[ test_3 starting ]------------------------------->\n";
         /* 
-            prove the orderbook can create a match when a buy order crosses the spread 
+            prove a buy order can create a match with a sell order
         */
         OrderBook *book = new OrderBook;
         int order_id_1 = this->create_order(book, "sell", 1, 23.47);
         int order_id_2 = this->create_order(book, "buy", 1, 23.47);
 
         if (book->highest_buy_limit || book->lowest_sell_limit){ 
-            cout << "3.1 failed." << endl; return false;
+            cout << "3.1 failed." << endl; return false; 
         } 
         if (!doubles_are_same(book->most_recent_trade_price, 23.47)){ 
             cout << "3.2 failed." << endl; return false;
@@ -144,7 +144,7 @@ public:
     bool test_4(){
         if (this->logging) std::cout << "<-----------------------[ test_4 starting ]------------------------------->\n";
         /* 
-            prove the orderbook can create a match when a sell order crosses the spread 
+            prove a sell order can create a match with a buy order
         */
         OrderBook *book = new OrderBook;
         int order_id_1 = this->create_order(book, "buy", 1, 23.48);
@@ -172,41 +172,7 @@ public:
     bool test_5(){
         if (this->logging) std::cout << "<-----------------------[ test_5 starting ]------------------------------->\n";
         /* 
-            prove the orderbook can create a match when a big sell order comes in to match with all of buy orders 
-            note: the logic assumes most_recent_trade_price is that of the big order that came in, not that of the order it had to adjust to. 
-        */
-        OrderBook *book = new OrderBook;
-
-        int order_id_1 = this->create_order(book, "buy", 1, 23.41);
-        int order_id_2 = this->create_order(book, "buy", 1, 23.42); 
-        int order_id_3 = this->create_order(book, "buy", 1, 23.43);
-        int order_id_4 = this->create_order(book, "buy", 1, 23.44);
-        // SPREAD
-        int order_id_5 = this->create_order(book, "sell", 4, 23.41);
-
-        if (book->highest_buy_limit || book->lowest_sell_limit){ 
-            cout << "5.1 failed." << endl; return false;
-        }
-        if (book->limit_map.size() != 0){ 
-            cout << "5.2 failed." << endl; return false;
-        }
-        if (book->order_map.size() != 0){ 
-            cout << "5.3 failed." << endl; return false;
-        }
-        if (!doubles_are_same(book->most_recent_trade_price, 23.41)){ 
-            cout << "5.4 failed." << endl; return false;
-        }
-
-        if (this->logging) std::cout << *book << std::endl;
-        if (this->logging) std::cout << "\n<-----------------------[ test_5 complete ]------------------------------->\n";
-        this->clean_up(book);
-        return true;
-    }
-
-    bool test_6(){
-        if (this->logging) std::cout << "<-----------------------[ test_6 starting ]------------------------------->\n";
-        /* 
-            prove the orderbook can create a match when a big buy order comes in to match with alls of sell orders 
+            prove a buy order can change limit nodes to fill orders
             note: the logic assumes most_recent_trade_price is that of the big order that came in, not that of the order it had to adjust to. 
         */
         OrderBook *book = new OrderBook;
@@ -219,12 +185,49 @@ public:
         int order_id_5 = this->create_order(book, "buy", 4, 23.45);
 
         if (book->highest_buy_limit || book->lowest_sell_limit){ 
+            cout << "5.1 failed." << endl; return false;
+        } 
+        if (book->limit_map.size() != 0){ 
+            cout << "5.2 failed." << endl; return false;
+        } 
+        if (book->order_map.size() != 0){ 
+            cout << "5.3 failed." << endl; return false;
+        } 
+        if (!doubles_are_same(book->most_recent_trade_price, 23.45)){ 
+            cout << "5.4 failed." << endl; return false;
+        }
+
+        if (this->logging) std::cout << *book << std::endl;
+        if (this->logging) std::cout << "\n<-----------------------[ test_5 complete ]------------------------------->\n";
+        this->clean_up(book);
+        return true;
+    }
+
+    bool test_6(){
+        if (this->logging) std::cout << "<-----------------------[ test_6 starting ]------------------------------->\n";
+        /* 
+            prove a sell order can change limit nodes to fill orders
+            note: the logic assumes most_recent_trade_price is that of the big order that came in, not that of the order it had to adjust to. 
+        */
+        OrderBook *book = new OrderBook;
+
+        int order_id_1 = this->create_order(book, "buy", 1, 23.41);
+        int order_id_2 = this->create_order(book, "buy", 1, 23.42); 
+        int order_id_3 = this->create_order(book, "buy", 1, 23.43);
+        int order_id_4 = this->create_order(book, "buy", 1, 23.44);
+        // SPREAD
+        int order_id_5 = this->create_order(book, "sell", 4, 23.41);
+
+        if (book->highest_buy_limit || book->lowest_sell_limit){ 
             cout << "6.1 failed." << endl; return false;
-        } else if (book->limit_map.size() != 0){ 
+        }
+        if (book->limit_map.size() != 0){ 
             cout << "6.2 failed." << endl; return false;
-        } else if (book->order_map.size() != 0){ 
+        }
+        if (book->order_map.size() != 0){ 
             cout << "6.3 failed." << endl; return false;
-        } else if (!doubles_are_same(book->most_recent_trade_price, 23.45)){ 
+        }
+        if (!doubles_are_same(book->most_recent_trade_price, 23.41)){ 
             cout << "6.4 failed." << endl; return false;
         }
 
@@ -237,22 +240,13 @@ public:
     bool test_7(){
         if (this->logging) std::cout << "<-----------------------[ test_7 starting ]------------------------------->\n";
         /* 
-            prove the orderbook can create a match when a big buy order comes in to match with lots of sell orders 
+            prove a buy order can partially fill a sell order 
         */
         OrderBook *book = new OrderBook;
 
         int order_id_1 = this->create_order(book, "sell", 100, 23.45);
-        int order_id_2 = this->create_order(book, "sell", 100, 23.44); 
-        int order_id_3 = this->create_order(book, "sell", 100, 23.43);
-        int order_id_4 = this->create_order(book, "sell", 100, 23.42);
         // SPREAD
-        if (this->logging) std::cout << *book << std::endl;
-
-        int order_id_5 = this->create_order(book, "buy", 350, 23.45);
-
-        cout << "AFTER\n";
-        if (this->logging) std::cout << *book << std::endl;
-
+        int order_id_2 = this->create_order(book, "buy", 50, 23.45);
 
         if (book->highest_buy_limit){ 
             cout << "7.1 failed." << endl; return false;
@@ -272,13 +266,140 @@ public:
         if (book->lowest_sell_limit->head_order->shares != 50){ 
             cout << "7.5 failed." << endl; return false;
         } 
+        if (book->order_map.at(book->lowest_sell_limit->head_order->order_id)->shares != 50){
+            cout << "7.6 failed." << endl; return false;
+        }
 
-        // FALSE SUCCESS! 
         if (this->logging) std::cout << *book << std::endl;
         if (this->logging) std::cout << "\n<-----------------------[ test_7 complete ]------------------------------->\n";
-        this->clean_up(book);
+        this->clean_up(book); 
+        return true;
+    }
+
+    bool test_8(){
+        if (this->logging) std::cout << "<-----------------------[ test_8 starting ]------------------------------->\n";
+        /* 
+            prove a sell order can partially fill a buy order 
+        */
+        OrderBook *book = new OrderBook;
+
+        int order_id_2 = this->create_order(book, "buy", 100, 23.46);
+        // SPREAD
+        int order_id_1 = this->create_order(book, "sell", 50, 23.46);
+
+        if (book->lowest_sell_limit){ 
+            cout << "8.1 failed." << endl; return false;
+        } 
+        if (!book->highest_buy_limit){ 
+            cout << "8.2 failed." << endl; return false;
+        } 
+        if (book->limit_map.size() != 1){ 
+            cout << "8.2 failed." << endl; return false;
+        } 
+        if (book->order_map.size() != 1){ 
+            cout << "8.3 failed." << endl; return false;
+        } 
+        if (!doubles_are_same(book->most_recent_trade_price, 23.46)){ 
+            cout << "8.4 failed." << endl; return false;
+        }
+        if (book->highest_buy_limit->head_order->shares != 50){ 
+            cout << "8.5 failed." << endl; return false;
+        } 
+        if (book->order_map.at(book->highest_buy_limit->head_order->order_id)->shares != 50){
+            cout << "8.6 failed." << endl; return false;
+        }
+
+        if (this->logging) std::cout << *book << std::endl;
+        if (this->logging) std::cout << "\n<-----------------------[ test_8 complete ]------------------------------->\n";
+        this->clean_up(book); 
+        return true;
+    }
+
+    bool test_9(){
+        if (this->logging) std::cout << "<-----------------------[ test_9 starting ]------------------------------->\n";
+        /* 
+            prove a buy order can be filled by traversing a DLL of orders of a single limit node 
+        */
+        OrderBook *book = new OrderBook;
+
+        int order_id_1 = this->create_order(book, "sell", 100, 23.45);
+        int order_id_2 = this->create_order(book, "sell", 100, 23.45);
+        int order_id_3 = this->create_order(book, "sell", 100, 23.45);
+        // SPREAD
+        int order_id_4 = this->create_order(book, "buy", 200, 23.45);
+
+        if (book->highest_buy_limit){ 
+            cout << "9.1 failed." << endl; return false;
+        } 
+        if (!book->lowest_sell_limit){ 
+            cout << "9.2 failed." << endl; return false;
+        } 
+        if (book->limit_map.size() != 1){ 
+            cout << "9.2 failed." << endl; return false;
+        } 
+        if (book->order_map.size() != 1){ 
+            cout << "9.3 failed." << endl; return false;
+        } 
+        if (!doubles_are_same(book->most_recent_trade_price, 23.45)){ 
+            cout << "9.4 failed." << endl; return false;
+        }
+        if (book->lowest_sell_limit->head_order->shares != 100){ 
+            cout << "9.5 failed." << endl; return false;
+        } 
+        if (book->order_map.at(book->lowest_sell_limit->head_order->order_id)->shares != 100){
+            cout << "9.6 failed." << endl; return false;
+        }
+
+        if (this->logging) std::cout << *book << std::endl;
+        if (this->logging) std::cout << "\n<-----------------------[ test_9 complete ]------------------------------->\n";
+        this->clean_up(book); 
+        return true;
+    }
+
+    bool test_10(){
+        if (this->logging) std::cout << "<-----------------------[ test_10 starting ]------------------------------->\n";
+        /* 
+            prove a sell order can be filled by traversing a DLL of orders of a single limit node 
+        */
+        OrderBook *book = new OrderBook;
+
+        int order_id_1 = this->create_order(book, "buy", 100, 23.47);
+        int order_id_2 = this->create_order(book, "buy", 100, 23.47);
+        int order_id_3 = this->create_order(book, "buy", 100, 23.47);
+        // SPREAD
+        int order_id_4 = this->create_order(book, "sell", 200, 23.47);
+
+        if (!book->highest_buy_limit){ 
+            cout << "10.1 failed." << endl; return false;
+        } 
+        if (book->lowest_sell_limit){ 
+            cout << "10.2 failed." << endl; return false;
+        } 
+        if (book->limit_map.size() != 1){ 
+            cout << "10.2 failed." << endl; return false;
+        } 
+        if (book->order_map.size() != 1){ 
+            cout << "10.3 failed." << endl; return false;
+        } 
+        if (!doubles_are_same(book->most_recent_trade_price, 23.47)){ 
+            cout << "10.4 failed." << endl; return false;
+        }
+        if (book->highest_buy_limit->head_order->shares != 100){ 
+            cout << "10.5 failed." << endl; return false;
+        } 
+        if (book->order_map.at(book->highest_buy_limit->head_order->order_id)->shares != 100){
+            cout << "10.6 failed." << endl; return false;
+        }
+
+        if (this->logging) std::cout << *book << std::endl;
+        if (this->logging) std::cout << "\n<-----------------------[ test_10 complete ]------------------------------->\n";
+        this->clean_up(book); 
         return true;
     }
 
 
+
+
+    // test to traverse multiple limit nodes 
+    // test to do both of the above 
 };
