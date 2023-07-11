@@ -455,10 +455,9 @@ int OrderBook::create_match(Order *incomming_order, Limit &limit_node){
             if (this->logging) std::cout << "\n\n";
             return 0;
         }
-    
-    
     } else {
         // if limit nodes were pointers, this could cause a memory leak.
+        // TODO: can't assume we can just delete tail or head here ...
         if (!limit_node.head_order){
             if (this->logging) std::cout << "incoming " << incomming_order->order_type << " order crossed the spread, but doesnt have a limit to create matches with." << std::endl;
             if (incomming_order->order_type == "buy"){
@@ -547,7 +546,7 @@ std::ostream& operator<<(std::ostream& os, const OrderBook &book){
     std::cout << "------------" << std::endl;
     std::cout << "order_id\t   limit        qantity\t\torder_type" << std::endl;
     for (auto it = book.order_map.begin(); it != book.order_map.end(); it++){
-        os << it->first << "\t   " << it->second->limit << "\t" << it->second->shares << "\t\t" << it->second->order_type << std::endl;
+        os << it->first << "\t   " << it->second->limit << "\t\t" << it->second->shares << "\t\t" << it->second->order_type << std::endl;
     }
 
     std::cout << "\n\nlimit_map: " << std::endl;
