@@ -1,0 +1,49 @@
+// SEG FAULT
+
+Printing all orders...
+99.21:  1791199179/buy/10/99.210000 
+99.53:  1864778147/buy/10/99.530000 
+99.93:  1258837807/buy/10/99.930000 
+100:  -1470214806/sell/10/100.000000 
+100.72:  1144447072/sell/10/100.720000 
+
+num_orders: 5
+num_limits: 5
+~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+----------------------------------------------------
+
+_________incoming order________
+| shares: 10
+| order_type: sell
+| limit: 99.54
+| order_id: -1513647246
+
+new sell order has crossed the spread ...
+find and return the most appropriate limit for the new sell order to match with. 
+start at head and look for a buy order to match with ...
+looking at curr->limit_price: 99.21
+looking at curr->limit_price: 99.53
+looking at curr->limit_price: 99.93
+most appropriate limit will be: 99.93
+attempting to create a match...
+perfect match between buyer (1258837807) and seller (-1513647246)
+deleting old order...1258837807
+deleting incoming order... -1513647246
+
+limit node is all out of orders! DELETING LIMIT NODE
+
+deleting middle
+
+Printing list...
+99.21/ 99.53/ 1.34852e-310/ done...
+
+
+loop 1 @ node 99.21
+loop 1.2 @ node 99.53
+loop 1 @ node 99.53
+loop 1.1 @ node 99.21
+loop 1.2 @ node 1.34852e-310
+loop 1 @ node 1.34852e-310
+[1]    86218 segmentation fault  ./socket

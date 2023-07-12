@@ -1,0 +1,48 @@
+// INFINATE LOOP 
+
+
+Printing all orders...
+99:  1320708745/buy/10/99.000000 
+99.11:  -1743659706/sell/10/99.110000 
+99.17:  1833347600/sell/10/99.170000 
+99.27:  2036856110/sell/10/99.270000 
+99.49:  1628788504/sell/10/99.490000 
+100:  -1470214806/sell/10/100.000000 
+
+num_orders: 6
+num_limits: 6
+~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+----------------------------------------------------
+
+_________incoming order________
+| shares: 10
+| order_type: buy
+| limit: 99.16
+| order_id: 1605307101
+
+new buy order has crossed the spread ...
+find and return the most appropriate limit for the new buy order to match with. 
+start at tail and look for a sell order to match with ...
+looking at curr->limit_price: 100
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+looking at curr->limit_price: 99.27
+
+

@@ -1,0 +1,34 @@
+// THROW EXCEPTION
+
+Printing all orders...
+99.13:  2086319587/buy/10/99.130000 
+99.38:  -1986829662/sell/10/99.380000 
+100:  -1470214806/sell/10/100.000000 
+100.02:  1790451802/sell/10/100.020000 
+100.48:  1759177348/sell/10/100.480000 
+100.5:  1582574450/sell/10/100.500000 
+
+num_orders: 6
+num_limits: 6
+~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+----------------------------------------------------
+
+_________incoming order________
+| shares: 10
+| order_type: buy
+| limit: 99.45
+| order_id: 1743813055
+
+new buy order has crossed the spread ...
+find and return the most appropriate limit for the new buy order to match with. 
+start at tail and look for a sell order to match with ...
+looking at curr->limit_price: 100.5
+looking at curr->limit_price: 100.48
+looking at curr->limit_price: 100
+curr: 0x600002a80040
+curr->head_order->order_typ: buy
+curr->limit_price: 99.13
+libc++abi: terminating
+[1]    86155 abort      ./socket

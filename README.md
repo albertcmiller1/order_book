@@ -21,6 +21,8 @@ The book, trading bot threads, api, and websocket will be apart of the same proc
 
 ## Todo 
 * tests
+* validation to ensure num limit nodes == limit_map.count(). same for orders 
+* find a way to make all incoming orders limit price values of dollars and cents format 
 * api (post order, cancel order, check current price)
 * validate inputs 
 * broadcast to socket
@@ -52,6 +54,11 @@ SPREAD
 23.48 sell
 23.49 sell
 
+a buyer  matches with a  seller when the incoming buy  price is greater than a sell offer
+
+a seller matches with a  buyer  when the incoming sell price is less    than a buy offer 
+
+
 Right now, if I post a buy order for 23.50, ill get a crossed the spread message
 but if I post a buy order for 23.49, it will match up both buyer and seller at 23.49, when it probably should match up the 23.49 buyer with the 23.46 seller. 
 
@@ -76,3 +83,36 @@ create a map <std::string ticker, OrderBook book> to hold all a unique book for 
 create api endpoint to IPO a stock, submit an order, cancel an order, check properties of the book
 socket should broadcast all trades, and the current state of the spread, and the limit dll
 
+
+
+
+
+
+head
+
+buy 
+buy 
+buy 
+buy 
+SPREAD
+98.4:       -1666021676/sell/10/98.400000 
+98.93:      -1802087656/sell/10/98.930000 
+99.29:      -1015061220/sell/10/99.290000 -1060229120/sell/10/99.290000 
+99.73:      1850612224/sell/10/99.730000 
+99.95:      1807663346/sell/10/99.950000 
+100:        -1470214806/sell/10/100.000000 
+100.29:     1809307880/sell/10/100.290000 
+100.39:     2092683790/sell/10/100.390000 
+100.41:     1249714992/sell/10/100.410000 
+100.44:     1048110644/sell/10/100.440000 
+100.68:     1090232368/sell/10/100.680000 
+100.72:     1204932772/sell/10/100.720000 
+
+
+tail 
+
+_________incoming order________
+| shares: 10
+| order_type: buy
+| limit: 98.61
+| order_id: 1095041655

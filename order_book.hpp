@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <chrono>
 #include <vector> 
+#include <stdexcept>
 
 struct Match {
     int match_id;
@@ -42,6 +43,7 @@ public:
     std::unordered_map<int, Order*> order_map = {};     // key is order_id
 
     double most_recent_trade_price;
+    bool debug {false};
     bool logging {true};
     
     Limit *sorted_limit_prices_head {nullptr};
