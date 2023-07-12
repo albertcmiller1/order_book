@@ -397,8 +397,6 @@ public:
         return true;
     }
 
-//////////////// needs work ////////////////
-
     bool test_11(){
         if (this->logging) std::cout << "<-----------------------[ test_11 starting ]------------------------------->\n";
         /* 
@@ -456,6 +454,7 @@ public:
         int order_id_3 = this->create_order(book, "sell", 10, 8.00);
         int order_id_4 = this->create_order(book, "sell", 10, 9.00);
         // TRIGGER 
+        if (this->logging) std::cout << *book << std::endl;
         int order_id_5 = this->create_order(book, "sell", 10, 5.00);
 
         if (book->highest_buy_limit){ 
@@ -485,6 +484,8 @@ public:
         this->clean_up(book); 
         return true;
     }
+
+//////////////// needs work ////////////////
 
     bool test_13(){
         if (this->logging) std::cout << "<-----------------------[ test_13 starting ]------------------------------->\n";
