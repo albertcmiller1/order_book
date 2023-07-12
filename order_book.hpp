@@ -38,7 +38,7 @@ struct Limit {
 
 class OrderBook {
 public:
-    std::unordered_map<double, Limit> limit_map = {};    // key is limit price
+    std::unordered_map<double, Limit*> limit_map = {};    // key is limit price
     std::unordered_map<int, Order*> order_map = {};     // key is order_id
 
     double most_recent_trade_price;
@@ -61,16 +61,17 @@ public:
         unsigned long long event_time
     );
 
-    Limit& insert_limit_map(double limit_price, int size, int total_volume);
+    Limit* find_best_limit_node_to_match_with(Order *new_order_ptr);
+    Limit* insert_limit_map(double limit_price, int size, int total_volume);
     void update_limit_spread_new();
-    int create_match(Order *incomming_order, Limit &limit_node);
+    int create_match(Order *incomming_order, Limit *limit_node);
     int insert_limit_dll(Limit *new_limit);
-    bool order_crossed_spread(Order *incomming_order, Limit &limit_node);
+    bool order_crossed_spread(Order *incomming_order);
     int cancel_order();
-    void insert_order_dll(Order *order, Limit &limit_node);
+    void insert_order_dll(Order *order, Limit *limit_node);
     void print_orders_dll(Order *n);
     void print_limits_dll(Limit *n);
     int validate();
-    void update_limit_spread(Limit &limit, std::string order_type);
+    void update_limit_spread(Limit *limit, std::string order_type);
     friend std::ostream& operator<<(std::ostream& os, const OrderBook& book);
 };

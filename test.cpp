@@ -4,7 +4,7 @@ using namespace std;
 class Testing{
 public: 
     unsigned int microseconds {10000};
-    bool logging = true;
+    bool logging = false;
 
     void clean_up(OrderBook *book){
         // delete all order pointers 
@@ -409,6 +409,7 @@ public:
         int order_id_3 = this->create_order(book, "buy", 10, 6.00);
         // SPREAD
         int order_id_4 = this->create_order(book, "sell", 10, 7.00);
+        if (this->logging) std::cout << *book << std::endl;
         // TRIGGER 
         int order_id_5 = this->create_order(book, "buy", 10, 9.00);
 
@@ -453,6 +454,7 @@ public:
         int order_id_3 = this->create_order(book, "sell", 10, 8.00);
         int order_id_4 = this->create_order(book, "sell", 10, 9.00);
         // TRIGGER 
+        if (this->logging) std::cout << *book << std::endl;
         int order_id_5 = this->create_order(book, "sell", 10, 5.00);
 
         if (book->highest_buy_limit){ 
@@ -483,13 +485,306 @@ public:
         return true;
     }
 
+//////////////// needs work ////////////////
 
+    bool test_13(){
+        if (this->logging) std::cout << "<-----------------------[ test_13 starting ]------------------------------->\n";
+        /* 
+            prove a buy order can be filled when it crosses the spread at a new limit price between other sell limits
+        */
+        OrderBook *book = new OrderBook;
+
+        // no seg fault, but there is a bug! 
+        int order_id_1 = this->create_order(book, "buy", 10, 13.00);
+        int order_id_2 = this->create_order(book, "buy", 10, 14.00);
+        int order_id_3 = this->create_order(book, "buy", 10, 15.00);
+        // SPREAD
+        int order_id_4 = this->create_order(book, "sell", 10, 16.00);
+        int order_id_5 = this->create_order(book, "sell", 10, 17.00);
+        int order_id_6 = this->create_order(book, "sell", 10, 50.00);
+        if (this->logging) std::cout << *book << std::endl;
+
+        // TRIGGER 
+        int order_id_7 = this->create_order(book, "buy", 10, 25.00);
+
+        // if (!book->highest_buy_limit){ 
+        //     cout << "13.1 failed." << endl; return false;
+        // } 
+        // if (book->lowest_sell_limit){ 
+        //     cout << "13.2 failed." << endl; return false;
+        // } 
+        // if (book->limit_map.size() != 3){ 
+        //     cout << "13.3 failed." << endl; return false;
+        // } 
+        // if (book->order_map.size() != 3){ 
+        //     cout << "13.4 failed." << endl; return false;
+        // } 
+        // if (!doubles_are_same(book->most_recent_trade_price, 9.00)){ 
+        //     cout << "13.5 failed." << endl; return false;
+        // }
+        // if (book->highest_buy_limit->head_order->shares != 10){ 
+        //     cout << "13.6 failed." << endl; return false;
+        // } 
+        // if (book->order_map.at(book->highest_buy_limit->head_order->order_id)->shares != 10){
+        //     cout << "13.7 failed." << endl; return false;
+        // }
+
+        if (this->logging) std::cout << *book << std::endl;
+        if (this->logging) std::cout << "\n<-----------------------[ test_13 complete ]------------------------------->\n";
+        this->clean_up(book); 
+        return true;
+    }
+
+    bool test_14(){
+        if (this->logging) std::cout << "<-----------------------[ test_14 starting ]------------------------------->\n";
+        /* 
+            prove a sell order can be filled when it crosses the spread at a new limit price between other buy limits
+        */
+        OrderBook *book = new OrderBook;
+
+        // no seg fault, but there is a bug! 
+        int order_id_1 = this->create_order(book, "buy", 10, 4.00);
+        int order_id_2 = this->create_order(book, "buy", 10, 14.00);
+        int order_id_3 = this->create_order(book, "buy", 10, 15.00);
+        // SPREAD
+        int order_id_4 = this->create_order(book, "sell", 10, 16.00);
+        int order_id_5 = this->create_order(book, "sell", 10, 17.00);
+        int order_id_6 = this->create_order(book, "sell", 10, 18.00);
+        if (this->logging) std::cout << *book << std::endl;
+
+        // TRIGGER 
+        int order_id_7 = this->create_order(book, "sell", 10, 9.00);
+
+        // if (!book->highest_buy_limit){ 
+        //     cout << "14.1 failed." << endl; return false;
+        // } 
+        // if (book->lowest_sell_limit){ 
+        //     cout << "14.2 failed." << endl; return false;
+        // } 
+        // if (book->limit_map.size() != 3){ 
+        //     cout << "14.3 failed." << endl; return false;
+        // } 
+        // if (book->order_map.size() != 3){ 
+        //     cout << "14.4 failed." << endl; return false;
+        // } 
+        // if (!doubles_are_same(book->most_recent_trade_price, 9.00)){ 
+        //     cout << "14.5 failed." << endl; return false;
+        // }
+        // if (book->highest_buy_limit->head_order->shares != 10){ 
+        //     cout << "14.6 failed." << endl; return false;
+        // } 
+        // if (book->order_map.at(book->highest_buy_limit->head_order->order_id)->shares != 10){
+        //     cout << "14.7 failed." << endl; return false;
+        // }
+
+        if (this->logging) std::cout << *book << std::endl;
+        if (this->logging) std::cout << "\n<-----------------------[ test_14 complete ]------------------------------->\n";
+        this->clean_up(book); 
+        return true;
+    }
+
+    bool test_15(){
+        if (this->logging) std::cout << "<-----------------------[ test_15 starting ]------------------------------->\n";
+        /* 
+            prove a buy order can be filled when it crosses the spread at a new limit price next to a DLL
+        */
+        OrderBook *book = new OrderBook;
+
+        // seg fault
+        int order_id_3 = this->create_order(book, "buy", 10, 6.00);
+        // SPREAD
+        int order_id_4 = this->create_order(book, "sell", 10, 7.00);
+        int order_id_5 = this->create_order(book, "sell", 10, 9.00);
+        int order_id_6 = this->create_order(book, "sell", 10, 9.00);
+        if (this->logging) std::cout << *book << std::endl;
+        // TRIGGER 
+        int order_id_7 = this->create_order(book, "buy", 10, 8.00);
+
+        // if (!book->highest_buy_limit){ 
+        //     cout << "15.1 failed." << endl; return false;
+        // } 
+        // if (book->lowest_sell_limit){ 
+        //     cout << "15.2 failed." << endl; return false;
+        // } 
+        // if (book->limit_map.size() != 3){ 
+        //     cout << "15.3 failed." << endl; return false;
+        // } 
+        // if (book->order_map.size() != 3){ 
+        //     cout << "15.4 failed." << endl; return false;
+        // } 
+        // if (!doubles_are_same(book->most_recent_trade_price, 9.00)){ 
+        //     cout << "15.5 failed." << endl; return false;
+        // }
+        // if (book->highest_buy_limit->head_order->shares != 10){ 
+        //     cout << "15.6 failed." << endl; return false;
+        // } 
+        // if (book->order_map.at(book->highest_buy_limit->head_order->order_id)->shares != 10){
+        //     cout << "15.7 failed." << endl; return false;
+        // }
+
+        if (this->logging) std::cout << *book << std::endl;
+        if (this->logging) std::cout << "\n<-----------------------[ test_15 complete ]------------------------------->\n";
+        this->clean_up(book); 
+        return true;
+    }
+
+    bool test_16(){
+        if (this->logging) std::cout << "<-----------------------[ test_16 starting ]------------------------------->\n";
+        /* 
+            prove a sell order can be filled when it crosses the spread at a new limit price next to a DLL
+        */
+        OrderBook *book = new OrderBook;
+
+        // seg fault
+        int order_id_2 = this->create_order(book, "buy", 10, 2.00);
+        int order_id_3 = this->create_order(book, "buy", 10, 6.00);
+        int order_id_4 = this->create_order(book, "buy", 10, 6.00);
+        // SPREAD
+        int order_id_7 = this->create_order(book, "sell", 10, 100.00);
+        if (this->logging) std::cout << *book << std::endl;
+        // TRIGGER 
+        int order_id_9 = this->create_order(book, "sell", 10, 4.00);
+
+        // if (!book->highest_buy_limit){ 
+        //     cout << "16.1 failed." << endl; return false;
+        // } 
+        // if (book->lowest_sell_limit){ 
+        //     cout << "16.2 failed." << endl; return false;
+        // } 
+        // if (book->limit_map.size() != 3){ 
+        //     cout << "16.3 failed." << endl; return false;
+        // } 
+        // if (book->order_map.size() != 3){ 
+        //     cout << "16.4 failed." << endl; return false;
+        // } 
+        // if (!doubles_are_same(book->most_recent_trade_price, 9.00)){ 
+        //     cout << "16.5 failed." << endl; return false;
+        // }
+        // if (book->highest_buy_limit->head_order->shares != 10){ 
+        //     cout << "16.6 failed." << endl; return false;
+        // } 
+        // if (book->order_map.at(book->highest_buy_limit->head_order->order_id)->shares != 10){
+        //     cout << "16.7 failed." << endl; return false;
+        // }
+
+        if (this->logging) std::cout << *book << std::endl;
+        if (this->logging) std::cout << "\n<-----------------------[ test_16 complete ]------------------------------->\n";
+        this->clean_up(book); 
+        return true;
+    }
+
+    bool test_17(){
+        if (this->logging) std::cout << "<-----------------------[ test_17 starting ]------------------------------->\n";
+        /* 
+            prove a buy order can be filled when it crosses the spread at a new limit price next to a DLL
+        */
+        OrderBook *book = new OrderBook;
+
+        // seg fault
+        int order_id_1 = this->create_order(book, "buy", 10, 6.00);
+        // SPREAD
+        int order_id_2 = this->create_order(book, "sell", 10, 7.00);
+        int order_id_3 = this->create_order(book, "sell", 10, 7.00);
+        int order_id_4 = this->create_order(book, "sell", 10, 9.00);
+        if (this->logging) std::cout << *book << std::endl;
+        // TRIGGER 
+        int order_id_5 = this->create_order(book, "buy", 10, 8.00);
+
+        // if (!book->highest_buy_limit){ 
+        //     cout << "17.1 failed." << endl; return false;
+        // } 
+        // if (book->lowest_sell_limit){ 
+        //     cout << "17.2 failed." << endl; return false;
+        // } 
+        // if (book->limit_map.size() != 3){ 
+        //     cout << "17.3 failed." << endl; return false;
+        // } 
+        // if (book->order_map.size() != 3){ 
+        //     cout << "17.4 failed." << endl; return false;
+        // } 
+        // if (!doubles_are_same(book->most_recent_trade_price, 9.00)){ 
+        //     cout << "17.5 failed." << endl; return false;
+        // }
+        // if (book->highest_buy_limit->head_order->shares != 10){ 
+        //     cout << "17.6 failed." << endl; return false;
+        // } 
+        // if (book->order_map.at(book->highest_buy_limit->head_order->order_id)->shares != 10){
+        //     cout << "17.7 failed." << endl; return false;
+        // }
+
+        if (this->logging) std::cout << *book << std::endl;
+        if (this->logging) std::cout << "\n<-----------------------[ test_17 complete ]------------------------------->\n";
+        this->clean_up(book); 
+        return true;
+    }
+
+    bool test_18(){
+        if (this->logging) std::cout << "<-----------------------[ test_18 starting ]------------------------------->\n";
+        /* 
+            prove a sell order can be filled when it crosses the spread at a new limit price next to a DLL
+        */
+        OrderBook *book = new OrderBook;
+
+        // seg fault
+        int order_id_1 = this->create_order(book, "buy", 10, 1.00);
+        int order_id_2 = this->create_order(book, "buy", 10, 2.00);
+        int order_id_3 = this->create_order(book, "buy", 10, 2.00);
+        int order_id_4 = this->create_order(book, "buy", 10, 6.00);
+        // SPREAD
+        int order_id_5 = this->create_order(book, "sell", 10, 100.00);
+        if (this->logging) std::cout << *book << std::endl;
+        // TRIGGER 
+        int order_id_6 = this->create_order(book, "sell", 10, 4.00);
+
+        // if (!book->highest_buy_limit){ 
+        //     cout << "18.1 failed." << endl; return false;
+        // } 
+        // if (book->lowest_sell_limit){ 
+        //     cout << "18.2 failed." << endl; return false;
+        // } 
+        // if (book->limit_map.size() != 3){ 
+        //     cout << "18.3 failed." << endl; return false;
+        // } 
+        // if (book->order_map.size() != 3){ 
+        //     cout << "18.4 failed." << endl; return false;
+        // } 
+        // if (!doubles_are_same(book->most_recent_trade_price, 9.00)){ 
+        //     cout << "18.5 failed." << endl; return false;
+        // }
+        // if (book->highest_buy_limit->head_order->shares != 10){ 
+        //     cout << "18.6 failed." << endl; return false;
+        // } 
+        // if (book->order_map.at(book->highest_buy_limit->head_order->order_id)->shares != 10){
+        //     cout << "18.7 failed." << endl; return false;
+        // }
+
+        if (this->logging) std::cout << *book << std::endl;
+        if (this->logging) std::cout << "\n<-----------------------[ test_18 complete ]------------------------------->\n";
+        this->clean_up(book); 
+        return true;
+    }
 
 };
 
 
 
 /*
+
+buy @ 0
+buy @ 0.06
+buy @ 6.00
+buy @ 6.00
+buy @ 8.00
+buy @ 8.00
+
+sell @ 100
+sell @ 100
+
+> sell @ 0.09
+
+
+
+
 HIGHEST BUY OFFER: 8
 LOWEST SELL OFFER: 100
 
@@ -513,29 +808,23 @@ price      volume       num_orders 	 order_ids
 0.06	    10		        1		 1930150786 
 8	        10		        2		 1140563598 1970383738 
 6	        10		        2		 2041647826 1481299816 
-100	        10		        2		 282475249 1622650073 
+100	        10		        2		 282475249  1622650073 
 
 Printing list NEW...
 0:          156288720/buy/10/0.000000 
 0.06:       1930150786/buy/10/0.060000 
-6:          2041647826/buy/10/6.000000 1481299816/buy/10/6.000000 
-8:          1140563598/buy/10/8.000000 1970383738/buy/10/8.000000 
-100:        282475249/sell/10/100.000000 1622650073/sell/10/100.000000 
+6:          2041647826/buy/10/6.000000      1481299816/buy/10/6.000000 
+8:          1140563598/buy/10/8.000000      1970383738/buy/10/8.000000 
+100:        282475249/sell/10/100.0000      1622650073/sell/10/100.000000 
 
 ----------------------------------------------------
 
-----------------
-order_id: 372016759
-order_type: sell
-shares: 59
-bid_price: 0.09
-curr_time: 1688510543852
-----------------
 _________incoming order________
 | shares: 10
 | order_type: sell
 | limit: 0.09
 | order_id: 372016759
+
 
 new sell order has crossed the spread ...
 attempting to create a match...
@@ -550,3 +839,25 @@ deleting incoming order... 372016759
 
 
 */ 
+
+
+
+
+
+/*
+test to prove that ...
+
+
+int order_id_1 = this->create_order(book, "buy", 10, 13.00);
+int order_id_2 = this->create_order(book, "buy", 10, 14.00);
+int order_id_3 = this->create_order(book, "buy", 10, 15.00);
+// SPREAD
+int order_id_4 = this->create_order(book, "sell", 10, 17.00);
+int order_id_5 = this->create_order(book, "sell", 10, 18.00);
+int order_id_6 = this->create_order(book, "sell", 10, 19.00);
+//TRIGGER
+int order_id_7 = this->create_order(book, "buy", 10, 16.00);
+
+
+can properly update 
+*/
