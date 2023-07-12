@@ -4,7 +4,7 @@ using namespace std;
 class Testing{
 public: 
     unsigned int microseconds {10000};
-    bool logging = true;
+    bool logging = false;
 
     void clean_up(OrderBook *book){
         // delete all order pointers 
@@ -397,6 +397,8 @@ public:
         return true;
     }
 
+//////////////// needs work ////////////////
+
     bool test_11(){
         if (this->logging) std::cout << "<-----------------------[ test_11 starting ]------------------------------->\n";
         /* 
@@ -483,8 +485,6 @@ public:
         this->clean_up(book); 
         return true;
     }
-
-//////////////// needs work ////////////////
 
     bool test_13(){
         if (this->logging) std::cout << "<-----------------------[ test_13 starting ]------------------------------->\n";
@@ -762,7 +762,6 @@ public:
         this->clean_up(book); 
         return true;
     }
-
 
 };
 

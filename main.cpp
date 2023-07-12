@@ -6,6 +6,7 @@ using namespace std;
 
 int main(int argc, char** argv){
     Testing tests = Testing();
+    tests.logging = true;
     if (
             // tests.test_1() &&       // prove the orderbook can add a buy  order 
             // tests.test_2() &&       // prove the orderbook can add a sell order
@@ -20,10 +21,7 @@ int main(int argc, char** argv){
             // tests.test_8() &&       // prove a sell order can partially fill a buy  order 
 
             // tests.test_9() &&       // prove a buy  order can be filled by traversing a DLL of orders of a single limit node 
-            // tests.test_10() &&      // prove a sell order can be filled by traversing a DLL of orders of a single limit node 
-
-            // tests.test_11() &&      // prove a buy  order can be filled when it crosses the spread at a new, very high limit price
-            // tests.test_12()         // prove a sell order can be filled when it crosses the spread at a new, very low  limit price
+            // tests.test_10()         // prove a sell order can be filled by traversing a DLL of orders of a single limit node 
 
             tests.test_11()
 
