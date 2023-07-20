@@ -62,7 +62,7 @@ public:
         unsigned long long entry_time,
         unsigned long long event_time
     );
-
+    double find_best_limit_node_to_match_with_new(std::string incoming_order_type, double incoming_order_limit);
     Limit* find_best_limit_node_to_match_with(Order *new_order_ptr);
     Limit* insert_limit_map(double limit_price, int size, int total_volume);
     void update_limit_spread_new();

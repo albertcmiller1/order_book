@@ -35,8 +35,26 @@ void OrderBook::add_order(
         // check if order crosses the spread 
         // TODO: will the create_match function take care of the issue of an incominng order that will have leftovers? 
         if (this->order_crossed_spread(new_order_ptr)){
-            Limit *best_limit_node = this->find_best_limit_node_to_match_with(new_order_ptr);
-            this->create_match(new_order_ptr, best_limit_node);
+            // Limit *best_limit_node = this->find_best_limit_node_to_match_with(new_order_ptr);
+            // std::cout << "TESTING__1\n";
+            // if (best_limit_node->prev) std::cout << "best_limit_node->prev->limit_price " << best_limit_node->prev->limit_price << std::endl;
+            // std::cout << "best_limit_node->limit_price " << best_limit_node->limit_price << std::endl;
+            // if (best_limit_node->next) std::cout << "best_limit_node->next->limit_price " << best_limit_node->next->limit_price << std::endl;
+            // std::cout << "TESTING__1\n";
+
+            // test 1 and test 2 give same answer
+
+            double best_limit_price = find_best_limit_node_to_match_with_new(new_order_ptr->order_type, new_order_ptr->limit);
+
+            std::cout << "TESTING__2\n";
+            this->print_limits_dll(this->sorted_limit_prices_head);
+            Limit *new_best_limit_node = this->limit_map[best_limit_price];
+            if (new_best_limit_node->prev) std::cout << "new_best_limit_node->prev->limit_price " << new_best_limit_node->prev->limit_price << std::endl;
+            std::cout << "new_best_limit_node->limit_price " << new_best_limit_node->limit_price << std::endl;
+            if (new_best_limit_node->next) std::cout << "new_best_limit_node->next->limit_price " << new_best_limit_node->next->limit_price << std::endl;
+            std::cout << "TESTING__2\n";
+
+            this->create_match(new_order_ptr, new_best_limit_node);
         } else {
             Limit *new_limit_node = this->insert_limit_map(limit_price, shares, shares);
             this->insert_limit_dll(new_limit_node);
@@ -57,16 +75,44 @@ void OrderBook::add_order(
     this->update_limit_spread_new();
 }
 
+
+double OrderBook::find_best_limit_node_to_match_with_new(std::string incoming_order_type, double incoming_order_limit){
+    this->print_limits_dll(this->sorted_limit_prices_head);
+
+    if (incoming_order_type == "buy"){
+        Limit *curr = this->sorted_limit_prices_tail;
+        while (curr != nullptr) {
+            cout << curr->limit_price << "/" << " ";
+            if (curr->limit_price <= incoming_order_limit){
+                cout << "FOUND: " << curr->limit_price << endl;
+                return curr->limit_price;
+            }
+            curr = curr->prev;
+        }
+    } else {
+        Limit *curr = this->sorted_limit_prices_head;
+        while (curr != nullptr){
+            cout << curr->limit_price << "/" << " ";
+            if (curr->limit_price >= incoming_order_limit){
+                cout << "FOUND: " << curr->limit_price << endl;
+                return curr->limit_price;
+            }
+            curr = curr->next;
+        }
+    }
+}
+
 Limit* OrderBook::find_best_limit_node_to_match_with(Order *new_order_ptr){
     // TODO: BUG: needs to be within range, look at line 408 of bug.txt
     // this got stuck in an infinate loop
     if (this->logging) std::cout << "find and return the most appropriate limit for the new " << new_order_ptr->order_type << " order to match with. \n";
+    this->print_limits_dll(this->sorted_limit_prices_head);
     Limit *curr = nullptr;
     if (new_order_ptr->order_type == "buy"){
+        // not sure why but this seems to skip to the end???
         if (this->logging) std::cout << "start at tail and look for a sell order to match with ...\n";
-        // start at sorted_limit_prices_tail and go backwards until we find a limit that is cool to match with 
         curr = this->sorted_limit_prices_tail;
-        while (curr != nullptr && curr->head_order->order_type == "sell"){
+        while (curr && curr->head_order->order_type == "sell"){
             if (this->logging) std::cout << "looking at curr->limit_price: " << curr->limit_price << std::endl;
             if (curr->limit_price <= new_order_ptr->limit){
                 break;
@@ -80,10 +126,10 @@ Limit* OrderBook::find_best_limit_node_to_match_with(Order *new_order_ptr){
             throw;
         }
     } else {
-        // start at sorted_limit_prices_head and go forward until we find a limit that is cool to match with 
+        // this seemed to work, but cant access curr->prev for some reason? 
         if (this->logging) std::cout << "start at head and look for a buy order to match with ...\n";
         curr = this->sorted_limit_prices_head;
-        while (curr != nullptr && curr->head_order->order_type == "buy"){
+        while (curr && curr->head_order->order_type == "buy"){
             if (this->logging) std::cout << "looking at curr->limit_price: " << curr->limit_price << std::endl;
             if (curr->limit_price >= new_order_ptr->limit){
                 break;
@@ -307,9 +353,39 @@ int OrderBook::insert_limit_dll(Limit *new_limit){
 }
 
 int OrderBook::validate(){
+    // loop over sorted_limit_dll
+    // count all orders
+    // count all limits 
+    // make sure the counts match up to their maps 
+    // also for each order/limit, make sure its in the map
+    // loop over the maps, make sure they're in the DLL
+
+
     // go through each limit price in limit_map
     // make sure all orders attached at that price are of the same order_type. 
     // would be also good to check that there are no limit nodes with empty orders (could be a memory leak)
+
+
+    cout << "\nStarting Validation..." << endl;
+    Limit *curr = this->sorted_limit_prices_head;
+    int num_limits = 0;
+    int num_orders = 0;
+    while (curr != nullptr) {
+        num_limits++;
+        std::string s = " ";
+        Order *n = curr->head_order;
+        while (n != nullptr) {
+            num_orders++;
+            s = s + std::to_string(n->order_id) + "/" + n->order_type + "/" + std::to_string(n->shares) + "/" + std::to_string(n->limit) + " ";
+            n = n->next;
+        };
+        cout << curr->limit_price << ": " << s << endl;
+        curr = curr->next;
+    }
+
+    std::cout << "\nnum_orders: " << num_orders << std::endl;
+    std::cout << "num_limits: " << num_limits << std::endl;
+
     return 0;
 }
 
@@ -382,51 +458,58 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
 
             // delete head 
             if (this->logging) std::cout << "deleting old order..." << limit_node->head_order->order_id << std::endl;
-            Order *tmp = limit_node->head_order; // TODO: memory leak?
+            Order *tmp = limit_node->head_order; 
             limit_node->head_order = limit_node->head_order->next;
             if (limit_node->head_order) { 
                 limit_node->head_order->prev=nullptr; 
             }
             this->order_map.erase(tmp->order_id);
             delete tmp;
+            tmp = nullptr;
 
             // delete incomming_order.
             if (this->logging) std::cout << "deleting incoming order... " << incomming_order->order_id << std::endl;
             this->order_map.erase(incomming_order->order_id);
             delete incomming_order;
+            incomming_order = nullptr;
 
             if (!limit_node->head_order){
                 // if limit has no orders, delete it
-                if (this->logging) std::cout << "\nlimit node is all out of orders! DELETING LIMIT NODE\n";
+                if (this->logging) std::cout << "\nlimit node is all out of orders! DELETING LIMIT NODE @ " << limit_node->limit_price << std::endl;
+                this->print_limits_dll(this->sorted_limit_prices_head);
 
                 if (limit_node->prev && limit_node->next){
                     if (this->logging) std::cout << "\ndeleting middle\n";
                     // middle of limit_dll
-                    // memory leak? 
+                    if (this->logging) std::cout << "limit_node->limit_price: " << limit_node->limit_price << std::endl;
+                    if (this->logging) std::cout << "limit_node->prev->limit_price: " << limit_node->prev->limit_price << std::endl;
+                    if (this->logging) std::cout << "limit_node->next->limit_price: " << limit_node->next->limit_price << std::endl;
+                    if (this->logging) std::cout << "limit_node->prev->next->limit_price: " << limit_node->prev->next->limit_price << std::endl;
+                    if (this->logging) std::cout << "limit_node->next->prev->limit_price: " << limit_node->next->prev->limit_price << std::endl;
+
                     limit_node->prev->next = limit_node->next;
                     limit_node->next->prev = limit_node->prev;
-                    this->limit_map.erase(limit_node->limit_price);
+
                 } else if (limit_node->prev && !limit_node->next){
                     if (this->logging) std::cout << "\ndeleting tail\n";
                     // tail of limit_dll
                     // memory leak? 
                     limit_node->prev->next = nullptr;
-                    this->limit_map.erase(limit_node->limit_price);
                 } else if (limit_node->next && !limit_node->prev){
                     if (this->logging) std::cout << "\ndeleting head\n";
                     // head of limit_dll
                     this->sorted_limit_prices_head = this->sorted_limit_prices_head->next;
                     limit_node->next->prev = nullptr;
-                    this->limit_map.erase(limit_node->limit_price);
                 } else {
                     if (this->logging) std::cout << "\ndeleting only existing\n";
                     // only one limit node exists
                     this->sorted_limit_prices_head = nullptr;
                     this->sorted_limit_prices_tail = nullptr;
-                    this->limit_map.erase(limit_node->limit_price);
                 }
-                
-                free(limit_node); 
+
+                this->limit_map.erase(limit_node->limit_price);
+                delete limit_node; 
+                limit_node = nullptr;
                 // delete limit_node; 
                 this->print_limits_dll(this->sorted_limit_prices_head);
             }
