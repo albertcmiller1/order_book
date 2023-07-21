@@ -118,11 +118,6 @@ double OrderBook::find_best_limit_node_to_match_with_new(std::string incoming_or
             curr = curr->next;
         }
     }
-
-
-
-
-
 }
 
 Limit* OrderBook::find_best_limit_node_to_match_with(Order *new_order_ptr){
@@ -358,10 +353,11 @@ int OrderBook::insert_limit_dll(Limit *new_limit){
                 return 0;
             } else if (curr->limit_price < new_limit->limit_price && new_limit->limit_price < curr->next->limit_price){
                 // inserting in middle
-                new_limit->prev = curr;
-                new_limit->next = curr->next;
+                Limit *tmp_nxt = curr->next;
                 curr->next = new_limit;
-                curr->next->prev = new_limit;
+                new_limit->prev = curr;
+                new_limit->next = tmp_nxt;
+                tmp_nxt->prev = new_limit;
                 return 0;
             } else {
                 curr = curr->next;
