@@ -40,7 +40,7 @@ struct Limit {
 class OrderBook {
 public:
     std::unordered_map<double, Limit*> limit_map = {};    // key is limit price
-    std::unordered_map<int, Order*> order_map = {};     // key is order_id
+    std::unordered_map<int, Order*> order_map = {};       // key is order_id
 
     int num_matches {0};
     double most_recent_trade_price;
@@ -76,6 +76,6 @@ public:
     void print_limits_dll(Limit *n);
     void print_limits_dll_backwards(Limit *n);
     int validate();
-    void update_limit_spread(Limit *limit, std::string order_type);
+    void update_limit_spread_old(Limit *limit, std::string order_type);
     friend std::ostream& operator<<(std::ostream& os, const OrderBook& book);
 };

@@ -57,7 +57,7 @@ std::unordered_set<crow::websocket::connection*> users;
 void trading_bot(OrderBook *book){
     int cnt = 1;
     while (true){
-        sleep(1);  
+        sleep(.1);  
 
         // std::cout << "THREAD still working" << std::endl;
         // for (auto user : users){
@@ -65,9 +65,17 @@ void trading_bot(OrderBook *book){
         //     user->send_text("THREAD still working");
         // }
        
-        // srand((unsigned) time(NULL));
         uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        
         int order_id = rand();
+
+        while (book->order_map.find(order_id) != book->order_map.end()){
+            // order is already exists. try a new one.
+            std::cout << "order is already exists. try a new one.\n";
+            order_id = rand();
+        }
+        std::cout << "order_id: " << order_id << std::endl;
+
         
         while (count_digit(order_id) <= 9){ 
             order_id *= 10;
@@ -103,20 +111,13 @@ void trading_bot(OrderBook *book){
 
         curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-        // cout << "----------------\n";
-        // cout << "order_id: "    << order_id << endl;
-        // cout << "order_type: "  << order_type << endl;
-        // cout << "shares: "      << shares << endl;
-        // cout << "bid_price: "   << bid_price << endl;
-        // cout << "curr_time: "   << curr_time << endl;
-        // cout << "----------------\n";
 
         std::cout << "<--------------------------------------------------------------------------" << cnt << "--------------------------------------------------------------------------------------->\n";
         book->add_order(
             order_id,           // order_id
             order_type,         // order_type
             10,                 // shares
-            bid_price,                // limit
+            bid_price,          // limit
             curr_time,          // entry_time
             curr_time           // event_time
         );
