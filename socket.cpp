@@ -55,6 +55,7 @@ bool validate_args(std::unordered_map<std::string, std::string> arg_map){
 std::unordered_set<crow::websocket::connection*> users;
 
 void trading_bot(OrderBook *book){
+    int cnt = 1;
     while (true){
         sleep(1);  
 
@@ -110,6 +111,7 @@ void trading_bot(OrderBook *book){
         // cout << "curr_time: "   << curr_time << endl;
         // cout << "----------------\n";
 
+        std::cout << "--------------------------------------------------------------------------" << cnt << "---------------------------------------------------------------------------------------\n";
         book->add_order(
             order_id,           // order_id
             order_type,         // order_type
@@ -120,7 +122,8 @@ void trading_bot(OrderBook *book){
         );
 
         std::cout << *book << std::endl;
-        std::cout << "----------------------------------------------------\n\n";
+        std::cout << "---------------------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n";
+        cnt++;
     }
 }
 

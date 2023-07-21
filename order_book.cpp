@@ -77,14 +77,24 @@ void OrderBook::add_order(
 
 
 double OrderBook::find_best_limit_node_to_match_with_new(std::string incoming_order_type, double incoming_order_limit){
+    std::cout << "new order doesnt have a limit. find one ....\n";
     this->print_limits_dll(this->sorted_limit_prices_head);
+    this->print_limits_dll_backwards(this->sorted_limit_prices_tail);
 
     if (incoming_order_type == "buy"){
         Limit *curr = this->sorted_limit_prices_tail;
         while (curr != nullptr) {
             cout << curr->limit_price << "/" << " ";
             if (curr->limit_price <= incoming_order_limit){
-                cout << "FOUND: " << curr->limit_price << endl;
+                cout << "___FOUND___: " << curr->limit_price << endl;
+                
+                if (curr->prev) std::cout << "curr->prev->limit_price " << curr->prev->limit_price << std::endl;
+                std::cout << "curr->limit_price " << curr->limit_price << std::endl;
+                if (curr->next) std::cout << "curr->next->limit_price " << curr->next->limit_price << std::endl;
+
+                std::cout << "list after found ....\n";
+                this->print_limits_dll(this->sorted_limit_prices_head);
+                this->print_limits_dll_backwards(this->sorted_limit_prices_tail);
                 return curr->limit_price;
             }
             curr = curr->prev;
@@ -94,12 +104,25 @@ double OrderBook::find_best_limit_node_to_match_with_new(std::string incoming_or
         while (curr != nullptr){
             cout << curr->limit_price << "/" << " ";
             if (curr->limit_price >= incoming_order_limit){
-                cout << "FOUND: " << curr->limit_price << endl;
+                cout << "___FOUND___: " << curr->limit_price << endl;
+                
+                if (curr->prev) std::cout << "curr->prev->limit_price " << curr->prev->limit_price << std::endl;
+                std::cout << "curr->limit_price " << curr->limit_price << std::endl;
+                if (curr->next) std::cout << "curr->next->limit_price " << curr->next->limit_price << std::endl;
+
+                std::cout << "list after found ....\n";
+                this->print_limits_dll(this->sorted_limit_prices_head);
+                this->print_limits_dll_backwards(this->sorted_limit_prices_tail);
                 return curr->limit_price;
             }
             curr = curr->next;
         }
     }
+
+
+
+
+
 }
 
 Limit* OrderBook::find_best_limit_node_to_match_with(Order *new_order_ptr){
@@ -188,15 +211,15 @@ void OrderBook::update_limit_spread_new(){
     if (this->debug) std::cout << "starting loop\n";
     while (curr != nullptr) {
         // loop over all limits 
-        if (this->logging) std::cout << "loop 1 @ node " << curr->limit_price << endl;
-        if (curr->prev) if (this->logging) std::cout << "loop 1.1 @ node " << curr->prev->limit_price << endl;
-        if (curr->next) if (this->logging) std::cout << "loop 1.2 @ node " << curr->next->limit_price << endl;
+        // if (this->logging) std::cout << "loop 1 @ node " << curr->limit_price << endl;
+        // if (curr->prev) if (this->logging) std::cout << "loop 1.1 @ node " << curr->prev->limit_price << endl;
+        // if (curr->next) if (this->logging) std::cout << "loop 1.2 @ node " << curr->next->limit_price << endl;
         Order *n = curr->head_order; // this is null for some reason 
-        if (this->debug) std::cout << "loop 2\n";
+        // if (this->debug) std::cout << "loop 2\n";
 
         bool all_same = true;
         std::string first_order_type = n->order_type;
-        if (this->debug) std::cout << "loop 3\n";
+        // if (this->debug) std::cout << "loop 3\n";
         
 
         while (n != nullptr) {
@@ -207,7 +230,7 @@ void OrderBook::update_limit_spread_new(){
             n = n->next;
         };
 
-        if (this->debug) std::cout << "loop 4\n";
+        // if (this->debug) std::cout << "loop 4\n";
         if (!all_same){
             std::cout << "??????AGGHH\n" << endl;
         } else if (this->highest_buy_limit == nullptr && curr->head_order->order_type == "buy"){
@@ -328,8 +351,9 @@ int OrderBook::insert_limit_dll(Limit *new_limit){
             } else if (!curr->next && new_limit->limit_price > curr->limit_price) {
                 // inserting at tail 
                 new_limit->prev = this->sorted_limit_prices_tail;
+                this->sorted_limit_prices_tail->next = new_limit;
                 new_limit->next = nullptr;
-                curr->next = new_limit;
+                // curr->next = new_limit;
                 this->sorted_limit_prices_tail = new_limit;
                 return 0;
             } else if (curr->limit_price < new_limit->limit_price && new_limit->limit_price < curr->next->limit_price){
@@ -647,10 +671,18 @@ void OrderBook::print_orders_dll(Order *n) {
 } 
 
 void OrderBook::print_limits_dll(Limit *n) {
-    cout << "\nPrinting list..." << endl;
+    cout << "\nPrinting list forwards..." << endl;
     while (n != nullptr) {
         cout << n->limit_price << "/" << " ";
         n = n->next;
+    }
+    cout << "done...\n\n" << endl;
+} 
+void OrderBook::print_limits_dll_backwards(Limit *n) {
+    cout << "\nPrinting list backwards..." << endl;
+    while (n != nullptr) {
+        cout << n->limit_price << "/" << " ";
+        n = n->prev;
     }
     cout << "done...\n\n" << endl;
 } 
@@ -733,6 +765,35 @@ std::ostream& operator<<(std::ostream& os, const OrderBook &book){
 
     std::cout << "\nnum_orders: " << num_orders << std::endl;
     std::cout << "num_limits: " << num_limits << std::endl;
+
+    int num_limits_cnt_forwards = 0;
+    int num_limits_cnt_backwards = 0;
+
+    std::cout << "\nPrinting list forwards..." << endl;
+    Limit *n = book.sorted_limit_prices_head;
+    while (n != nullptr) {
+        num_limits_cnt_forwards++;
+        std::cout << n->limit_price << "/" << " ";
+        n = n->next;
+    }
+    std::cout << "done...\n\n" << endl;
+
+    std::cout << "\nPrinting list backwards..." << endl;
+    Limit *p = book.sorted_limit_prices_tail;
+
+    while (p != nullptr) {
+        num_limits_cnt_backwards++;
+        cout << p->limit_price << "/" << " ";
+        p = p->prev;
+    }
+    std::cout << "done...\n\n" << endl;
+
+    if (num_limits_cnt_forwards != num_limits_cnt_backwards){
+        std::cout << "num_limits_cnt_forwards: " << num_limits_cnt_forwards << std::endl;
+        std::cout << "num_limits_cnt_backwards: " << num_limits_cnt_backwards << std::endl;
+        throw;
+    }
+
     if (true) std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
     return os;
 }
