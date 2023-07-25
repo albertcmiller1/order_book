@@ -57,7 +57,7 @@ std::unordered_set<crow::websocket::connection*> users;
 void trading_bot(OrderBook *book){
     int cnt = 1;
     while (true){
-        sleep(.1);  
+        sleep(1);  
 
         // std::cout << "THREAD still working" << std::endl;
         // for (auto user : users){

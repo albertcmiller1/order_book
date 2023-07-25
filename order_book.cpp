@@ -1,14 +1,7 @@
 #include "order_book.hpp" 
 using namespace std; 
 
-void OrderBook::add_order(
-        int order_id,
-        std::string order_type,
-        int shares,
-        double limit_price,
-        unsigned long long entry_time,
-        unsigned long long event_time
-    ){
+void OrderBook::add_order(int order_id, std::string order_type, int shares, double limit_price, unsigned long long entry_time, unsigned long long event_time){
 
     Order *new_order_ptr = new Order {
         order_id,
