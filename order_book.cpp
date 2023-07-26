@@ -1,7 +1,40 @@
 #include "order_book.hpp" 
 using namespace std; 
 
-void OrderBook::add_order(int order_id, std::string order_type, int shares, double limit_price, unsigned long long entry_time, unsigned long long event_time){
+static std::random_device              rd;
+static std::mt19937                    gen(rd());
+static std::uniform_int_distribution<> dis(0, 15);
+static std::uniform_int_distribution<> dis2(8, 11);
+
+std::string generate_uuid_v4_1() {
+    std::stringstream ss;
+    int i;
+    ss << std::hex;
+    for (i = 0; i < 10; i++) {
+        ss << dis(gen);
+    }
+    // ss << "-";
+    // for (i = 0; i < 4; i++) {
+    //     ss << dis(gen);
+    // }
+    // ss << "-4";
+    // for (i = 0; i < 3; i++) {
+    //     ss << dis(gen);
+    // }
+    // ss << "-";
+    // ss << dis2(gen);
+    // for (i = 0; i < 3; i++) {
+    //     ss << dis(gen);
+    // }
+    // ss << "-";
+    // for (i = 0; i < 12; i++) {
+    //     ss << dis(gen);
+    // };
+    return ss.str();
+}
+
+
+void OrderBook::add_order(string order_id, std::string order_type, int shares, double limit_price, unsigned long long entry_time, unsigned long long event_time){
 
     Order *new_order_ptr = new Order {
         order_id,
@@ -262,7 +295,8 @@ int OrderBook::validate(){
         Order *n = curr->head_order;
         while (n != nullptr) {
             num_orders++;
-            s = s + std::to_string(n->order_id) + "/" + n->order_type + "/" + std::to_string(n->shares) + "/" + std::to_string(n->limit) + " ";
+            s = s + n->order_id + "/" + n->order_type + "/" + std::to_string(n->shares) + "/" + std::to_string(n->limit) + " ";
+            // s = s + std::to_string(n->order_id) + "/" + n->order_type + "/" + std::to_string(n->shares) + "/" + std::to_string(n->limit) + " ";
             n = n->next;
         };
         cout << curr->limit_price << ": " << s << endl;
@@ -308,8 +342,8 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
     Limit *tmp_next = limit_node->next;
 
     if (limit_node->head_order && incomming_order->order_type != limit_node->head_order->order_type){
-        int buyers_order_id {0};
-        int sellers_order_id {0};
+        string buyers_order_id {NULL};
+        string sellers_order_id {NULL};
         srand((unsigned) time(NULL));
 
         // set buyer and seller
@@ -390,7 +424,11 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
             while (limit_node->head_order && incomming_order->shares >= limit_node->head_order->shares){
                 // create a new order which will match the quantity of the limit_node.head_order 
                 srand((unsigned) time(NULL));
-                int order_id = rand();
+                string order_id = generate_uuid_v4_1();
+                while (this->order_map.find(order_id) != this->order_map.end()){
+                    // order is already exists. try a new one.
+                    order_id = generate_uuid_v4_1();
+                }
                 Order *new_order_ptr = new Order {
                     order_id,                           // order_id
                     incomming_order->order_type,        // order_type
@@ -467,7 +505,13 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
             if (this->logging) std::cout << "incoming " << incomming_order->order_type << " order does not have enough shares to completely fill limit_node.head_order. create match, partially fill limit_node.head_order, update limit_node.head_order, delete incomming_order, return.\n";
 
             srand((unsigned) time(NULL));
-            int order_id = rand();
+            string order_id = generate_uuid_v4_1();
+            while (this->order_map.find(order_id) != this->order_map.end()){
+                // order is already exists. try a new one.
+                order_id = generate_uuid_v4_1();
+            }
+
+
             Order *new_order_ptr = new Order {
                 order_id,                                    // order_id
                 limit_node->head_order->order_type,          // order_type
@@ -585,7 +629,8 @@ std::ostream& operator<<(std::ostream& os, const OrderBook &book){
         std::string s = " ";
         Order *n = it->second->head_order;
         while (n != nullptr) {
-                s = s + std::to_string(n->order_id) + " ";
+                s = s + n->order_id + " ";
+                // s = s + std::to_string(n->order_id) + " ";
                 n = n->next;
         };
 
@@ -602,7 +647,8 @@ std::ostream& operator<<(std::ostream& os, const OrderBook &book){
         Order *n = curr->head_order;
         while (n != nullptr) {
             num_orders++;
-            s = s + std::to_string(n->order_id) + "/" + n->order_type + "/" + std::to_string(n->shares) + "/" + std::to_string(n->limit) + " ";
+            s = s + n->order_id + "/" + n->order_type + "/" + std::to_string(n->shares) + "/" + std::to_string(n->limit) + " ";
+            // s = s + std::to_string(n->order_id) + "/" + n->order_type + "/" + std::to_string(n->shares) + "/" + std::to_string(n->limit) + " ";
             n = n->next;
         };
         cout << curr->limit_price << ": " << s << endl;

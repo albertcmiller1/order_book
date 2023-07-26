@@ -1,0 +1,344 @@
+starting trading bot threads...
+all threads up and running.
+starting webserver...
+starting api + websocket...
+(2023-07-26 01:43:14) [INFO    ] Crow/master server is running at http://0.0.0.0:5001 using 10 threads
+(2023-07-26 01:43:14) [INFO    ] Call `app.loglevel(crow::LogLevel::Warning)` to hide Info level logs.
+<--------------------------------------------------------------------------1--------------------------------------------------------------------------------------->
+_________incoming order________
+| shares: 10
+| order_type: buy
+| limit: 100
+| order_id: 29ef5d1ee0
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+HIGHEST BUY OFFER: 100
+NO SELL OFFERS YET 
+NO TRADES YET 
+
+order_map (1):
+------------
+order_id	   limit        qantity		order_type
+29ef5d1ee0	   100		10		buy
+
+
+limit_map (1):
+------------
+price      volume       num_orders 	 order_ids
+100	   10		1		 29ef5d1ee0 
+
+Printing all orders...
+100:  29ef5d1ee0/buy/10/100.000000 
+
+num_orders: 1
+num_limits: 1
+
+Printing list forwards...
+100/ done...
+
+
+
+Printing list backwards...
+100/ done...
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+<------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+
+
+<--------------------------------------------------------------------------2--------------------------------------------------------------------------------------->
+_________incoming order________
+| shares: 10
+| order_type: buy
+| limit: 100
+| order_id: dec8eca8fe
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+HIGHEST BUY OFFER: 100
+NO SELL OFFERS YET 
+NO TRADES YET 
+
+order_map (2):
+------------
+order_id	   limit        qantity		order_type
+dec8eca8fe	   100		10		buy
+29ef5d1ee0	   100		10		buy
+
+
+limit_map (1):
+------------
+price      volume       num_orders 	 order_ids
+100	   10		2		 29ef5d1ee0 dec8eca8fe 
+
+Printing all orders...
+100:  29ef5d1ee0/buy/10/100.000000 dec8eca8fe/buy/10/100.000000 
+
+num_orders: 2
+num_limits: 1
+
+Printing list forwards...
+100/ done...
+
+
+
+Printing list backwards...
+100/ done...
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+<------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+
+
+<--------------------------------------------------------------------------3--------------------------------------------------------------------------------------->
+_________incoming order________
+| shares: 10
+| order_type: buy
+| limit: 100
+| order_id: dcf783f78c
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+HIGHEST BUY OFFER: 100
+NO SELL OFFERS YET 
+NO TRADES YET 
+
+order_map (3):
+------------
+order_id	   limit        qantity		order_type
+dcf783f78c	   100		10		buy
+dec8eca8fe	   100		10		buy
+29ef5d1ee0	   100		10		buy
+
+
+limit_map (1):
+------------
+price      volume       num_orders 	 order_ids
+100	   10		3		 29ef5d1ee0 dec8eca8fe dcf783f78c 
+
+Printing all orders...
+100:  29ef5d1ee0/buy/10/100.000000 dec8eca8fe/buy/10/100.000000 dcf783f78c/buy/10/100.000000 
+
+num_orders: 3
+num_limits: 1
+
+Printing list forwards...
+100/ done...
+
+
+
+Printing list backwards...
+100/ done...
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+<------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+
+
+<--------------------------------------------------------------------------4--------------------------------------------------------------------------------------->
+_________incoming order________
+| shares: 10
+| order_type: sell
+| limit: 100
+| order_id: 3182e87aee
+
+new (first and only) sell order has crossed the spread ...
+attempting to create a match...
+perfect match between buyer (29ef5d1ee0) and seller (3182e87aee)
+deleting old order...29ef5d1ee0
+deleting incoming order... 3182e87aee
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+HIGHEST BUY OFFER: 100
+NO SELL OFFERS YET 
+MOST RECENT TRADE PRICE: 100
+
+order_map (2):
+------------
+order_id	   limit        qantity		order_type
+dcf783f78c	   100		10		buy
+dec8eca8fe	   100		10		buy
+
+
+limit_map (1):
+------------
+price      volume       num_orders 	 order_ids
+100	   10		2		 dec8eca8fe dcf783f78c 
+
+Printing all orders...
+100:  dec8eca8fe/buy/10/100.000000 dcf783f78c/buy/10/100.000000 
+
+num_orders: 2
+num_limits: 1
+
+Printing list forwards...
+100/ done...
+
+
+
+Printing list backwards...
+100/ done...
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+<------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+
+
+<--------------------------------------------------------------------------5--------------------------------------------------------------------------------------->
+_________incoming order________
+| shares: 10
+| order_type: sell
+| limit: 100.01
+| order_id: 5535f5f7cd
+
+inserting new limit node at tail
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+HIGHEST BUY OFFER: 100
+LOWEST SELL OFFER: 100.01
+MOST RECENT TRADE PRICE: 100
+
+order_map (3):
+------------
+order_id	   limit        qantity		order_type
+5535f5f7cd	   100.01		10		sell
+dcf783f78c	   100		10		buy
+dec8eca8fe	   100		10		buy
+
+
+limit_map (2):
+------------
+price      volume       num_orders 	 order_ids
+100.01	   10		1		 5535f5f7cd 
+100	   10		2		 dec8eca8fe dcf783f78c 
+
+Printing all orders...
+100:  dec8eca8fe/buy/10/100.000000 dcf783f78c/buy/10/100.000000 
+100.01:  5535f5f7cd/sell/10/100.010000 
+
+num_orders: 3
+num_limits: 2
+
+Printing list forwards...
+100/ 100.01/ done...
+
+
+
+Printing list backwards...
+100.01/ 100/ done...
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+<------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+
+
+<--------------------------------------------------------------------------6--------------------------------------------------------------------------------------->
+_________incoming order________
+| shares: 10
+| order_type: buy
+| limit: 100.01
+| order_id: ca7160b120
+
+new buy order has crossed the spread ...
+attempting to create a match...
+perfect match between buyer (ca7160b120) and seller (5535f5f7cd)
+deleting old order...5535f5f7cd
+deleting incoming order... ca7160b120
+
+limit node is all out of orders! DELETING LIMIT NODE @ 100.01
+
+deleting tail
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+HIGHEST BUY OFFER: 100
+NO SELL OFFERS YET 
+MOST RECENT TRADE PRICE: 100.01
+
+order_map (2):
+------------
+order_id	   limit        qantity		order_type
+dcf783f78c	   100		10		buy
+dec8eca8fe	   100		10		buy
+
+
+limit_map (1):
+------------
+price      volume       num_orders 	 order_ids
+100	   10		2		 dec8eca8fe dcf783f78c 
+
+Printing all orders...
+100:  dec8eca8fe/buy/10/100.000000 dcf783f78c/buy/10/100.000000 
+
+num_orders: 2
+num_limits: 1
+
+Printing list forwards...
+100/ done...
+
+
+
+Printing list backwards...
+7.50395e-311/ done...
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+<------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+
+
+<--------------------------------------------------------------------------7--------------------------------------------------------------------------------------->
+_________incoming order________
+| shares: 10
+| order_type: sell
+| limit: 100.02
+| order_id: 5cb62ad483
+
+inserting new limit node at tail
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+HIGHEST BUY OFFER: 100
+NO SELL OFFERS YET 
+MOST RECENT TRADE PRICE: 100.01
+
+order_map (3):
+------------
+order_id	   limit        qantity		order_type
+5cb62ad483	   100.02		10		sell
+dcf783f78c	   100		10		buy
+dec8eca8fe	   100		10		buy
+
+
+limit_map (2):
+------------
+price      volume       num_orders 	 order_ids
+100.02	   10		1		 5cb62ad483 
+100	   10		2		 dec8eca8fe dcf783f78c 
+
+Printing all orders...
+100:  dec8eca8fe/buy/10/100.000000 dcf783f78c/buy/10/100.000000 
+
+num_orders: 2
+num_limits: 1
+num_oders counted: 2
+book.order_map.size: 3
+libc++abi: terminating
+[1]    5716 abort      ./socket

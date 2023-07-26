@@ -5,17 +5,20 @@
 #include <chrono>
 #include <vector> 
 #include <stdexcept>
+#include <random>
+#include <sstream>
+
 
 struct Match {
     int match_id;
-    int buying_order_id;
-    int selling_order_id;
+    std::string buying_order_id;
+    std::string selling_order_id;
     int sale_quantity;
     double sale_price;
 };
 
 struct Order {
-    int order_id;
+    std::string order_id;
     std::string order_type;
     // int customer_id;
     int shares;
@@ -40,10 +43,10 @@ struct Limit {
 class OrderBook {
 public:
     std::unordered_map<double, Limit*> limit_map = {};    // key is limit price
-    std::unordered_map<int, Order*> order_map = {};       // key is order_id
+    std::unordered_map<std::string, Order*> order_map = {};       // key is order_id
 
     int num_matches {0};
-    double most_recent_trade_price;
+    double most_recent_trade_price {0};
     bool debug {false};
     bool logging {true};
     
@@ -56,7 +59,7 @@ public:
     Limit *lowest_sell_limit {nullptr};
 
     void add_order(
-        int order_id,
+        std::string order_id,
         std::string order_type,
         int shares,
         double limit,
