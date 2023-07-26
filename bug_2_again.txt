@@ -1,16 +1,14 @@
-➜  build git:(main) ✗ ./socket 
+➜  build git:(main) ✗ ./socket
 starting trading bot threads...
 all threads up and running.
 starting webserver...
 starting api + websocket...
-(2023-07-26 03:05:12) [INFO    ] Crow/master server is running at http://0.0.0.0:5001 using 10 threads
-(2023-07-26 03:05:12) [INFO    ] Call `app.loglevel(crow::LogLevel::Warning)` to hide Info level logs.
 <--------------------------------------------------------------------------1--------------------------------------------------------------------------------------->
 _________incoming order________
 | shares: 7
 | order_type: buy
 | limit: 100
-| order_id: 6d2386c242
+| order_id: 3d1374502c
 
 updating limit spread
 
@@ -23,16 +21,16 @@ NO TRADES YET
 order_map (1):
 ------------
 order_id	   limit        qantity		order_type
-6d2386c242	   100		7		buy
+3d1374502c	   100		7		buy
 
 
 limit_map (1):
 ------------
 price      volume       num_orders 	 order_ids
-100	   7		1		 6d2386c242 
+100	   7		1		 3d1374502c 
 
 Printing all orders...
-100:  6d2386c242/buy/7/100.000000 
+100:  3d1374502c/buy/7/100.000000 
 
 num_orders: 1
 num_limits: 1
@@ -57,7 +55,7 @@ _________incoming order________
 | shares: 49
 | order_type: buy
 | limit: 100
-| order_id: 6c30d4a3ff
+| order_id: 2946b4ca20
 
 updating limit spread
 
@@ -70,17 +68,17 @@ NO TRADES YET
 order_map (2):
 ------------
 order_id	   limit        qantity		order_type
-6c30d4a3ff	   100		49		buy
-6d2386c242	   100		7		buy
+2946b4ca20	   100		49		buy
+3d1374502c	   100		7		buy
 
 
 limit_map (1):
 ------------
 price      volume       num_orders 	 order_ids
-100	   7		2		 6d2386c242 6c30d4a3ff 
+100	   7		2		 3d1374502c 2946b4ca20 
 
 Printing all orders...
-100:  6d2386c242/buy/7/100.000000 6c30d4a3ff/buy/49/100.000000 
+100:  3d1374502c/buy/7/100.000000 2946b4ca20/buy/49/100.000000 
 
 num_orders: 2
 num_limits: 1
@@ -105,7 +103,7 @@ _________incoming order________
 | shares: 73
 | order_type: buy
 | limit: 100
-| order_id: f073115a93
+| order_id: 9eaee2e414
 
 updating limit spread
 
@@ -118,18 +116,18 @@ NO TRADES YET
 order_map (3):
 ------------
 order_id	   limit        qantity		order_type
-f073115a93	   100		73		buy
-6c30d4a3ff	   100		49		buy
-6d2386c242	   100		7		buy
+2946b4ca20	   100		49		buy
+9eaee2e414	   100		73		buy
+3d1374502c	   100		7		buy
 
 
 limit_map (1):
 ------------
 price      volume       num_orders 	 order_ids
-100	   7		3		 6d2386c242 6c30d4a3ff f073115a93 
+100	   7		3		 3d1374502c 2946b4ca20 9eaee2e414 
 
 Printing all orders...
-100:  6d2386c242/buy/7/100.000000 6c30d4a3ff/buy/49/100.000000 f073115a93/buy/73/100.000000 
+100:  3d1374502c/buy/7/100.000000 2946b4ca20/buy/49/100.000000 9eaee2e414/buy/73/100.000000 
 
 num_orders: 3
 num_limits: 1
@@ -154,7 +152,7 @@ _________incoming order________
 | shares: 58
 | order_type: sell
 | limit: 100
-| order_id: 8f863a0a51
+| order_id: 4679f12996
 
 new (first and only) sell order has crossed the spread ...
 attempting to create a match...
@@ -162,22 +160,22 @@ incoming order (100) wants to sell more orders than the limit_node.head_order ha
 STARTING traversing limit node (100) orders to create matches.
 
 attempting to create a match...
-perfect match between buyer (6d2386c242) and seller (3e40ab442f)
-deleting old order...6d2386c242
-deleting incoming order... 3e40ab442f
+perfect match between buyer (3d1374502c) and seller (f7142aeafb)
+deleting old order...3d1374502c
+deleting incoming order... f7142aeafb
 attempting to create a match...
-perfect match between buyer (6c30d4a3ff) and seller (9a0aa2b8b7)
-deleting old order...6c30d4a3ff
-deleting incoming order... 9a0aa2b8b7
+perfect match between buyer (2946b4ca20) and seller (5299ed44aa)
+deleting old order...2946b4ca20
+deleting incoming order... 5299ed44aa
 DONE traversing limit node's orders.
 
 partially filled, can still fill more.
 attempting to create a match...
 incoming sell order does not have enough shares to completely fill limit_node.head_order. create match, partially fill limit_node.head_order, update limit_node.head_order, delete incomming_order, return.
 attempting to create a match...
-perfect match between buyer (916363be1f) and seller (8f863a0a51)
-deleting old order...916363be1f
-deleting incoming order... 8f863a0a51
+perfect match between buyer (c9b128f2bb) and seller (4679f12996)
+deleting old order...c9b128f2bb
+deleting incoming order... 4679f12996
 
 
 incoming order has been fully filled!
@@ -193,16 +191,16 @@ MOST RECENT TRADE PRICE: 100
 order_map (1):
 ------------
 order_id	   limit        qantity		order_type
-f073115a93	   100		71		buy
+9eaee2e414	   100		71		buy
 
 
 limit_map (1):
 ------------
 price      volume       num_orders 	 order_ids
-100	   7		1		 f073115a93 
+100	   7		1		 9eaee2e414 
 
 Printing all orders...
-100:  f073115a93/buy/71/100.000000 
+100:  9eaee2e414/buy/71/100.000000 
 
 num_orders: 1
 num_limits: 1
@@ -224,36 +222,36 @@ Printing list backwards...
 
 <--------------------------------------------------------------------------5--------------------------------------------------------------------------------------->
 _________incoming order________
-| shares: 18
-| order_type: sell
+| shares: 9
+| order_type: buy
 | limit: 100.01
-| order_id: 459b276900
+| order_id: 761a8d2ec5
 
 inserting new limit node at tail
 updating limit spread
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
-HIGHEST BUY OFFER: 100
-LOWEST SELL OFFER: 100.01
+HIGHEST BUY OFFER: 100.01
+NO SELL OFFERS YET 
 MOST RECENT TRADE PRICE: 100
 
 order_map (2):
 ------------
 order_id	   limit        qantity		order_type
-459b276900	   100.01		18		sell
-f073115a93	   100		71		buy
+761a8d2ec5	   100.01		9		buy
+9eaee2e414	   100		71		buy
 
 
 limit_map (2):
 ------------
 price      volume       num_orders 	 order_ids
-100.01	   18		1		 459b276900 
-100	   7		1		 f073115a93 
+100.01	   9		1		 761a8d2ec5 
+100	   7		1		 9eaee2e414 
 
 Printing all orders...
-100:  f073115a93/buy/71/100.000000 
-100.01:  459b276900/sell/18/100.010000 
+100:  9eaee2e414/buy/71/100.000000 
+100.01:  761a8d2ec5/buy/9/100.010000 
 
 num_orders: 2
 num_limits: 2
@@ -275,50 +273,77 @@ Printing list backwards...
 
 <--------------------------------------------------------------------------6--------------------------------------------------------------------------------------->
 _________incoming order________
-| shares: 41
-| order_type: buy
+| shares: 74
+| order_type: sell
 | limit: 99.99
-| order_id: 652fc302ab
+| order_id: 96816e7c92
 
-inserting new limit node at head
+new (first and only) sell order has crossed the spread ...
+find and return the most appropriate limit for the new sell order to match with. 
+
+Printing list forwards...
+100/ 100.01/ done...
+
+
+most appropriate limit will be: 100
+attempting to create a match...
+incoming order (99.99) wants to sell more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders 
+STARTING traversing limit node (100) orders to create matches.
+
+attempting to create a match...
+perfect match between buyer (9eaee2e414) and seller (b5f8f115b3)
+deleting old order...9eaee2e414
+deleting incoming order... b5f8f115b3
+
+limit node is all out of orders! DELETING LIMIT NODE @ 100
+
+deleting head
+DONE traversing limit node's orders.
+
+
+changing limit nodes and trying again with: 100.01
+attempting to create a match...
+incoming sell order does not have enough shares to completely fill limit_node.head_order. create match, partially fill limit_node.head_order, update limit_node.head_order, delete incomming_order, return.
+attempting to create a match...
+perfect match between buyer (6c8b43410b) and seller (96816e7c92)
+deleting old order...6c8b43410b
+deleting incoming order... 96816e7c92
+
+
+incoming order has been fully filled!
+
 updating limit spread
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
-HIGHEST BUY OFFER: 100
-LOWEST SELL OFFER: 100.01
-MOST RECENT TRADE PRICE: 100
+HIGHEST BUY OFFER: 100.01
+NO SELL OFFERS YET 
+MOST RECENT TRADE PRICE: 99.99
 
-order_map (3):
+order_map (1):
 ------------
 order_id	   limit        qantity		order_type
-652fc302ab	   99.99		41		buy
-459b276900	   100.01		18		sell
-f073115a93	   100		71		buy
+761a8d2ec5	   100.01		6		buy
 
 
-limit_map (3):
+limit_map (1):
 ------------
 price      volume       num_orders 	 order_ids
-99.99	   41		1		 652fc302ab 
-100.01	   18		1		 459b276900 
-100	   7		1		 f073115a93 
+100.01	   9		1		 761a8d2ec5 
 
 Printing all orders...
-99.99:  652fc302ab/buy/41/99.990000 
-100:  f073115a93/buy/71/100.000000 
-100.01:  459b276900/sell/18/100.010000 
+100.01:  761a8d2ec5/buy/6/100.010000 
 
-num_orders: 3
-num_limits: 3
+num_orders: 1
+num_limits: 1
 
 Printing list forwards...
-99.99/ 100/ 100.01/ done...
+100.01/ done...
 
 
 
 Printing list backwards...
-100.01/ 100/ 99.99/ done...
+100.01/ done...
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -329,58 +354,47 @@ Printing list backwards...
 
 <--------------------------------------------------------------------------7--------------------------------------------------------------------------------------->
 _________incoming order________
-| shares: 4
-| order_type: sell
-| limit: 99.99
-| order_id: 29e4646388
+| shares: 9
+| order_type: buy
+| limit: 100
+| order_id: bf1eab2b6a
 
-new sell order has crossed the spread ...
-attempting to create a match...
-incoming sell order does not have enough shares to completely fill limit_node.head_order. create match, partially fill limit_node.head_order, update limit_node.head_order, delete incomming_order, return.
-attempting to create a match...
-perfect match between buyer (c6d79dfb36) and seller (29e4646388)
-deleting old order...c6d79dfb36
-deleting incoming order... 29e4646388
-
-
+inserting new limit node at head
 updating limit spread
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
-HIGHEST BUY OFFER: 100
-LOWEST SELL OFFER: 100.01
+HIGHEST BUY OFFER: 100.01
+NO SELL OFFERS YET 
 MOST RECENT TRADE PRICE: 99.99
 
-order_map (3):
+order_map (2):
 ------------
 order_id	   limit        qantity		order_type
-652fc302ab	   99.99		37		buy
-459b276900	   100.01		18		sell
-f073115a93	   100		71		buy
+bf1eab2b6a	   100		9		buy
+761a8d2ec5	   100.01		6		buy
 
 
-limit_map (3):
+limit_map (2):
 ------------
 price      volume       num_orders 	 order_ids
-99.99	   41		1		 652fc302ab 
-100.01	   18		1		 459b276900 
-100	   7		1		 f073115a93 
+100	   9		1		 bf1eab2b6a 
+100.01	   9		1		 761a8d2ec5 
 
 Printing all orders...
-99.99:  652fc302ab/buy/37/99.990000 
-100:  f073115a93/buy/71/100.000000 
-100.01:  459b276900/sell/18/100.010000 
+100:  bf1eab2b6a/buy/9/100.000000 
+100.01:  761a8d2ec5/buy/6/100.010000 
 
-num_orders: 3
-num_limits: 3
+num_orders: 2
+num_limits: 2
 
 Printing list forwards...
-99.99/ 100/ 100.01/ done...
+100/ 100.01/ done...
 
 
 
 Printing list backwards...
-100.01/ 100/ 99.99/ done...
+100.01/ 100/ done...
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -391,94 +405,48 @@ Printing list backwards...
 
 <--------------------------------------------------------------------------8--------------------------------------------------------------------------------------->
 _________incoming order________
-| shares: 18
+| shares: 74
 | order_type: sell
-| limit: 100
-| order_id: 956c0d5636
+| limit: 99.98
+| order_id: 0ccceb1e97
 
-new sell order has crossed the spread ...
-attempting to create a match...
-incoming sell order does not have enough shares to completely fill limit_node.head_order. create match, partially fill limit_node.head_order, update limit_node.head_order, delete incomming_order, return.
-attempting to create a match...
-perfect match between buyer (639caca069) and seller (956c0d5636)
-deleting old order...639caca069
-deleting incoming order... 956c0d5636
-
-
-updating limit spread
-
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
-HIGHEST BUY OFFER: 100
-LOWEST SELL OFFER: 100.01
-MOST RECENT TRADE PRICE: 100
-
-order_map (3):
-------------
-order_id	   limit        qantity		order_type
-652fc302ab	   99.99		37		buy
-459b276900	   100.01		18		sell
-f073115a93	   100		53		buy
-
-
-limit_map (3):
-------------
-price      volume       num_orders 	 order_ids
-99.99	   41		1		 652fc302ab 
-100.01	   18		1		 459b276900 
-100	   7		1		 f073115a93 
-
-Printing all orders...
-99.99:  652fc302ab/buy/37/99.990000 
-100:  f073115a93/buy/53/100.000000 
-100.01:  459b276900/sell/18/100.010000 
-
-num_orders: 3
-num_limits: 3
+new (first and only) sell order has crossed the spread ...
+find and return the most appropriate limit for the new sell order to match with. 
 
 Printing list forwards...
-99.99/ 100/ 100.01/ done...
+100/ 100.01/ done...
 
 
-
-Printing list backwards...
-100.01/ 100/ 99.99/ done...
-
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-<------------------------------------------------------------------------------------------------------------------------------------------------------------------>
-
-
-<--------------------------------------------------------------------------9--------------------------------------------------------------------------------------->
-_________incoming order________
-| shares: 67
-| order_type: buy
-| limit: 100.01
-| order_id: b8a0434455
-
-new buy order has crossed the spread ...
+most appropriate limit will be: 100
 attempting to create a match...
-incoming order (100.01) wants to buy more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders 
-STARTING traversing limit node (100.01) orders to create matches.
+incoming order (99.98) wants to sell more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders 
+STARTING traversing limit node (100) orders to create matches.
 
 attempting to create a match...
-perfect match between buyer (17fc6a2c58) and seller (459b276900)
-deleting old order...459b276900
-deleting incoming order... 17fc6a2c58
+perfect match between buyer (bf1eab2b6a) and seller (a93bb5a0d5)
+deleting old order...bf1eab2b6a
+deleting incoming order... a93bb5a0d5
 
-limit node is all out of orders! DELETING LIMIT NODE @ 100.01
+limit node is all out of orders! DELETING LIMIT NODE @ 100
 
-deleting tail   // NOTE: also seen this with deleting middle 
+deleting head
 DONE traversing limit node's orders.
 
 
-changing limit nodes and trying again with: 100
+changing limit nodes and trying again with: 100.01
 attempting to create a match...
-this should only happen if we are trying to match a buyer with a buyer or the limit node we have doesnt have any orders.
-  >> incomming_order->order_type: buy
-  >> limit_node.head_order->order_type: buy
-  >> limit_node.head_order: 0x60000233c120
-libc++abi: terminating
-[1]    8035 abort      ./socket
+incoming order (99.98) wants to sell more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders 
+STARTING traversing limit node (100.01) orders to create matches.
+
+attempting to create a match...
+perfect match between buyer (761a8d2ec5) and seller (a0151535fd)
+deleting old order...761a8d2ec5
+deleting incoming order... a0151535fd
+
+limit node is all out of orders! DELETING LIMIT NODE @ 100.01
+
+deleting only existing
+DONE traversing limit node's orders.
+
+
+[1]    8435 segmentation fault  ./socket
