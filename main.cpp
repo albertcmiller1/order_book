@@ -9,7 +9,7 @@ int main(int argc, char** argv){
     tests.logging = true;
     if (
             // tests.test_1() &&       // prove the orderbook can add a buy  order 
-            // tests.test_2() &&       // prove the orderbook can add a sell order
+            // tests.test_2()        // prove the orderbook can add a sell order
             
             // tests.test_3() &&       // prove a buy  order can create a match with a sell order
             // tests.test_4() &&       // prove a sell order can create a match with a buy  order
@@ -37,7 +37,7 @@ int main(int argc, char** argv){
             // tests.test_18() 
             
             
-            tests.test_19() 
+            tests.test_20() 
             
 
         ){ cout << "<--all tests passed-->" << endl;} 
@@ -48,3 +48,6 @@ int main(int argc, char** argv){
 
 
 // test to ensure the new find_best function works when a match should have leftovers ...
+// tests to prove book can insert new limit at front, middle, end 
+// tests to prove book can delete new limit at front, middle, end 
+// add to all tests a check that num nodes == expected forwards and backwards 

@@ -20,19 +20,16 @@ Every 60 seconds the book will post the current price of each stock traded into 
 The book, trading bot threads, api, and websocket will be apart of the same process which will be running on an AWS EC2 instance. 
 
 ## Todo 
-* tests
-* validation to ensure num limit nodes == limit_map.count(). same for orders 
+* tests 
+* print 100 as 100.00
 * find a way to make all incoming orders limit price values of dollars and cents format 
 * api (post order, cancel order, check current price)
 * validate inputs 
 * broadcast to socket
-* convert Limit nodes to pointers 
 * limit should hold the total volume of num shares contained in its order dll
 * logic to retract from queue 
 * botoCpp to post transaction (updated price) to dynamodb
 * remove total_volume and num_limit_nodes ?
-* convert limit nodes to be pointers? 
-
 
 ## Future ideas
 * how to build a driver/buffer for much faster performance? 
@@ -55,7 +52,6 @@ SPREAD
 23.49 sell
 
 a buyer  matches with a  seller when the incoming buy  price is greater than a sell offer
-
 a seller matches with a  buyer  when the incoming sell price is less    than a buy offer 
 
 

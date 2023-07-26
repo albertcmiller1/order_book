@@ -1,10 +1,26 @@
-// #include "test.hpp"
+#include "test.hpp"
 using namespace std; 
 
+
+static std::random_device              rd;
+static std::mt19937                    gen(rd());
+static std::uniform_int_distribution<> dis(0, 15);
+static std::uniform_int_distribution<> dis2(8, 11);
 class Testing{
 public: 
     unsigned int microseconds {10000};
     bool logging = false;
+
+
+    std::string generate_uuid_v4() {
+        std::stringstream ss;
+        int i;
+        ss << std::hex;
+        for (i = 0; i < 10; i++) {
+            ss << dis(gen);
+        }
+        return ss.str();
+    }
 
     void clean_up(OrderBook *book){
         // delete all order pointers 
@@ -26,15 +42,9 @@ public:
         return count;
     }
 
-    int create_order(OrderBook *book, string order_type, int shares, double limit){
-        int order_id = rand();
-        
-        while (count_digit(order_id) <= 9){ 
-            order_id *= 10;
-        }
-
+    std::string create_order(OrderBook *book, string order_type, int shares, double limit){
+        std::string order_id = generate_uuid_v4();
         uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        order_id = rand();
         usleep(this->microseconds);
         curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         book->add_order(
@@ -59,7 +69,7 @@ public:
             prove the orderbook can add a buy order 
         */
         OrderBook *book = new OrderBook;
-        int order_id = this->create_order(book, "buy", 1, 23.46);
+        string order_id = this->create_order(book, "buy", 1, 23.46);
 
         if (!book->highest_buy_limit){ 
             cout << "1.1 failed." << endl; return false;
@@ -96,7 +106,7 @@ public:
         */
         OrderBook *book = new OrderBook;
 
-        int order_id = this->create_order(book, "sell", 1, 23.47);
+        string order_id = this->create_order(book, "sell", 1, 23.47);
 
         if (book->highest_buy_limit){ 
             cout << "2.1 failed." << endl; return false;
@@ -132,8 +142,8 @@ public:
             prove a buy order can create a match with a sell order
         */
         OrderBook *book = new OrderBook;
-        int order_id_1 = this->create_order(book, "sell", 1, 23.47);
-        int order_id_2 = this->create_order(book, "buy", 1, 23.47);
+        string order_id_1 = this->create_order(book, "sell", 1, 23.47);
+        string order_id_2 = this->create_order(book, "buy", 1, 23.47);
 
         if (book->highest_buy_limit || book->lowest_sell_limit){ 
             cout << "3.1 failed." << endl; return false; 
@@ -160,8 +170,8 @@ public:
             prove a sell order can create a match with a buy order
         */
         OrderBook *book = new OrderBook;
-        int order_id_1 = this->create_order(book, "buy", 1, 23.48);
-        int order_id_2 = this->create_order(book, "sell", 1, 23.48);
+        string order_id_1 = this->create_order(book, "buy", 1, 23.48);
+        string order_id_2 = this->create_order(book, "sell", 1, 23.48);
 
         if (book->highest_buy_limit || book->lowest_sell_limit){ 
             cout << "4.1 failed." << endl; return false;
@@ -190,12 +200,12 @@ public:
         */
         OrderBook *book = new OrderBook;
 
-        int order_id_1 = this->create_order(book, "sell", 1, 23.45);
-        int order_id_2 = this->create_order(book, "sell", 1, 23.44); 
-        int order_id_3 = this->create_order(book, "sell", 1, 23.43);
-        int order_id_4 = this->create_order(book, "sell", 1, 23.42);
+        string order_id_1 = this->create_order(book, "sell", 1, 23.45);
+        string order_id_2 = this->create_order(book, "sell", 1, 23.44); 
+        string order_id_3 = this->create_order(book, "sell", 1, 23.43);
+        string order_id_4 = this->create_order(book, "sell", 1, 23.42);
         // SPREAD
-        int order_id_5 = this->create_order(book, "buy", 4, 23.45);
+        string order_id_5 = this->create_order(book, "buy", 4, 23.45);
 
         if (book->highest_buy_limit || book->lowest_sell_limit){ 
             cout << "5.1 failed." << endl; return false;
@@ -224,12 +234,12 @@ public:
         */
         OrderBook *book = new OrderBook;
 
-        int order_id_1 = this->create_order(book, "buy", 1, 23.41);
-        int order_id_2 = this->create_order(book, "buy", 1, 23.42); 
-        int order_id_3 = this->create_order(book, "buy", 1, 23.43);
-        int order_id_4 = this->create_order(book, "buy", 1, 23.44);
+        string order_id_1 = this->create_order(book, "buy", 1, 23.41);
+        string order_id_2 = this->create_order(book, "buy", 1, 23.42); 
+        string order_id_3 = this->create_order(book, "buy", 1, 23.43);
+        string order_id_4 = this->create_order(book, "buy", 1, 23.44);
         // SPREAD
-        int order_id_5 = this->create_order(book, "sell", 4, 23.41);
+        string order_id_5 = this->create_order(book, "sell", 4, 23.41);
 
         if (book->highest_buy_limit || book->lowest_sell_limit){ 
             cout << "6.1 failed." << endl; return false;
@@ -257,9 +267,9 @@ public:
         */
         OrderBook *book = new OrderBook;
 
-        int order_id_1 = this->create_order(book, "sell", 100, 23.45);
+        string order_id_1 = this->create_order(book, "sell", 100, 23.45);
         // SPREAD
-        int order_id_2 = this->create_order(book, "buy", 50, 23.45);
+        string order_id_2 = this->create_order(book, "buy", 50, 23.45);
 
         if (book->highest_buy_limit){ 
             cout << "7.1 failed." << endl; return false;
@@ -296,9 +306,9 @@ public:
         */
         OrderBook *book = new OrderBook;
 
-        int order_id_2 = this->create_order(book, "buy", 100, 23.46);
+        string order_id_2 = this->create_order(book, "buy", 100, 23.46);
         // SPREAD
-        int order_id_1 = this->create_order(book, "sell", 50, 23.46);
+        string order_id_1 = this->create_order(book, "sell", 50, 23.46);
 
         if (book->lowest_sell_limit){ 
             cout << "8.1 failed." << endl; return false;
@@ -335,11 +345,11 @@ public:
         */
         OrderBook *book = new OrderBook;
 
-        int order_id_1 = this->create_order(book, "sell", 100, 23.45);
-        int order_id_2 = this->create_order(book, "sell", 100, 23.45);
-        int order_id_3 = this->create_order(book, "sell", 100, 23.45);
+        string order_id_1 = this->create_order(book, "sell", 100, 23.45);
+        string order_id_2 = this->create_order(book, "sell", 100, 23.45);
+        string order_id_3 = this->create_order(book, "sell", 100, 23.45);
         // SPREAD
-        int order_id_4 = this->create_order(book, "buy", 200, 23.45);
+        string order_id_4 = this->create_order(book, "buy", 200, 23.45);
 
         if (book->highest_buy_limit){ 
             cout << "9.1 failed." << endl; return false;
@@ -376,11 +386,11 @@ public:
         */
         OrderBook *book = new OrderBook;
 
-        int order_id_1 = this->create_order(book, "buy", 100, 23.47);
-        int order_id_2 = this->create_order(book, "buy", 100, 23.47);
-        int order_id_3 = this->create_order(book, "buy", 100, 23.47);
+        string order_id_1 = this->create_order(book, "buy", 100, 23.47);
+        string order_id_2 = this->create_order(book, "buy", 100, 23.47);
+        string order_id_3 = this->create_order(book, "buy", 100, 23.47);
         // SPREAD
-        int order_id_4 = this->create_order(book, "sell", 200, 23.47);
+        string order_id_4 = this->create_order(book, "sell", 200, 23.47);
 
         if (!book->highest_buy_limit){ 
             cout << "10.1 failed." << endl; return false;
@@ -417,14 +427,14 @@ public:
         */
         OrderBook *book = new OrderBook;
 
-        int order_id_1 = this->create_order(book, "buy", 10, 4.00);
-        int order_id_2 = this->create_order(book, "buy", 10, 5.00);
-        int order_id_3 = this->create_order(book, "buy", 10, 6.00);
+        string order_id_1 = this->create_order(book, "buy", 10, 4.00);
+        string order_id_2 = this->create_order(book, "buy", 10, 5.00);
+        string order_id_3 = this->create_order(book, "buy", 10, 6.00);
         // SPREAD
-        int order_id_4 = this->create_order(book, "sell", 10, 7.00);
+        string order_id_4 = this->create_order(book, "sell", 10, 7.00);
         if (this->logging) std::cout << *book << std::endl;
         // TRIGGER 
-        int order_id_5 = this->create_order(book, "buy", 10, 9.00);
+        string order_id_5 = this->create_order(book, "buy", 10, 9.00);
 
         if (!book->highest_buy_limit){ 
             cout << "11.1 failed." << endl; return false;
@@ -461,14 +471,14 @@ public:
         */
         OrderBook *book = new OrderBook;
 
-        int order_id_1 = this->create_order(book, "buy", 10, 6.00);
+        string order_id_1 = this->create_order(book, "buy", 10, 6.00);
         // SPREAD
-        int order_id_2 = this->create_order(book, "sell", 10, 7.00);
-        int order_id_3 = this->create_order(book, "sell", 10, 8.00);
-        int order_id_4 = this->create_order(book, "sell", 10, 9.00);
+        string order_id_2 = this->create_order(book, "sell", 10, 7.00);
+        string order_id_3 = this->create_order(book, "sell", 10, 8.00);
+        string order_id_4 = this->create_order(book, "sell", 10, 9.00);
         // TRIGGER 
         if (this->logging) std::cout << *book << std::endl;
-        int order_id_5 = this->create_order(book, "sell", 10, 5.00);
+        string order_id_5 = this->create_order(book, "sell", 10, 5.00);
 
         if (book->highest_buy_limit){ 
             cout << "12.1 failed." << endl; return false;
@@ -506,17 +516,17 @@ public:
         OrderBook *book = new OrderBook;
 
         // no seg fault, but there is a bug! 
-        int order_id_1 = this->create_order(book, "buy", 10, 13.00);
-        int order_id_2 = this->create_order(book, "buy", 10, 14.00);
-        int order_id_3 = this->create_order(book, "buy", 10, 15.00);
+        string order_id_1 = this->create_order(book, "buy", 10, 13.00);
+        string order_id_2 = this->create_order(book, "buy", 10, 14.00);
+        string order_id_3 = this->create_order(book, "buy", 10, 15.00);
         // SPREAD
-        int order_id_4 = this->create_order(book, "sell", 10, 16.00);
-        int order_id_5 = this->create_order(book, "sell", 10, 17.00);
-        int order_id_6 = this->create_order(book, "sell", 10, 50.00);
+        string order_id_4 = this->create_order(book, "sell", 10, 16.00);
+        string order_id_5 = this->create_order(book, "sell", 10, 17.00);
+        string order_id_6 = this->create_order(book, "sell", 10, 50.00);
         
         if (this->logging) std::cout << *book << std::endl;
         // TRIGGER 
-        int order_id_7 = this->create_order(book, "buy", 10, 25.00);
+        string order_id_7 = this->create_order(book, "buy", 10, 25.00);
 
         if (book->highest_buy_limit->limit_price != 15.00){ 
             cout << "13.1 failed." << endl; return false;
@@ -554,17 +564,17 @@ public:
         OrderBook *book = new OrderBook;
 
         // no seg fault, but there is a bug! 
-        int order_id_1 = this->create_order(book, "buy", 10, 4.00);
-        int order_id_2 = this->create_order(book, "buy", 10, 14.00);
-        int order_id_3 = this->create_order(book, "buy", 10, 15.00);
+        string order_id_1 = this->create_order(book, "buy", 10, 4.00);
+        string order_id_2 = this->create_order(book, "buy", 10, 14.00);
+        string order_id_3 = this->create_order(book, "buy", 10, 15.00);
         // SPREAD
-        int order_id_4 = this->create_order(book, "sell", 10, 16.00);
-        int order_id_5 = this->create_order(book, "sell", 10, 17.00);
-        int order_id_6 = this->create_order(book, "sell", 10, 18.00);
+        string order_id_4 = this->create_order(book, "sell", 10, 16.00);
+        string order_id_5 = this->create_order(book, "sell", 10, 17.00);
+        string order_id_6 = this->create_order(book, "sell", 10, 18.00);
 
         if (this->logging) std::cout << *book << std::endl;
         // TRIGGER 
-        int order_id_7 = this->create_order(book, "sell", 10, 9.00);
+        string order_id_7 = this->create_order(book, "sell", 10, 9.00);
 
         if (book->highest_buy_limit->limit_price != 15.00){ 
             cout << "14.1 failed." << endl; return false;
@@ -602,15 +612,15 @@ public:
         OrderBook *book = new OrderBook;
 
         // seg fault
-        int order_id_1 = this->create_order(book, "buy", 10, 6.00);
+        string order_id_1 = this->create_order(book, "buy", 10, 6.00);
         // SPREAD
-        int order_id_2 = this->create_order(book, "sell", 10, 7.00);
-        int order_id_3 = this->create_order(book, "sell", 10, 9.00);
-        int order_id_4 = this->create_order(book, "sell", 10, 9.00);
+        string order_id_2 = this->create_order(book, "sell", 10, 7.00);
+        string order_id_3 = this->create_order(book, "sell", 10, 9.00);
+        string order_id_4 = this->create_order(book, "sell", 10, 9.00);
         
         if (this->logging) std::cout << *book << std::endl;
         // TRIGGER 
-        int order_id_5 = this->create_order(book, "buy", 10, 8.00);
+        string order_id_5 = this->create_order(book, "buy", 10, 8.00);
 
         if (book->highest_buy_limit->limit_price != 6.00){ 
             cout << "15.1 failed." << endl; return false;
@@ -648,14 +658,14 @@ public:
         OrderBook *book = new OrderBook;
 
         // seg fault
-        int order_id_2 = this->create_order(book, "buy", 10, 2.00);
-        int order_id_3 = this->create_order(book, "buy", 10, 6.00);
-        int order_id_4 = this->create_order(book, "buy", 10, 6.00);
+        string order_id_2 = this->create_order(book, "buy", 10, 2.00);
+        string order_id_3 = this->create_order(book, "buy", 10, 6.00);
+        string order_id_4 = this->create_order(book, "buy", 10, 6.00);
         // SPREAD
-        int order_id_7 = this->create_order(book, "sell", 10, 100.00);
+        string order_id_7 = this->create_order(book, "sell", 10, 100.00);
         if (this->logging) std::cout << *book << std::endl;
         // TRIGGER 
-        int order_id_9 = this->create_order(book, "sell", 10, 4.00);
+        string order_id_9 = this->create_order(book, "sell", 10, 4.00);
 
         if (book->highest_buy_limit->limit_price != 6.00){ 
             cout << "16.1 failed." << endl; return false;
@@ -694,14 +704,14 @@ public:
         */
         OrderBook *book = new OrderBook;
 
-        int order_id_1 = this->create_order(book, "buy", 10, 6.00);
+        string order_id_1 = this->create_order(book, "buy", 10, 6.00);
         // SPREAD
-        int order_id_2 = this->create_order(book, "sell", 10, 7.00);
-        int order_id_3 = this->create_order(book, "sell", 10, 7.00);
-        int order_id_4 = this->create_order(book, "sell", 10, 9.00);
+        string order_id_2 = this->create_order(book, "sell", 10, 7.00);
+        string order_id_3 = this->create_order(book, "sell", 10, 7.00);
+        string order_id_4 = this->create_order(book, "sell", 10, 9.00);
         if (this->logging) std::cout << *book << std::endl;
         // TRIGGER 
-        int order_id_5 = this->create_order(book, "buy", 10, 8.00);
+        string order_id_5 = this->create_order(book, "buy", 10, 8.00);
 
         // if (!book->highest_buy_limit){ 
         //     cout << "17.1 failed." << endl; return false;
@@ -739,15 +749,15 @@ public:
         OrderBook *book = new OrderBook;
 
         // seg fault
-        int order_id_1 = this->create_order(book, "buy", 10, 1.00);
-        int order_id_2 = this->create_order(book, "buy", 10, 2.00);
-        int order_id_3 = this->create_order(book, "buy", 10, 2.00);
-        int order_id_4 = this->create_order(book, "buy", 10, 6.00);
+        string order_id_1 = this->create_order(book, "buy", 10, 1.00);
+        string order_id_2 = this->create_order(book, "buy", 10, 2.00);
+        string order_id_3 = this->create_order(book, "buy", 10, 2.00);
+        string order_id_4 = this->create_order(book, "buy", 10, 6.00);
         // SPREAD
-        int order_id_5 = this->create_order(book, "sell", 10, 100.00);
+        string order_id_5 = this->create_order(book, "sell", 10, 100.00);
         if (this->logging) std::cout << *book << std::endl;
         // TRIGGER 
-        int order_id_6 = this->create_order(book, "sell", 10, 4.00);
+        string order_id_6 = this->create_order(book, "sell", 10, 4.00);
 
         // if (!book->highest_buy_limit){ 
         //     cout << "18.1 failed." << endl; return false;
@@ -783,16 +793,16 @@ public:
         OrderBook *book = new OrderBook;
 
 
-        int order_id_3 = this->create_order(book, "buy", 10, 98.46);
+        string order_id_3 = this->create_order(book, "buy", 10, 98.46);
         // SPREAD
-        int order_id_4 = this->create_order(book, "sell", 10, 98.61);
-        int order_id_5 = this->create_order(book, "sell", 10, 98.89);
-        int order_id_6 = this->create_order(book, "sell", 10, 99.15);
-        int order_id_7 = this->create_order(book, "sell", 10, 99.19);
+        string order_id_4 = this->create_order(book, "sell", 10, 98.61);
+        string order_id_5 = this->create_order(book, "sell", 10, 98.89);
+        string order_id_6 = this->create_order(book, "sell", 10, 99.15);
+        string order_id_7 = this->create_order(book, "sell", 10, 99.19);
 
         if (this->logging) std::cout << *book << std::endl;
         // TRIGGER 
-        int order_id_16 = this->create_order(book, "buy", 10, 98.62);
+        string order_id_16 = this->create_order(book, "buy", 10, 98.62);
 
         // if (!book->highest_buy_limit){ 
         //     cout << "17.1 failed." << endl; return false;
@@ -821,5 +831,49 @@ public:
         this->clean_up(book); 
         return true;
     }
+
+    bool test_20(){
+        if (this->logging) std::cout << "<-----------------------[ test_20 starting ]------------------------------->\n";
+
+        OrderBook *book = new OrderBook;
+
+        string order_id_1 = this->create_order(book, "buy", 10, 100.00);
+        string order_id_2 = this->create_order(book, "buy", 10, 100.00);
+        string order_id_3 = this->create_order(book, "buy", 10, 100.00);
+
+        string order_id_4 = this->create_order(book, "sell", 10, 100.00);
+        string order_id_5 = this->create_order(book, "sell", 10, 100.01);
+        string order_id_6 = this->create_order(book, "sell", 10, 100.02);
+
+        if (this->logging) std::cout << *book << std::endl;
+
+        // if (!book->highest_buy_limit){ 
+        //     cout << "17.1 failed." << endl; return false;
+        // } 
+        // if (book->lowest_sell_limit){ 
+        //     cout << "17.2 failed." << endl; return false;
+        // } 
+        // if (book->limit_map.size() != 3){ 
+        //     cout << "17.3 failed." << endl; return false;
+        // } 
+        // if (book->order_map.size() != 3){ 
+        //     cout << "17.4 failed." << endl; return false;
+        // } 
+        // if (!doubles_are_same(book->most_recent_trade_price, 9.00)){ 
+        //     cout << "17.5 failed." << endl; return false;
+        // }
+        // if (book->highest_buy_limit->head_order->shares != 10){ 
+        //     cout << "17.6 failed." << endl; return false;
+        // } 
+        // if (book->order_map.at(book->highest_buy_limit->head_order->order_id)->shares != 10){
+        //     cout << "17.7 failed." << endl; return false;
+        // }
+
+        if (this->logging) std::cout << *book << std::endl;
+        if (this->logging) std::cout << "\n<-----------------------[ test_20 complete ]------------------------------->\n";
+        this->clean_up(book); 
+        return true;
+    }
+
 
 };

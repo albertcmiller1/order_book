@@ -87,11 +87,17 @@ std::string generate_uuid_v4() {
 std::unordered_set<crow::websocket::connection*> users;
 
 void trading_bot(OrderBook *book){
+    /*
+        TODO:
+        > bot should not allow for negative order prices 
+        > bot should realize how many orders/limits there are. if the number of orders/limits is getting too big, slightly influence the book to create matches so we dont run out of memory 
+    */
+
     int cnt = 1;
     double ipo = 100.00;
 
     while (true){
-        sleep(1);  
+        sleep(0);  
 
         // std::cout << "THREAD still working" << std::endl;
         // for (auto user : users){
@@ -103,18 +109,12 @@ void trading_bot(OrderBook *book){
         
         std::string order_id = generate_uuid_v4();
         while (book->order_map.find(order_id) != book->order_map.end()){
-            // order is already exists. try a new one.
+            // order id already exists. try a new one.
             order_id = generate_uuid_v4();
         }
 
         std::string order_type;
         int rand_num = rand();
-
-        if (rand_num % 2){
-            order_type = "buy";
-        } else {
-            order_type = "sell";
-        }
 
         if (rand_num % 2){
             order_type = "buy";
@@ -147,11 +147,7 @@ void trading_bot(OrderBook *book){
             offer = ipo;
         }
 
-
-
-
         int shares = rand_num%100;
-
         curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
         std::cout << "<--------------------------------------------------------------------------" << cnt << "--------------------------------------------------------------------------------------->\n";
@@ -244,123 +240,9 @@ void start_socket_server(OrderBook *book){
       .run();
 }
 
-// void test(){
-//     while (true){
-//         sleep(4);  
-
-//         // srand((unsigned) time(NULL));
-//         uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-//         int order_id = rand();
-        
-//         std::string order_type;
-//         if (order_id %2){
-//             order_type = "sell";
-//         } else {
-//             order_type = "buy";
-//         }
-
-//         double bid_price;
-//         double most_recent_trade_price {100};
-
-//         int opt;
-//         opt = order_id % 4; 
-
-//         double factor;
-//         factor = (order_id % 100) * 0.01;
-//         std::cout << "mulip factor: " << factor << std::endl;
-//         std::cout << "opt: " << opt << std::endl;
-
-
-
-//         if (most_recent_trade_price){
-//             if (opt == 0){
-//                 bid_price = most_recent_trade_price + factor;
-//             } else if (opt == 1){
-//                 bid_price = most_recent_trade_price - factor;
-//             } else if (opt == 2){
-//                 bid_price = most_recent_trade_price + factor;
-//             } else if (opt == 3){
-//                 bid_price = most_recent_trade_price - factor;
-//             } else {
-//                 bid_price = most_recent_trade_price + factor;
-//             }
-//         } else {
-//             bid_price = 100;
-//         }
-
-
-//         std::cout << "bid_price: " << bid_price << std::endl;
-
-//         int shares = order_id%100;
-
-//         curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-
-//         cout << "----------------\n";
-//         cout << "order_id: "    << order_id << endl;
-//         cout << "order_type: "  << order_type << endl;
-//         cout << "shares: "      << shares << endl;
-//         cout << "bid_price: "   << bid_price << endl;
-//         cout << "curr_time: "   << curr_time << endl;
-//         cout << "----------------\n";
-
-//     }
-
-// }
-
-void test_2(){
-
-    double ipo = 100;
-
-    while (true){
-        sleep(0);
-        std::string order_id = generate_uuid_v4();
-        
-        std::string order_type;
-
-        int rand_num = rand();
-        if (rand_num % 2){
-            order_type = "buy";
-        } else {
-            order_type = "sell";
-        }
-
-        if (rand_num % 2){
-            order_type = "buy";
-        } else {
-            order_type = "sell";
-        }
-        
-        int opt = rand_num % 10; 
-        double factor = 0.01;
-        double offer = ipo * factor;
-
-        if (opt == 0){
-            offer = ipo + factor;
-        } else if (opt == 1){
-            offer = ipo - factor;
-        } else if (opt == 2){
-            offer = ipo + factor;
-        } else if (opt == 3){
-            offer = ipo - factor;
-        } else if (opt == 4){
-            offer = ipo - factor;
-        } else if (opt == 5){
-            offer = ipo - factor;
-        } else {
-            offer = ipo + factor;
-        }
-
-        std::cout << offer << std::endl;
-
-    }
-
-
-
-}
 
 int main(){
     OrderBook *book = new OrderBook;
-    // test_2();
 
     std::cout << "starting trading bot threads...\n";
     std::thread th1(trading_bot, book);
