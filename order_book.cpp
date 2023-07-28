@@ -237,7 +237,7 @@ int OrderBook::insert_limit_dll(Limit *new_limit){
         Limit *curr = this->sorted_limit_prices_head;
         while (curr != nullptr){
             if (!curr->prev && new_limit->limit_price < curr->limit_price){
-                if (this->logging) std::cout << "inserting new limit node at head\n";
+                if (this->logging) std::cout << "inserting new limit node (" << new_limit->limit_price <<") at head\n";
                 new_limit->prev = nullptr;
                 new_limit->next = this->sorted_limit_prices_head;
                 curr->prev = new_limit;
@@ -245,7 +245,7 @@ int OrderBook::insert_limit_dll(Limit *new_limit){
                 return 0;
 
             } else if (!curr->next && new_limit->limit_price > curr->limit_price) {
-                if (this->logging) std::cout << "inserting new limit node at tail\n";
+                if (this->logging) std::cout << "inserting new limit node (" << new_limit->limit_price << ") at tail\n";
                 new_limit->prev = this->sorted_limit_prices_tail;
                 this->sorted_limit_prices_tail->next = new_limit;
                 new_limit->next = nullptr;
@@ -253,7 +253,7 @@ int OrderBook::insert_limit_dll(Limit *new_limit){
                 return 0;
 
             } else if (curr->limit_price < new_limit->limit_price && new_limit->limit_price < curr->next->limit_price){
-                if (this->logging) std::cout << "inserting new limit node in middle\n";
+                if (this->logging) std::cout << "inserting new limit node (" << new_limit->limit_price << ") in middle\n";
                 Limit *tmp_nxt = curr->next;
                 curr->next = new_limit;
                 new_limit->prev = curr;
@@ -372,7 +372,8 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
             };
 
             // update most_recent_trade_price
-            this->most_recent_trade_price = incomming_order->limit;
+            // this->most_recent_trade_price = incomming_order->limit;
+            this->most_recent_trade_price = limit_node->limit_price; // what if we do this instead? 
 
             // delete head 
             if (this->logging) std::cout << "deleting old order..." << limit_node->head_order->order_id << std::endl;
@@ -421,21 +422,23 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
             return 0;
 
         } else if (incomming_order->shares > limit_node->head_order->shares){
-            if (this->logging) std::cout << "incoming order (" << incomming_order->limit <<  ") wants to " << incomming_order->order_type << " more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders \n";
+            if (this->logging) std::cout << "incoming order (" << incomming_order->order_id <<  ") wants to " << incomming_order->order_type << " more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders \n";
 
             if (this->logging) std::cout << "STARTING traversing limit node (" << limit_node->limit_price << ") orders to create matches.\n" << std::endl;
             while (limit_node->head_order && incomming_order->shares >= limit_node->head_order->shares){
-                // create a new order which will match the quantity of the limit_node.head_order 
+                // create a new order (branched from incoming_order) which will match the quantity of the limit_node.head_order 
+                // use this new order to create a perfect match 
+                // OG incoming_order will still have some leftover shares
                 srand((unsigned) time(NULL));
                 string order_id = generate_uuid_v4_1();
                 while (this->order_map.find(order_id) != this->order_map.end()){
-                    // order is already exists. try a new one.
+                    // order id already exists. try a new one.
                     order_id = generate_uuid_v4_1();
                 }
                 Order *new_order_ptr = new Order {
                     order_id,                           // order_id
                     incomming_order->order_type,        // order_type
-                    limit_node->head_order->shares,      // shares
+                    limit_node->head_order->shares,     // shares
                     incomming_order->limit,             // limit
                     incomming_order->entry_time,        // entry_time
                     incomming_order->entry_time         // event_time
@@ -457,43 +460,51 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
             if (this->logging) std::cout << "DONE traversing limit node's orders.\n" << std::endl;
 
             if (incomming_order->shares == 0){
-                if (this->logging) std::cout << "incoming order has been completley filled :)\n";
-                if (this->logging) std::cout << "deleting order: " << incomming_order->order_id << std::endl;
+                if (this->logging) std::cout << "incoming_order has been completley filled :)\n";
+                if (this->logging) std::cout << "deleting incoming_order: " << incomming_order->order_id << std::endl;
                 this->order_map.erase(incomming_order->order_id);
                 delete incomming_order;
-            } else if (limit_node->head_order && limit_node->head_order->shares > incomming_order->shares){
+                return 0;
+            }  
+
+            if (limit_node->head_order && limit_node->head_order->shares > incomming_order->shares){
                 if (this->logging) cout << "partially filled, can still fill more.\n";
                 this->create_match(incomming_order, limit_node);
-            } else {
+            }  
+            
+            if (incomming_order->shares > 0) {
                 // change limit nodes and keep trying to fill order 
-                if (this->logging) std::cout << "\nchanging limit nodes and "; 
-                if (incomming_order->order_type == "buy") {
-                    if (this->logging) std::cout << "trying again with: " << tmp_prev->limit_price << std::endl;
+                if (this->logging) std::cout << "\nincoming order still has " << incomming_order->shares << " to deal with.\n";
+                
+                if (tmp_prev && incomming_order->order_type == "buy" && tmp_prev->head_order->order_type == "sell") {
+                    if (this->logging) std::cout << "changing limit nodes and trying again with: " << tmp_prev->limit_price << std::endl;
                     this->create_match(incomming_order, tmp_prev);
-                } else {
-                    if (this->logging) std::cout << "trying again with: " << tmp_next->limit_price << std::endl;
+                } 
+                
+                if (tmp_next && incomming_order->order_type == "sell" && tmp_next->head_order->order_type == "buy") {
+                    if (this->logging) std::cout << "changing limit nodes and trying again with: " << tmp_next->limit_price << std::endl;
                     this->create_match(incomming_order, tmp_next);
                 }
             }
 
             if (incomming_order->shares > 0){
-                if (this->logging) std::cout << "\nincoming order still has shares to buy/sell! " << std::endl;
+                if (this->logging) std::cout << "\nincoming order still has shares to buy/sell that cant be matched with." << std::endl;
                 if (this->limit_map.find(incomming_order->limit) == this->limit_map.end()) {
-                    if (this->logging) std::cout << ">> creating it a limit node: ";
+                    if (this->logging) std::cout << ">> creating it a limit node: \n";
 
-                    Limit *limit_node = this->insert_limit_map(incomming_order->limit, incomming_order->shares, incomming_order->shares);
-                    this->insert_limit_dll(limit_node);
-                    this->insert_order_dll(incomming_order, limit_node);
+                    Limit *new_limit_node = this->insert_limit_map(incomming_order->limit, incomming_order->shares, incomming_order->shares);
+                    this->insert_limit_dll(new_limit_node);
+                    this->insert_order_dll(incomming_order, new_limit_node);
                     
                     std::cout << limit_node->limit_price << std::endl;
                 } else {
-                    std::cout << ">> limit node already exists ???: ";
                     auto it = limit_map.find(incomming_order->limit); 
-                    Limit *limit_node = it->second;  
-                    std::cout << limit_node->limit_price;
+                    Limit *found_limit_node = it->second;  
+                    std::cout << found_limit_node->limit_price;
+                    std::cout << ">> limit node " << found_limit_node->limit_price << " already exists... it must have been priviously created during recursion.: ";
                 }
 
-                this->update_limit_spread_new();
+                this->update_limit_spread_new(); // do we need this here? 
 
             } else if (incomming_order->shares == 0){
                 if (this->logging) std::cout << "incoming order has been fully filled!\n" << std::endl;
@@ -514,7 +525,8 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
                 order_id = generate_uuid_v4_1();
             }
 
-
+            // create a new order branched off of limit_node.head order
+            // and place this at the the head 
             Order *new_order_ptr = new Order {
                 order_id,                                    // order_id
                 limit_node->head_order->order_type,          // order_type
@@ -524,10 +536,10 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
                 limit_node->head_order->event_time           // event_time
             };
 
-            Order *order = this->order_map.at(limit_node->head_order->order_id); // TODO: why do i have to do this ??? i think we can take it out now that limits are pointers? 
-            order->shares -= incomming_order->shares;
-            limit_node->head_order->shares -= incomming_order->shares;
-            if (limit_node->head_order->shares < 0){
+            // Order *order = this->order_map.at(limit_node->head_order->order_id); 
+            // order->shares -= incomming_order->shares;                // why am i doing this twice???
+            limit_node->head_order->shares -= incomming_order->shares;  
+            if (limit_node->head_order->shares < 0 || incomming_order->shares < 0){
                 cout << "limit_node->head_order->shares is negative... exiting.\n";
                 throw;
             }
@@ -610,39 +622,39 @@ std::ostream& operator<<(std::ostream& os, const OrderBook &book){
         return os;
     }
 
-    if (book.debug){
-        std::cout << "\norder_map (" << book.order_map.size() << "):" << std::endl;
-        std::cout << "------------" << std::endl;
-        std::cout << "order_id\t   limit        qantity\t\torder_type" << std::endl;
-        for (auto it = book.order_map.begin(); it != book.order_map.end(); it++){
-            os << it->first << "\t   " << it->second->limit << "\t\t" << it->second->shares << "\t\t" << it->second->order_type << std::endl;
-        }
-    }
+    // if (book.debug){
+    //     std::cout << "\norder_map (" << book.order_map.size() << "):" << std::endl;
+    //     std::cout << "------------" << std::endl;
+    //     std::cout << "order_id\t   limit        qantity\t\torder_type" << std::endl;
+    //     for (auto it = book.order_map.begin(); it != book.order_map.end(); it++){
+    //         os << it->first << "\t   " << it->second->limit << "\t\t" << it->second->shares << "\t\t" << it->second->order_type << std::endl;
+    //     }
+    // }
 
-    if (book.debug){
-        std::cout << "\n\nlimit_map (" << book.limit_map.size() << "):" << std::endl;
-        std::cout << "------------" << std::endl;
-        std::cout << "price      volume       num_orders \t order_ids" << std::endl;
-        for (auto it = book.limit_map.begin(); it != book.limit_map.end(); it++){
-            // this is O(n) -- instead, just keep a new field on Limit.num_orders
-            int num_orders_at_limit_price {0};
-            Order *curr = it->second->head_order;;
-            while (curr != nullptr) {
-                num_orders_at_limit_price++;
-                curr = curr->next;
-            };
+    // if (book.debug){
+    //     std::cout << "\n\nlimit_map (" << book.limit_map.size() << "):" << std::endl;
+    //     std::cout << "------------" << std::endl;
+    //     std::cout << "price      volume       num_orders \t order_ids" << std::endl;
+    //     for (auto it = book.limit_map.begin(); it != book.limit_map.end(); it++){
+    //         // this is O(n) -- instead, just keep a new field on Limit.num_orders
+    //         int num_orders_at_limit_price {0};
+    //         Order *curr = it->second->head_order;;
+    //         while (curr != nullptr) {
+    //             num_orders_at_limit_price++;
+    //             curr = curr->next;
+    //         };
 
-            std::string s = " ";
-            Order *n = it->second->head_order;
-            while (n != nullptr) {
-                    s = s + n->order_id + " ";
-                    // s = s + std::to_string(n->order_id) + " ";
-                    n = n->next;
-            };
+    //         std::string s = " ";
+    //         Order *n = it->second->head_order;
+    //         while (n != nullptr) {
+    //                 s = s + n->order_id + " ";
+    //                 // s = s + std::to_string(n->order_id) + " ";
+    //                 n = n->next;
+    //         };
 
-            os << it->first << "\t   " << it->second->total_volume << "\t\t"  << num_orders_at_limit_price << "\t\t" << s << std::endl;
-        }
-    }
+    //         os << it->first << "\t   " << it->second->total_volume << "\t\t"  << num_orders_at_limit_price << "\t\t" << s << std::endl;
+    //     }
+    // }
 
     if (book.debug){
         cout << "\nPrinting all orders..." << endl;
@@ -673,33 +685,33 @@ std::ostream& operator<<(std::ostream& os, const OrderBook &book){
         }
     }
 
-    int num_limits_cnt_forwards = 0;
-    int num_limits_cnt_backwards = 0;
+    // int num_limits_cnt_forwards = 0;
+    // int num_limits_cnt_backwards = 0;
 
-    std::cout << "\nPrinting list forwards..." << endl;
-    Limit *n = book.sorted_limit_prices_head;
-    while (n != nullptr) {
-        num_limits_cnt_forwards++;
-        std::cout << n->limit_price << "/" << " ";
-        n = n->next;
-    }
-    std::cout << "done...\n\n" << endl;
+    // std::cout << "\nPrinting list forwards..." << endl;
+    // Limit *n = book.sorted_limit_prices_head;
+    // while (n != nullptr) {
+    //     num_limits_cnt_forwards++;
+    //     std::cout << n->limit_price << "/" << " ";
+    //     n = n->next;
+    // }
+    // std::cout << "done...\n\n" << endl;
 
-    std::cout << "\nPrinting list backwards..." << endl;
-    Limit *p = book.sorted_limit_prices_tail;
+    // std::cout << "\nPrinting list backwards..." << endl;
+    // Limit *p = book.sorted_limit_prices_tail;
 
-    while (p != nullptr) {
-        num_limits_cnt_backwards++;
-        cout << p->limit_price << "/" << " ";
-        p = p->prev;
-    }
-    std::cout << "done...\n\n" << endl;
+    // while (p != nullptr) {
+    //     num_limits_cnt_backwards++;
+    //     cout << p->limit_price << "/" << " ";
+    //     p = p->prev;
+    // }
+    // std::cout << "done...\n\n" << endl;
 
-    if (num_limits_cnt_forwards != num_limits_cnt_backwards){
-        std::cout << "num_limits_cnt_forwards: " << num_limits_cnt_forwards << std::endl;
-        std::cout << "num_limits_cnt_backwards: " << num_limits_cnt_backwards << std::endl;
-        throw;
-    }
+    // if (num_limits_cnt_forwards != num_limits_cnt_backwards){
+    //     std::cout << "num_limits_cnt_forwards: " << num_limits_cnt_forwards << std::endl;
+    //     std::cout << "num_limits_cnt_backwards: " << num_limits_cnt_backwards << std::endl;
+    //     throw;
+    // }
 
     if (true) std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
     return os;

@@ -1,0 +1,218 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+HIGHEST BUY OFFER: 100
+LOWEST SELL OFFER: 100.01
+MOST RECENT TRADE PRICE: 104.31
+
+Printing all orders...
+100:     99648b3729/buy/71/100.000000 
+100.01:  5e629f524c/sell/31/100.010000 
+100.02:  be539a9c45/sell/31/100.020000 
+100.03:  1a356a14bf/sell/31/100.030000 
+100.04:  c2111bc181/sell/31/100.040000 
+100.05:  aa5cb40ab8/sell/31/100.050000 
+100.06:  c533cef62d/sell/22/100.060000 
+
+num_orders: 7
+num_limits: 7
+~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+<------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+
+
+<--------------------------------------------------------------------------764--------------------------------------------------------------------------------------->
+_________incoming order________
+| shares: 97
+| order_type: buy
+| limit: 104.32
+| order_id: 9de244210f
+
+new buy order has crossed the spread ...
+find and return the most appropriate limit for the new buy order to match with. 
+
+Printing list forwards...
+100/ 100.01/ 100.02/ 100.03/ 100.04/ 100.05/ 100.06/ done...
+
+
+most appropriate limit will be: 100.06
+attempting to create a match...
+incoming order (9de244210f) wants to buy more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders 
+STARTING traversing limit node (100.06) orders to create matches.
+
+attempting to create a match...
+perfect match between buyer (cecd3ad40e) and seller (c533cef62d)
+deleting old order...c533cef62d
+deleting incoming order... cecd3ad40e
+
+limit node is all out of orders! DELETING LIMIT NODE @ 100.06
+
+deleting tail
+DONE traversing limit node's orders.
+
+
+incoming order still has 75 to deal with.
+changing limit nodes and trying again with: 100.05
+attempting to create a match...
+incoming order (9de244210f) wants to buy more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders 
+STARTING traversing limit node (100.05) orders to create matches.
+
+attempting to create a match...
+perfect match between buyer (c939702d02) and seller (aa5cb40ab8)
+deleting old order...aa5cb40ab8
+deleting incoming order... c939702d02
+
+limit node is all out of orders! DELETING LIMIT NODE @ 100.05
+
+deleting tail
+DONE traversing limit node's orders.
+
+
+incoming order still has 44 to deal with.
+changing limit nodes and trying again with: 100.04
+attempting to create a match...
+incoming order (9de244210f) wants to buy more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders 
+STARTING traversing limit node (100.04) orders to create matches.
+
+attempting to create a match...
+perfect match between buyer (5a8fd3041d) and seller (c2111bc181)
+deleting old order...c2111bc181
+deleting incoming order... 5a8fd3041d
+
+limit node is all out of orders! DELETING LIMIT NODE @ 100.04
+
+deleting tail
+DONE traversing limit node's orders.
+
+
+incoming order still has 13 to deal with.
+changing limit nodes and trying again with: 100.03
+attempting to create a match...
+incoming buy order does not have enough shares to completely fill limit_node.head_order. create match, partially fill limit_node.head_order, update limit_node.head_order, delete incomming_order, return.
+attempting to create a match...
+perfect match between buyer (9de244210f) and seller (c63cb6fe9b)
+deleting old order...c63cb6fe9b
+deleting incoming order... 9de244210f
+
+
+incoming order has been fully filled!
+
+incoming order has been fully filled!
+
+incoming order has been fully filled!
+
+updating limit spread
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+HIGHEST BUY OFFER: 100
+LOWEST SELL OFFER: 100.01
+MOST RECENT TRADE PRICE: 104.32
+
+Printing all orders...
+100:  99648b3729/buy/71/100.000000 
+100.01:  5e629f524c/sell/31/100.010000 
+100.02:  be539a9c45/sell/31/100.020000 
+100.03:  1a356a14bf/sell/18/100.030000 
+
+num_orders: 4
+num_limits: 4
+~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+<------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+
+
+<--------------------------------------------------------------------------765--------------------------------------------------------------------------------------->
+_________incoming order________
+| shares: 97
+| order_type: buy
+| limit: 104.33
+| order_id: a362e57a99
+
+new buy order has crossed the spread ...
+find and return the most appropriate limit for the new buy order to match with. 
+
+Printing list forwards...
+100/ 100.01/ 100.02/ 100.03/ done...
+
+
+most appropriate limit will be: 100.03
+attempting to create a match...
+incoming order (a362e57a99) wants to buy more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders 
+STARTING traversing limit node (100.03) orders to create matches.
+
+attempting to create a match...
+perfect match between buyer (e2696b2d8f) and seller (1a356a14bf)
+deleting old order...1a356a14bf
+deleting incoming order... e2696b2d8f
+
+limit node is all out of orders! DELETING LIMIT NODE @ 100.03
+
+deleting tail
+DONE traversing limit node's orders.
+
+
+incoming order still has 79 to deal with.
+changing limit nodes and trying again with: 100.02
+attempting to create a match...
+incoming order (a362e57a99) wants to buy more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders 
+STARTING traversing limit node (100.02) orders to create matches.
+
+attempting to create a match...
+perfect match between buyer (86c7610060) and seller (be539a9c45)
+deleting old order...be539a9c45
+deleting incoming order... 86c7610060
+
+limit node is all out of orders! DELETING LIMIT NODE @ 100.02
+
+deleting tail
+DONE traversing limit node's orders.
+
+
+incoming order still has 48 to deal with.
+changing limit nodes and trying again with: 100.01
+attempting to create a match...
+incoming order (a362e57a99) wants to buy more orders than the limit_node.head_order has. create match, delete limit_node.head_order, and continue trying to fill orders 
+STARTING traversing limit node (100.01) orders to create matches.
+
+attempting to create a match...
+perfect match between buyer (4c5dd3e5e4) and seller (5e629f524c)
+deleting old order...5e629f524c
+deleting incoming order... 4c5dd3e5e4
+
+limit node is all out of orders! DELETING LIMIT NODE @ 100.01
+
+deleting tail
+DONE traversing limit node's orders.
+
+
+incoming order still has 17 to deal with.
+
+incoming order still has shares to buy/sell that cant be matched with.
+>> creating it a limit node: inserting new limit node at tail
+6.50479e-310
+updating limit spread
+
+incoming order still has shares to buy/sell that cant be matched with.
+104.33>> limit node 104.33 already exists... it must have been priviously created during recursion.: updating limit spread
+
+incoming order still has shares to buy/sell that cant be matched with.
+104.33>> limit node 104.33 already exists... it must have been priviously created during recursion.: updating limit spread
+updating limit spread
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+HIGHEST BUY OFFER: 104.33
+NO SELL OFFERS YET 
+MOST RECENT TRADE PRICE: 104.33
+
+Printing all orders...
+100:  99648b3729/buy/71/100.000000 
+104.33:  a362e57a99/buy/17/104.330000 
+
+num_orders: 2
+num_limits: 2
+~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+<------------------------------------------------------------------------------------------------------------------------------------------------------------------>

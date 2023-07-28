@@ -154,7 +154,7 @@ void trading_bot(OrderBook *book){
         book->add_order(
             order_id,           // order_id
             order_type,         // order_type
-            10,             // shares
+            shares,             // shares
             offer,              // limit
             curr_time,          // entry_time
             curr_time           // event_time

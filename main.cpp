@@ -51,3 +51,6 @@ int main(int argc, char** argv){
 // tests to prove book can insert new limit at front, middle, end 
 // tests to prove book can delete new limit at front, middle, end 
 // add to all tests a check that num nodes == expected forwards and backwards 
+// test to prove an incoming order can match with a limit's head that has less shares than incoming order 
+// test to prove an incoming order can match with a limit's head that has more shares than incoming order 
+// test to prove shit.txt works as expected 
