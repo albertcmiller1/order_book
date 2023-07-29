@@ -141,7 +141,7 @@ void trading_bot(OrderBook *book){
             } else if (opt == 5){
                 offer = book->most_recent_trade_price - factor;
             } else {
-                offer = book->most_recent_trade_price + factor;
+                offer = book->most_recent_trade_price;
             }
         } else {
             offer = ipo;
@@ -159,7 +159,6 @@ void trading_bot(OrderBook *book){
             curr_time,          // entry_time
             curr_time           // event_time
         );
-
         std::cout << *book << std::endl;
         std::cout << "<------------------------------------------------------------------------------------------------------------------------------------------------------------------>\n\n\n";
         cnt++;
