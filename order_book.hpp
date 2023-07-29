@@ -8,7 +8,6 @@
 #include <random>
 #include <sstream>
 
-
 struct Match {
     int match_id;
     std::string buying_order_id;
@@ -42,31 +41,22 @@ struct Limit {
 
 class OrderBook {
 public:
-    std::unordered_map<double, Limit*> limit_map = {};    // key is limit price
-    std::unordered_map<std::string, Order*> order_map = {};       // key is order_id
+    std::unordered_map<double, Limit*> limit_map = {};          // key is limit price
+    std::unordered_map<std::string, Order*> order_map = {};     // key is order_id
 
     int num_matches {0};
     double most_recent_trade_price {0};
     bool debug {true};
     bool logging {true};
-    bool is_busy {false}; // use this to prevent any orders to come in while 
     
     Limit *sorted_limit_prices_head {nullptr};
     Limit *sorted_limit_prices_tail {nullptr};
     int num_limit_nodes {0}; 
 
-    // instead of having these, we could insert a dummy "spread" limit node between best buy and best sell
     Limit *highest_buy_limit {nullptr}; 
     Limit *lowest_sell_limit {nullptr};
 
-    void add_order(
-        std::string order_id,
-        std::string order_type,
-        int shares,
-        double limit,
-        unsigned long long entry_time,
-        unsigned long long event_time
-    );
+    void add_order(std::string order_id, std::string order_type, int shares, double limit, unsigned long long entry_time, unsigned long long event_time);
     double find_best_limit_node_to_match_with_new(std::string incoming_order_type, double incoming_order_limit);
     Limit* find_best_limit_node_to_match_with(Order *new_order_ptr);
     Limit* insert_limit_map(double limit_price, int size, int total_volume);

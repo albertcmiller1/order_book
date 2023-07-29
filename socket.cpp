@@ -90,14 +90,15 @@ void trading_bot(OrderBook *book){
     /*
         TODO:
         > bot should not allow for negative order prices 
-        > bot should realize how many orders/limits there are. if the number of orders/limits is getting too big, slightly influence the book to create matches so we dont run out of memory 
+        > bot should realize how many orders/limits there are. 
+        >> if the number of orders/limits is getting too big, slightly influence the book to create matches so we dont run out of memory 
     */
 
     int cnt = 1;
     double ipo = 100.00;
 
     while (true){
-        sleep(0);  
+        sleep(1);  
 
         // std::cout << "THREAD still working" << std::endl;
         // for (auto user : users){
@@ -113,36 +114,23 @@ void trading_bot(OrderBook *book){
             order_id = generate_uuid_v4();
         }
 
-        std::string order_type;
-        int rand_num = rand();
-
-        if (rand_num % 2){
-            order_type = "buy";
-        } else {
-            order_type = "sell";
-        }
-
         double offer;
+        int rand_num = rand();
+        std::string order_type;
+        if (rand_num % 2){ order_type = "buy";} else { order_type = "sell"; }
+
         if (book->most_recent_trade_price){
             int opt = rand_num % 10; 
             double factor = 0.01;
             offer = ipo * factor;
 
-            if (opt == 0){
-                offer = book->most_recent_trade_price + factor;
-            } else if (opt == 1){
-                offer = book->most_recent_trade_price - factor;
-            } else if (opt == 2){
-                offer = book->most_recent_trade_price + factor;
-            } else if (opt == 3){
-                offer = book->most_recent_trade_price - factor;
-            } else if (opt == 4){
-                offer = book->most_recent_trade_price - factor;
-            } else if (opt == 5){
-                offer = book->most_recent_trade_price - factor;
-            } else {
-                offer = book->most_recent_trade_price;
-            }
+            if      (opt == 0)  {offer = book->most_recent_trade_price + factor;} 
+            else if (opt == 1)  {offer = book->most_recent_trade_price - factor;} 
+            else if (opt == 2)  {offer = book->most_recent_trade_price + factor;} 
+            else if (opt == 3)  {offer = book->most_recent_trade_price - factor;} 
+            else if (opt == 4)  {offer = book->most_recent_trade_price - factor;} 
+            else if (opt == 5)  {offer = book->most_recent_trade_price - factor;} 
+            else                {offer = book->most_recent_trade_price;}
         } else {
             offer = ipo;
         }
@@ -152,12 +140,12 @@ void trading_bot(OrderBook *book){
 
         std::cout << "<--------------------------------------------------------------------------" << cnt << "--------------------------------------------------------------------------------------->\n";
         book->add_order(
-            order_id,           // order_id
-            order_type,         // order_type
-            shares,             // shares
-            offer,              // limit
-            curr_time,          // entry_time
-            curr_time           // event_time
+            order_id,           
+            order_type,        
+            shares,            
+            offer,             
+            curr_time,         
+            curr_time          
         );
         std::cout << *book << std::endl;
         std::cout << "<------------------------------------------------------------------------------------------------------------------------------------------------------------------>\n\n\n";
@@ -208,16 +196,15 @@ void start_socket_server(OrderBook *book){
                 std::cout << "invalid input" << endl;
             }
 
-            // std::cout << 11111111               << endl;                   
-            // std::cout << arg_map["order_type"]  << endl;                   
-            // std::cout << stoi(arg_map["shares"]) << endl;                   
-            // std::cout << stof(arg_map["limit"]) << endl;                   
-            // std::cout << 66666666               << endl;                   
-            // std::cout << 99999999                << endl;                   
+            // std::cout << 11111111                    << endl;                   
+            // std::cout << arg_map["order_type"]       << endl;                   
+            // std::cout << stoi(arg_map["shares"])     << endl;                   
+            // std::cout << stof(arg_map["limit"])      << endl;                   
+            // std::cout << 66666666                    << endl;                   
+            // std::cout << 99999999                    << endl;                   
 
 
-            // std::cout << *book << std::endl;
-            // std::cout << "BOOOG----------------------------------------------------GIIIIE\n\n";
+            std::cout << *book << std::endl;
 
             // broadcast message to all connectued users 
             // for (auto user : users)
