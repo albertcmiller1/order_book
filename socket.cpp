@@ -56,7 +56,6 @@ static std::random_device              rd;
 static std::mt19937                    gen(rd());
 static std::uniform_int_distribution<> dis(0, 15);
 static std::uniform_int_distribution<> dis2(8, 11);
-
 std::string generate_uuid_v4() {
     std::stringstream ss;
     int i;
@@ -64,27 +63,8 @@ std::string generate_uuid_v4() {
     for (i = 0; i < 10; i++) {
         ss << dis(gen);
     }
-    // ss << "-";
-    // for (i = 0; i < 4; i++) {
-    //     ss << dis(gen);
-    // }
-    // ss << "-4";
-    // for (i = 0; i < 3; i++) {
-    //     ss << dis(gen);
-    // }
-    // ss << "-";
-    // ss << dis2(gen);
-    // for (i = 0; i < 3; i++) {
-    //     ss << dis(gen);
-    // }
-    // ss << "-";
-    // for (i = 0; i < 12; i++) {
-    //     ss << dis(gen);
-    // };
     return ss.str();
 }
-
-std::unordered_set<crow::websocket::connection*> users;
 
 void trading_bot(OrderBook *book){
     /*
@@ -98,7 +78,7 @@ void trading_bot(OrderBook *book){
     double ipo = 100.00;
 
     while (true){
-        sleep(1);  
+        sleep(0);  
 
         // std::cout << "THREAD still working" << std::endl;
         // for (auto user : users){
@@ -128,8 +108,9 @@ void trading_bot(OrderBook *book){
             else if (opt == 1)  {offer = book->most_recent_trade_price - factor;} 
             else if (opt == 2)  {offer = book->most_recent_trade_price + factor;} 
             else if (opt == 3)  {offer = book->most_recent_trade_price - factor;} 
-            else if (opt == 4)  {offer = book->most_recent_trade_price - factor;} 
-            else if (opt == 5)  {offer = book->most_recent_trade_price - factor;} 
+            else if (opt == 4)  {offer = book->most_recent_trade_price + factor;} 
+            else if (opt == 5)  {offer = book->most_recent_trade_price + factor + 0.01;} 
+            else if (opt == 6)  {offer = book->most_recent_trade_price + factor + 0.01;} 
             else                {offer = book->most_recent_trade_price;}
         } else {
             offer = ipo;
@@ -138,7 +119,7 @@ void trading_bot(OrderBook *book){
         int shares = rand_num%100;
         curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-        std::cout << "<--------------------------------------------------------------------------" << cnt << "--------------------------------------------------------------------------------------->\n";
+        // std::cout << "<--------------------------------------------------------------------------" << cnt << "--------------------------------------------------------------------------------------->\n";
         book->add_order(
             order_id,           
             order_type,        
@@ -147,8 +128,8 @@ void trading_bot(OrderBook *book){
             curr_time,         
             curr_time          
         );
-        std::cout << *book << std::endl;
-        std::cout << "<------------------------------------------------------------------------------------------------------------------------------------------------------------------>\n\n\n";
+        // std::cout << *book << std::endl;
+        // std::cout << "<------------------------------------------------------------------------------------------------------------------------------------------------------------------>\n\n\n";
         cnt++;
     }
 }
@@ -161,12 +142,12 @@ void start_socket_server(OrderBook *book){
       .onopen([&](crow::websocket::connection& conn) {
           CROW_LOG_INFO << "new websocket connection from " << conn.get_remote_ip();
           std::lock_guard<std::mutex> _(mtx);
-          users.insert(&conn);
+          book->users.insert(&conn);
       })
       .onclose([&](crow::websocket::connection& conn, const std::string& reason) {
           CROW_LOG_INFO << "websocket connection closed: " << reason;
           std::lock_guard<std::mutex> _(mtx);
-          users.erase(&conn);
+          book->users.erase(&conn);
       })
       .onmessage([&](crow::websocket::connection& /*conn*/, const std::string& data, bool is_binary) {
           std::lock_guard<std::mutex> _(mtx);
