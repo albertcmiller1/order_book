@@ -53,7 +53,6 @@ target_link_libraries(Crow
 
 target_compile_definitions(Crow INTERFACE "")
 
-
 #####################################
 # Install Files
 #####################################

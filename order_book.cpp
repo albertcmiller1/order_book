@@ -14,7 +14,6 @@ std::string generate_uuid_v4_1() {
     return ss.str();
 }
 
-
 void OrderBook::add_order(string order_id, std::string order_type, int shares, double limit_price, unsigned long long entry_time, unsigned long long event_time){
     Order *new_order_ptr = new Order {
         order_id,
@@ -478,7 +477,7 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
             } else if (incomming_order->shares == 0){
                 if (this->logging) std::cout << "incoming order has been fully filled!\n" << std::endl;
             } else {
-                std::cout << "??????? BAD NEW BEARS\n" << std::endl; throw;
+                std::cout << "???\n" << std::endl; throw;
             }
 
             return 0;

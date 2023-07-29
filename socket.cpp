@@ -226,7 +226,6 @@ void start_socket_server(OrderBook *book){
       .run();
 }
 
-
 int main(){
     OrderBook *book = new OrderBook;
 
