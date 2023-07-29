@@ -63,7 +63,6 @@ void OrderBook::add_order(string order_id, std::string order_type, int shares, d
 
 Limit* OrderBook::find_best_limit_node_to_match_with(Order *new_order_ptr){
     if (this->logging) std::cout << "find and return the most appropriate limit for the new " << new_order_ptr->order_type << " order to match with. \n";
-    this->print_limits_dll(this->sorted_limit_prices_head);
     Limit *curr = nullptr;
     if (new_order_ptr->order_type == "buy"){
         // start at tail and look for a sell order to match with
@@ -223,6 +222,13 @@ int OrderBook::insert_limit_dll(Limit *new_limit){
                 curr->prev = new_limit;
                 this->sorted_limit_prices_head = new_limit;
                 return 0;
+            } else if (!curr->next && new_limit->limit_price > curr->limit_price) {
+                if (this->logging) std::cout << "inserting new limit node (" << new_limit->limit_price << ") at tail\n";
+                new_limit->prev = this->sorted_limit_prices_tail;
+                this->sorted_limit_prices_tail->next = new_limit;
+                new_limit->next = nullptr;
+                this->sorted_limit_prices_tail = new_limit;
+                return 0;
             } else if (curr->limit_price < new_limit->limit_price && new_limit->limit_price < curr->next->limit_price){
                 if (this->logging) std::cout << "inserting new limit node (" << new_limit->limit_price << ") in middle\n";
                 Limit *tmp_nxt = curr->next;
@@ -230,13 +236,6 @@ int OrderBook::insert_limit_dll(Limit *new_limit){
                 new_limit->prev = curr;
                 new_limit->next = tmp_nxt;
                 tmp_nxt->prev = new_limit;
-                return 0;
-            } else if (!curr->next && new_limit->limit_price > curr->limit_price) {
-                if (this->logging) std::cout << "inserting new limit node (" << new_limit->limit_price << ") at tail\n";
-                new_limit->prev = this->sorted_limit_prices_tail;
-                this->sorted_limit_prices_tail->next = new_limit;
-                new_limit->next = nullptr;
-                this->sorted_limit_prices_tail = new_limit;
                 return 0;
             } else {
                 curr = curr->next;
@@ -347,10 +346,16 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
                 1,                          // sale_quantity;
                 incomming_order->limit      // sale_price;
             };
-
+            
             // update most_recent_trade_price
             // this->most_recent_trade_price = incomming_order->limit;
             this->most_recent_trade_price = limit_node->limit_price; 
+
+            for (auto user : users){
+                // user->send_text("MATCH CREATED!");
+                std::string s = "most recent trade price: " + to_string(this->most_recent_trade_price);
+                user->send_text(s);
+            }
 
             // delete head 
             if (this->logging) std::cout << "deleting old order..." << limit_node->head_order->order_id << std::endl;
@@ -458,6 +463,7 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
                     this->create_match(incomming_order, tmp_next);
                 }
             }
+            
             // TODO: can clean this up a bit
             if (incomming_order->shares > 0){
                 if (this->logging) std::cout << "\nincoming order still has shares to buy/sell that cant be matched with." << std::endl;
@@ -469,7 +475,7 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
                 } else {
                     auto it = limit_map.find(incomming_order->limit); 
                     Limit *found_limit_node = it->second;  
-                    std::cout << ">> limit node " << found_limit_node->limit_price << " already exists... it must have been priviously created during recursion.: ";
+                    if (this->logging) std::cout << ">> limit node " << found_limit_node->limit_price << " already exists... it must have been priviously created during recursion.: ";
                 }
 
                 this->update_limit_spread_new(); // TODO: do we need this here? 
