@@ -3,7 +3,6 @@ build2/
 logs/
 aws/
 .vscode/
-cmake/
 shit/
 
 # Prerequisites
