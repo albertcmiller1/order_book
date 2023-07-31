@@ -39,8 +39,8 @@ The book, trading bot threads, api, and websocket will be apart of the same proc
 * attack.py python program to test multiple users firing off orders 
 
 ## notes 
-a buyer  matches with a  seller when the incoming buy  price is greater than a sell offer
-a seller matches with a  buyer  when the incoming sell price is less    than a buy offer 
+* a buyer  matches with a  seller when the incoming buy  price is greater than a sell offer
+* a seller matches with a  buyer  when the incoming sell price is less    than a buy offer 
 
 create a map <std::string ticker, OrderBook book> to hold a unique book for each unique ticker 
 create api endpoint to IPO a stock, submit an order, cancel an order, check properties of the book
