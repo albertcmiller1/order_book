@@ -41,7 +41,6 @@ int count_digit(int number) {
 }
 
 bool validate_args(std::unordered_map<std::string, std::string> arg_map){
-
     // std::string s = arg_map["limit"];
     // for( int i = 0; i < s.length(); i++ ) {
     //     if( !isdigit( s[i] ) !=) {
@@ -166,7 +165,7 @@ void start_socket_server(OrderBook *book){
 
             if (validate_args(arg_map)){
                 book->add_order(
-                    generate_uuid_v4(),                                   // int order_id
+                    generate_uuid_v4(),                         // int order_id
                     arg_map["order_type"],                      // bool order_type
                     stoi(arg_map["shares"]),                    // int shares
                     stof(arg_map["limit"]),                     // double limit
