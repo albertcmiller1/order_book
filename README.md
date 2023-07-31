@@ -19,6 +19,13 @@ Every 60 seconds the book will post the current price of each stock traded into 
 ### Infrastructure 
 The book, trading bot threads, api, and websocket will be apart of the same process which will be running on an AWS EC2 instance. 
 
+## To get started 
+dependencies: [asio](https://think-async.com/Asio/)
+1. clone the repository 
+2. `mkdir build && cd build`
+3. `cmake ..`
+4. `make` 
+
 ## Future ideas
 * how to build a driver/buffer for much faster performance? 
 * other data structure ideas for the order book? increase speed? 
@@ -30,6 +37,7 @@ The book, trading bot threads, api, and websocket will be apart of the same proc
 
 ## Todo 
 * more tests 
+* speed up update_limit_spread_new()
 * print 100 as 100.00
 * api (post order, cancel order, check current price)
 * validate inputs 
