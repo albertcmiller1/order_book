@@ -54,18 +54,26 @@ bool validate_args(std::unordered_map<std::string, std::string> arg_map){
 static std::random_device              rd;
 static std::mt19937                    gen(rd());
 static std::uniform_int_distribution<> dis(0, 15);
-static std::uniform_int_distribution<> dis2(8, 11);
-std::string generate_uuid_v4() {
+// static std::uniform_int_distribution<> dis2(8, 11);
+std::string generate_order_id(OrderBook *book) {
     std::stringstream ss;
     int i;
+    
     ss << std::hex;
-    for (i = 0; i < 10; i++) {
-        ss << dis(gen);
+    for (i = 0; i < 10; i++) { ss << dis(gen); }
+
+    std::string order_id = ss.str();
+    while (book->order_map.find(order_id) != book->order_map.end()){
+        // order id already exists. try a new one.
+        order_id = generate_order_id(book);
     }
-    return ss.str();
+
+    return order_id;
 }
 
-void trading_bot(OrderBook *book){
+std::mutex m;
+std::atomic<int> cnt = 1;
+void trading_bot(OrderBook *book, std::string thread_id){
     /*
         TODO:
         > bot should not allow for negative order prices 
@@ -73,24 +81,17 @@ void trading_bot(OrderBook *book){
         >> if the number of orders/limits is getting too big, slightly influence the book to create matches so we dont run out of memory 
     */
 
-    int cnt = 1;
     double ipo = 100.00;
 
     while (true){
         sleep(0);  
 
-        // std::cout << "THREAD still working" << std::endl;
-        // for (auto user : users){
-        //     // std::cout << "data: " << data << std::endl;
-        //     user->send_text("THREAD still working");
-        // }
-       
         uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         
-        std::string order_id = generate_uuid_v4();
-        while (book->order_map.find(order_id) != book->order_map.end()){
-            // order id already exists. try a new one.
-            order_id = generate_uuid_v4();
+        std::string order_id = generate_order_id(book);
+        if (book->order_map.find(order_id) != book->order_map.end()){
+            std::cout << "shit\n" ;
+            throw;
         }
 
         double offer;
@@ -118,7 +119,8 @@ void trading_bot(OrderBook *book){
         int shares = rand_num%100;
         curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-        // std::cout << "<--------------------------------------------------------------------------" << cnt << "--------------------------------------------------------------------------------------->\n";
+        m.lock();
+        std::cout << "<--------------------------------------------------------------------------" << thread_id << "-" << cnt << "--------------------------------------------------------------------------------------->\n";
         book->add_order(
             order_id,           
             order_type,        
@@ -127,9 +129,10 @@ void trading_bot(OrderBook *book){
             curr_time,         
             curr_time          
         );
-        // std::cout << *book << std::endl;
-        // std::cout << "<------------------------------------------------------------------------------------------------------------------------------------------------------------------>\n\n\n";
+        std::cout << *book << std::endl;
+        std::cout << "<------------------------------------------------------------------------------------------------------------------------------------------------------------------>\n\n\n";
         cnt++;
+        m.unlock();
     }
 }
 
@@ -164,14 +167,24 @@ void start_socket_server(OrderBook *book){
             std::unordered_map<std::string, std::string> arg_map = parse_args(V);
 
             if (validate_args(arg_map)){
+                m.lock();
+
+                std::string order_id = generate_order_id(book);
+                if (book->order_map.find(order_id) != book->order_map.end()){
+                    std::cout << "shit\n" ;
+                    throw;
+                }
+
+
                 book->add_order(
-                    generate_uuid_v4(),                         // int order_id
+                    order_id,                                   // string order_id
                     arg_map["order_type"],                      // bool order_type
                     stoi(arg_map["shares"]),                    // int shares
                     stof(arg_map["limit"]),                     // double limit
                     66666666,                                   // int entry_time
                     99999999                                    // int event_time
                 );
+                m.unlock();
             } else {
                 std::cout << "invalid input" << endl;
             }
@@ -210,7 +223,9 @@ int main(){
     OrderBook *book = new OrderBook;
 
     std::cout << "starting trading bot threads...\n";
-    std::thread th1(trading_bot, book);
+    std::thread th1(trading_bot, book, "th1");
+    std::thread th2(trading_bot, book, "th2");
+    std::thread th3(trading_bot, book, "th3");
     std::cout << "all threads up and running.\n";
 
     // wscat -c ws://0.0.0.0:5001/ws

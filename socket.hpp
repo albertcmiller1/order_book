@@ -10,7 +10,7 @@
 #include <string> 
 #include <vector> 
 #include <random>
-
+#include <atomic>
 
 // std::unordered_set<crow::websocket::connection*> users;
 // std::unordered_map<std::string, std::string> parse_args(std::vector <std::string> v);

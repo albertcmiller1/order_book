@@ -4,14 +4,21 @@ using namespace std;
 static std::random_device              rd;
 static std::mt19937                    gen(rd());
 static std::uniform_int_distribution<> dis(0, 15);
-static std::uniform_int_distribution<> dis2(8, 11);
 
-std::string generate_uuid_v4_1() {
+std::string OrderBook::generate_order_id() {
     std::stringstream ss;
     int i;
+    
     ss << std::hex;
     for (i = 0; i < 10; i++) { ss << dis(gen); }
-    return ss.str();
+
+    std::string order_id = ss.str();
+    while (this->order_map.find(order_id) != this->order_map.end()){
+        // order id already exists. try a new one.
+        order_id = generate_order_id();
+    }
+
+    return order_id;
 }
 
 void OrderBook::add_order(string order_id, std::string order_type, int shares, double limit_price, unsigned long long entry_time, unsigned long long event_time){
@@ -320,9 +327,8 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
     Limit *tmp_next = limit_node->next;
 
     if (limit_node->head_order && incomming_order->order_type != limit_node->head_order->order_type){
-        string buyers_order_id {NULL};
-        string sellers_order_id {NULL};
-        srand((unsigned) time(NULL));
+        string buyers_order_id;
+        string sellers_order_id;
 
         // set buyer and seller
         if (incomming_order->order_type == "buy"){
@@ -408,16 +414,9 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
                 // create a new order (branched from incoming_order) which will match the quantity of the limit_node->head_order 
                 // use this new order to create a perfect match 
                 // OG incoming_order will still have some leftover shares
-                srand((unsigned) time(NULL));
-                string order_id = generate_uuid_v4_1();
-                // TODO: move this
-                while (this->order_map.find(order_id) != this->order_map.end()){
-                    // order id already exists. try a new one.
-                    order_id = generate_uuid_v4_1();
-                }
 
                 Order *new_order_ptr = new Order {
-                    order_id,                           
+                    generate_order_id(),                           
                     incomming_order->order_type,        
                     limit_node->head_order->shares,     
                     incomming_order->limit,             
@@ -426,7 +425,9 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
                 };
 
                 // add new order to order_map
-                order_map[order_id] = new_order_ptr;
+                order_map[new_order_ptr->order_id] = new_order_ptr;
+
+                // update incoming order 
                 incomming_order->shares -= limit_node->head_order->shares; 
                 if (incomming_order->shares < 0){ cout << "incoming order has negative shares... exiting.\n"; throw; }
 
@@ -491,18 +492,9 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
             // incomming_order->shares < limit_node.head_order->shares
             if (this->logging) std::cout << "incoming " << incomming_order->order_type << " order does not have enough shares to completely fill limit_node->head_order.\n";
 
-            srand((unsigned) time(NULL));
-            string order_id = generate_uuid_v4_1();
-            // TODO: move this
-            while (this->order_map.find(order_id) != this->order_map.end()){
-                // order is already exists. try a new one.
-                order_id = generate_uuid_v4_1();
-            }
-
-            // create a new order branched off of limit_node.head order
-            // and place it at the the head of 
+            // create a new order branched off of limit_node.head order and place it at the the head of limit node
             Order *new_order_ptr = new Order {
-                order_id,                                    // order_id
+                generate_order_id(),                         // order_id
                 limit_node->head_order->order_type,          // order_type
                 incomming_order->shares,                     // shares
                 limit_node->head_order->limit,               // limit
@@ -510,10 +502,9 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
                 limit_node->head_order->event_time           // event_time
             };
 
+            // update head order of limit node
             limit_node->head_order->shares -= incomming_order->shares;  
-            if (limit_node->head_order->shares < 0 || incomming_order->shares < 0){
-                cout << "limit_node->head_order->shares is negative... exiting.\n"; throw;
-            }
+            if (limit_node->head_order->shares < 0 || incomming_order->shares < 0){ cout << "limit_node->head_order->shares is negative... exiting.\n"; throw; }
 
             new_order_ptr->next = limit_node->head_order;
             limit_node->head_order = new_order_ptr;
@@ -684,7 +675,7 @@ std::ostream& operator<<(std::ostream& os, const OrderBook &book){
     //     throw;
     // }
 
-    if (true) std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
+    if (true) std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~end printing book~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n";
     return os;
 }
 

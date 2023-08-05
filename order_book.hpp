@@ -74,5 +74,6 @@ public:
     void print_limits_dll_backwards(Limit *n);
     int validate();
     void update_limit_spread_old(Limit *limit, std::string order_type);
+    std::string generate_order_id();
     friend std::ostream& operator<<(std::ostream& os, const OrderBook& book);
 };
