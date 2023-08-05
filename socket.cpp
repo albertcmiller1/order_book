@@ -1,4 +1,5 @@
 #include "socket.hpp"
+#define CROW_JSON_USE_MAP
 using namespace std;
 
 std::unordered_map<std::string, std::string> parse_args(vector <std::string> v){
@@ -54,7 +55,6 @@ bool validate_args(std::unordered_map<std::string, std::string> arg_map){
 static std::random_device              rd;
 static std::mt19937                    gen(rd());
 static std::uniform_int_distribution<> dis(0, 15);
-// static std::uniform_int_distribution<> dis2(8, 11);
 std::string generate_order_id(OrderBook *book) {
     std::stringstream ss;
     int i;
@@ -76,8 +76,8 @@ std::atomic<int> cnt = 1;
 void trading_bot(OrderBook *book, std::string thread_id){
     /*
         TODO:
-        > bot should not allow for negative order prices 
         > bot should realize how many orders/limits there are. 
+        > keep set limits on most_recent_trade price so stock price doesnt go negative or blow up
         >> if the number of orders/limits is getting too big, slightly influence the book to create matches so we dont run out of memory 
     */
 
@@ -87,12 +87,8 @@ void trading_bot(OrderBook *book, std::string thread_id){
         sleep(0);  
 
         uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        
         std::string order_id = generate_order_id(book);
-        if (book->order_map.find(order_id) != book->order_map.end()){
-            std::cout << "shit\n" ;
-            throw;
-        }
+        if (book->order_map.find(order_id) != book->order_map.end()){std::cout << "shit\n"; throw;}
 
         double offer;
         int rand_num = rand();
@@ -136,7 +132,7 @@ void trading_bot(OrderBook *book, std::string thread_id){
     }
 }
 
-void start_socket_server(OrderBook *book){
+void start_socket_server(OrderBook *book, int crow_port){
     crow::SimpleApp app;
     std::mutex mtx;
 
@@ -167,15 +163,9 @@ void start_socket_server(OrderBook *book){
             std::unordered_map<std::string, std::string> arg_map = parse_args(V);
 
             if (validate_args(arg_map)){
-                m.lock();
-
                 std::string order_id = generate_order_id(book);
-                if (book->order_map.find(order_id) != book->order_map.end()){
-                    std::cout << "shit\n" ;
-                    throw;
-                }
-
-
+                if (book->order_map.find(order_id) != book->order_map.end()){ std::cout << "shit\n"; throw; }
+                m.lock();
                 book->add_order(
                     order_id,                                   // string order_id
                     arg_map["order_type"],                      // bool order_type
@@ -212,9 +202,47 @@ void start_socket_server(OrderBook *book){
     CROW_ROUTE(app, "/")([](){
         return "Hello world\n";
     });
+    
+    CROW_ROUTE(app, "/json")
+    ([]{
+        crow::json::wvalue x({{"message", "Hello, World!"}});
+        x["message2"] = "Hello, World.. Again!";
+        return x;
+    });
 
-    std::cout << "starting api + websocket...\n";
-    app.port(5001)
+    CROW_ROUTE(app, "/json_2")
+    ([] {
+        crow::json::wvalue x({{"zmessage", "Hello, World!"},
+                              {"amessage", "Hello, World2!"}});
+        return x;
+    });
+
+
+    CROW_ROUTE(app, "/add_json")
+    .methods("POST"_method)
+    ([](const crow::request& req){
+        auto x = crow::json::load(req.body);
+        if (!x) return crow::response(crow::status::BAD_REQUEST); // same as crow::response(400)
+
+        std::cout << x << std::endl;
+        std::cout << typeid(x).name() << std::endl;
+        std::cout << x["price"].d() << std::endl;
+        std::cout << x["order_type"].s() << std::endl;
+
+        double price = x["price"].d();
+        std::string order_type = x["order_type"].s();
+        std::cout << "price: " << price << std::endl;
+        std::cout << "order_type: " << order_type << std::endl;
+
+
+        crow::json::wvalue z({{"Order_placed", "true"},
+                              {"trade_price", "103.22"}});
+        return crow::response(z);
+    });
+
+
+    std::cout << "starting api + websocket on port: " << crow_port << std::endl;
+    app.port(crow_port)
       .multithreaded()
       .run();
 }
@@ -222,16 +250,18 @@ void start_socket_server(OrderBook *book){
 int main(){
     OrderBook *book = new OrderBook;
 
-    std::cout << "starting trading bot threads...\n";
-    std::thread th1(trading_bot, book, "th1");
-    std::thread th2(trading_bot, book, "th2");
-    std::thread th3(trading_bot, book, "th3");
-    std::cout << "all threads up and running.\n";
+    // std::cout << "starting trading bot threads...\n";
+    // std::thread th1(trading_bot, book, "th1");
+    // std::thread th2(trading_bot, book, "th2");
+    // std::thread th3(trading_bot, book, "th3");
+    // std::cout << "all threads up and running.\n";
 
     // wscat -c ws://0.0.0.0:5001/ws
+    // curl http://0.0.0.0:5001 
     // --limit 23.42 --shares 3 --order_type buy --user_id albert
+
     std::cout << "starting webserver...\n";
-    start_socket_server(book);
+    start_socket_server(book, 5001);
 
     return 0; 
 }
