@@ -8,16 +8,13 @@ static std::uniform_int_distribution<> dis(0, 15);
 std::string generate_order_id(OrderBook *book) {
     std::stringstream ss;
     int i;
-    
     ss << std::hex;
     for (i = 0; i < 10; i++) { ss << dis(gen); }
-
     std::string order_id = ss.str();
     while (book->order_map.find(order_id) != book->order_map.end()){
         // order id already exists. try a new one.
         order_id = generate_order_id(book);
     }
-
     return order_id;
 }
 
@@ -66,7 +63,7 @@ void trading_bot(OrderBook *book, std::string thread_id){
         curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
         m.lock();
-        std::cout << "<--------------------------------------------------------------------------" << thread_id << "-" << cnt << "--------------------------------------------------------------------------------------->\n";
+        // std::cout << "<--------------------------------------------------------------------------" << thread_id << "-" << cnt << "--------------------------------------------------------------------------------------->\n";
         book->add_order(
             order_id,           
             order_type,        
@@ -75,8 +72,8 @@ void trading_bot(OrderBook *book, std::string thread_id){
             curr_time,         
             curr_time          
         );
-        std::cout << *book << std::endl;
-        std::cout << "<------------------------------------------------------------------------------------------------------------------------------------------------------------------>\n\n\n";
+        // std::cout << *book << std::endl;
+        // std::cout << "<--------------------------------------------------------------------------------------------------------------------------------------------------------------------------->\n\n\n";
         cnt++;
         m.unlock();
     }
@@ -92,11 +89,22 @@ void send_spread_to_users(OrderBook *book){
     }
 }
 
+void send_curr_price_to_users(OrderBook *book){
+    while (true){
+        sleep(5);
+        std::string curr_price = to_string(book->most_recent_trade_price);
+        for (auto user : book->users) {
+            user->send_text(curr_price);
+        }
+    }
+}
+
 void start_socket_server(OrderBook *book, int crow_port){
     crow::SimpleApp app;
     std::mutex mtx;
 
     // might want multiple wesbocket routs? 
+    // each book should have a unique websocket rout -> might need to move this over to the book itself. 
     CROW_WEBSOCKET_ROUTE(app, "/ws")
       .onopen([&](crow::websocket::connection& conn) {
           CROW_LOG_INFO << "new websocket connection from " << conn.get_remote_ip();
@@ -113,10 +121,23 @@ void start_socket_server(OrderBook *book, int crow_port){
             // no reason for users to send messages         
       });
 
-    CROW_ROUTE(app, "/")([](){
+    CROW_ROUTE(app, "/ipo")([](){
+        // create a book, add to set, start trading bot threads @ ipo price
+        std::string ticker;
+        std::unordered_map<std::string, OrderBook*> books;  // ticker, associated book
+        return "Hello world\n";
+    });
+
+    CROW_ROUTE(app, "/cancel_order")([](){
+        // build function to remove order from limit's dll and order_map
         return "Hello world\n";
     });
     
+    CROW_ROUTE(app, "/order_status")([](){
+        // show order type, current trading price
+        return "Hello world\n";
+    });
+
     CROW_ROUTE(app, "/spread")
     ([]{
         crow::json::wvalue x({
@@ -165,8 +186,6 @@ void start_socket_server(OrderBook *book, int crow_port){
         return crow::response(z);
     });
 
-
-    std::cout << "starting api + websocket on port: " << crow_port << std::endl;
     app.port(crow_port)
       .multithreaded()
       .run();
@@ -179,14 +198,15 @@ int main(){
     std::thread th1(trading_bot, book, "th1");
     std::thread th2(trading_bot, book, "th2");
     std::thread th3(trading_bot, book, "th3");
-    std::cout << "all threads up and running.\n";
+    std::cout << "all threads up.\n";
 
     // wscat -c ws://0.0.0.0:5001/ws
     // curl http://0.0.0.0:5001 
-    // --limit 23.42 --shares 3 --order_type buy --user_id albert
 
-    std::cout << "starting webserver...\n";
-    start_socket_server(book, 5001);
+    int crow_port = 5001;
+    std::cout << "starting api + websocket on port: " << crow_port << std::endl;
+    start_socket_server(book, crow_port);
+    std::cout << "webserver up.\n";
 
     return 0; 
 }

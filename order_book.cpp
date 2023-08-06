@@ -32,15 +32,16 @@ void OrderBook::add_order(string order_id, std::string order_type, int shares, d
 
     if (this->logging) {
         std::cout << "_________incoming order________" << std::endl;
-        std::cout << "| shares: " << new_order_ptr->shares << std::endl;
-        std::cout << "| order_type: " << new_order_ptr->order_type << std::endl;
-        std::cout << "| limit: " << new_order_ptr->limit << std::endl;
-        std::cout << "| order_id: " << new_order_ptr->order_id << std::endl << std::endl;
+        std::cout << "| shares: "       << new_order_ptr->shares        << std::endl;
+        std::cout << "| order_type: "   << new_order_ptr->order_type    << std::endl;
+        std::cout << "| limit: "        << new_order_ptr->limit         << std::endl;
+        std::cout << "| order_id: "     << new_order_ptr->order_id      << std::endl << std::endl;
     }
     
     // add new order to order_map
     order_map[order_id] = new_order_ptr;
 
+    // TODO: there's a more modern way to check if a map contains a value.
     if (this->limit_map.find(limit_price) == this->limit_map.end()) {
         // limit doesnt exist in limit_map yet
         // check if order crosses the spread 
@@ -104,6 +105,7 @@ Limit* OrderBook::find_best_limit_node_to_match_with(Order *new_order_ptr){
     return curr;
 }
 
+// TODO: instead of doing this, just update do a check each time we delete or add an order. 
 void OrderBook::update_limit_spread_new(){
     // this is very slow.
 
@@ -320,6 +322,7 @@ bool OrderBook::order_crossed_spread(Order *incomming_order){
     }
 }
 
+// TODO: this function is too big. separate each case into 3 separate functions for clarity. 
 int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
     if (this->logging) std::cout << "attempting to create a match...\n";
     Limit *tmp_prev = limit_node->prev;
@@ -479,9 +482,6 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
                     Limit *found_limit_node = it->second;  
                     if (this->logging) std::cout << ">> limit node " << found_limit_node->limit_price << " already exists... it must have been priviously created during recursion.: ";
                 }
-
-                this->update_limit_spread_new(); // TODO: do we need this here? 
-
             } else if (incomming_order->shares == 0){
                 if (this->logging) std::cout << "incoming order has been fully filled!\n" << std::endl;
             } else {
