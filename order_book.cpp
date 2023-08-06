@@ -12,7 +12,7 @@ std::string OrderBook::generate_order_id() {
     for (i = 0; i < 10; i++) { ss << dis(gen); }
 
     std::string order_id = ss.str();
-    while (this->order_map.find(order_id) != this->order_map.end()){
+    while (this->order_map.count(order_id)){
         // order id already exists. try a new one.
         order_id = generate_order_id();
     }
@@ -41,8 +41,17 @@ void OrderBook::add_order(string order_id, std::string order_type, int shares, d
     // add new order to order_map
     order_map[order_id] = new_order_ptr;
 
-    // TODO: there's a more modern way to check if a map contains a value.
-    if (this->limit_map.find(limit_price) == this->limit_map.end()) {
+    if (this->limit_map.count(limit_price)) {
+        // limit already exists in limit_map
+        Limit *existing_limit_node = limit_map.find(limit_price)->second;  
+
+        // check if order crosses the spread 
+        if (this->order_crossed_spread(new_order_ptr)){
+            this->create_match(new_order_ptr, existing_limit_node);
+        } else {
+            this->insert_order_dll(new_order_ptr, existing_limit_node);
+        }
+    } else  {
         // limit doesnt exist in limit_map yet
         // check if order crosses the spread 
         if (this->order_crossed_spread(new_order_ptr)){
@@ -53,18 +62,8 @@ void OrderBook::add_order(string order_id, std::string order_type, int shares, d
             this->insert_limit_dll(new_limit_node);
             this->insert_order_dll(new_order_ptr, new_limit_node);
         }
-    } else {
-        // limit already exists in limit_map
-        auto it = limit_map.find(limit_price); 
-        Limit *existing_limit_node = it->second;  
-
-        // check if order crosses the spread 
-        if (this->order_crossed_spread(new_order_ptr)){
-            this->create_match(new_order_ptr, existing_limit_node);
-        } else {
-            this->insert_order_dll(new_order_ptr, existing_limit_node);
-        }
     }
+
     this->update_limit_spread_new();
 }
 
@@ -469,19 +468,19 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
                 }
             }
             
-            // TODO: can clean this up a bit
+            // TODO: can clean this up a bit ^ above is under the same condition as below 
             if (incomming_order->shares > 0){
                 if (this->logging) std::cout << "\nincoming order still has shares to buy/sell that cant be matched with." << std::endl;
-                if (this->limit_map.find(incomming_order->limit) == this->limit_map.end()) {
+                if (this->limit_map.count(incomming_order->limit)){
+                    Limit *found_limit_node = limit_map.find(incomming_order->limit)->second;  
+                    if (this->logging) std::cout << ">> limit node " << found_limit_node->limit_price << " already exists... it must have been priviously created during recursion.: ";
+                } else {
                     if (this->logging) std::cout << ">> creating it a limit node: \n";
                     Limit *new_limit_node = this->insert_limit_map(incomming_order->limit, incomming_order->shares, incomming_order->shares);
                     this->insert_limit_dll(new_limit_node);
                     this->insert_order_dll(incomming_order, new_limit_node);
-                } else {
-                    auto it = limit_map.find(incomming_order->limit); 
-                    Limit *found_limit_node = it->second;  
-                    if (this->logging) std::cout << ">> limit node " << found_limit_node->limit_price << " already exists... it must have been priviously created during recursion.: ";
                 }
+
             } else if (incomming_order->shares == 0){
                 if (this->logging) std::cout << "incoming order has been fully filled!\n" << std::endl;
             } else {

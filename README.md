@@ -53,3 +53,8 @@ dependencies: [asio](https://think-async.com/Asio/)
 create a map <std::string ticker, OrderBook book> to hold a unique book for each unique ticker 
 create api endpoint to IPO a stock, submit an order, cancel an order, check properties of the book
 socket should broadcast all trades, and the current state of the spread, and the limit dll
+
+TODO: 
+> why is there a bug when i run on ec2
+> why are all rand numbers the same on ec2
+14,080 orders/sec wo logging 

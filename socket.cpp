@@ -75,6 +75,7 @@ void trading_bot(OrderBook *book, std::string thread_id){
         // std::cout << *book << std::endl;
         // std::cout << "<--------------------------------------------------------------------------------------------------------------------------------------------------------------------------->\n\n\n";
         cnt++;
+        if (cnt == 1000000){ throw; }
         m.unlock();
     }
 }
@@ -194,7 +195,7 @@ void start_socket_server(OrderBook *book, int crow_port){
 int main(){
     OrderBook *book = new OrderBook;
 
-    std::cout << "starting trading bot threads...\n";
+    std::cout << "starting threads...\n";
     std::thread th1(trading_bot, book, "th1");
     std::thread th2(trading_bot, book, "th2");
     std::thread th3(trading_bot, book, "th3");

@@ -44,12 +44,12 @@ target_include_directories(Crow
 		$<INSTALL_INTERFACE:include>
 )
 
-find_package(asio REQUIRED)
+# find_package(asio REQUIRED)
 
-target_link_libraries(Crow
-	INTERFACE
-		asio::asio
-)
+# target_link_libraries(Crow
+# 	INTERFACE
+# 		asio::asio
+# )
 
 target_compile_definitions(Crow INTERFACE "")
 
