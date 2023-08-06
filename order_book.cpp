@@ -356,6 +356,8 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
             // this->most_recent_trade_price = incomming_order->limit;
             this->most_recent_trade_price = limit_node->limit_price; 
 
+            // When a match is created, we will need to send a message about it to both users 
+
             for (auto user : users){
                 // user->send_text("MATCH CREATED!");
                 std::string s = "most recent trade price: " + to_string(this->most_recent_trade_price);

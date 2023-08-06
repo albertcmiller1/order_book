@@ -2,56 +2,6 @@
 #define CROW_JSON_USE_MAP
 using namespace std;
 
-std::unordered_map<std::string, std::string> parse_args(vector <std::string> v){
-    std::unordered_map<std::string, std::string> arg_map = {};
-
-    for (int i = 0; i < v.size(); i++){
-        if (v[i] == "--limit"){
-            arg_map["limit"] = v[i+1];
-        } else if (v[i] == "--user_id") {
-            arg_map["user_id"] = v[i+1];
-        } else if (v[i] == "--shares") {
-            arg_map["shares"] = v[i+1];
-        } else if (v[i] == "--order_type") {
-            arg_map["order_type"] = v[i+1];
-        }
-    }
-
-    srand((unsigned) time(NULL));
-    int order_id = rand();
-    uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-
-    arg_map["order_id"] = to_string(order_id);
-    arg_map["entry_time"] = curr_time;
-
-    cout << arg_map["limit"] << endl;
-    cout << arg_map["user_id"] << endl;
-    cout << arg_map["shares"] << endl;
-    cout << arg_map["order_type"] << endl;
-
-    return arg_map;
-}
-
-int count_digit(int number) {
-    int count = 0;
-    while(number != 0) {
-        number = number / 10;
-        count++;
-    }
-    return count;
-}
-
-bool validate_args(std::unordered_map<std::string, std::string> arg_map){
-    // std::string s = arg_map["limit"];
-    // for( int i = 0; i < s.length(); i++ ) {
-    //     if( !isdigit( s[i] ) !=) {
-    //         return false;
-    //     }
-    // }
-
-    return true;
-}
-
 static std::random_device              rd;
 static std::mt19937                    gen(rd());
 static std::uniform_int_distribution<> dis(0, 15);
@@ -132,10 +82,21 @@ void trading_bot(OrderBook *book, std::string thread_id){
     }
 }
 
+void send_spread_to_users(OrderBook *book){
+    while (true){
+        sleep(5);
+        std::string spread_data = "spread info";
+        for (auto user : book->users) {
+            user->send_text(spread_data);
+        }
+    }
+}
+
 void start_socket_server(OrderBook *book, int crow_port){
     crow::SimpleApp app;
     std::mutex mtx;
 
+    // might want multiple wesbocket routs? 
     CROW_WEBSOCKET_ROUTE(app, "/ws")
       .onopen([&](crow::websocket::connection& conn) {
           CROW_LOG_INFO << "new websocket connection from " << conn.get_remote_ip();
@@ -149,94 +110,58 @@ void start_socket_server(OrderBook *book, int crow_port){
       })
       .onmessage([&](crow::websocket::connection& /*conn*/, const std::string& data, bool is_binary) {
           std::lock_guard<std::mutex> _(mtx);
-        
-            // parse message and create order  
-            vector<std::string> V; 
-            istringstream iss(data);   
-            string word;
-            while(iss>>word){V.push_back(word);}
-
-            for (auto i : V){
-                std::cout << i << endl;
-            }
-
-            std::unordered_map<std::string, std::string> arg_map = parse_args(V);
-
-            if (validate_args(arg_map)){
-                std::string order_id = generate_order_id(book);
-                if (book->order_map.find(order_id) != book->order_map.end()){ std::cout << "shit\n"; throw; }
-                m.lock();
-                book->add_order(
-                    order_id,                                   // string order_id
-                    arg_map["order_type"],                      // bool order_type
-                    stoi(arg_map["shares"]),                    // int shares
-                    stof(arg_map["limit"]),                     // double limit
-                    66666666,                                   // int entry_time
-                    99999999                                    // int event_time
-                );
-                m.unlock();
-            } else {
-                std::cout << "invalid input" << endl;
-            }
-
-            // std::cout << 11111111                    << endl;                   
-            // std::cout << arg_map["order_type"]       << endl;                   
-            // std::cout << stoi(arg_map["shares"])     << endl;                   
-            // std::cout << stof(arg_map["limit"])      << endl;                   
-            // std::cout << 66666666                    << endl;                   
-            // std::cout << 99999999                    << endl;                   
-
-
-            std::cout << *book << std::endl;
-
-            // broadcast message to all connectued users 
-            // for (auto user : users)
-            //     if (is_binary)
-            //         user->send_binary(data);
-            //     else {
-            //         std::cout << "data: " << data << std::endl;
-            //         user->send_text(data);
-            //     }
+            // no reason for users to send messages         
       });
 
     CROW_ROUTE(app, "/")([](){
         return "Hello world\n";
     });
     
-    CROW_ROUTE(app, "/json")
+    CROW_ROUTE(app, "/spread")
     ([]{
-        crow::json::wvalue x({{"message", "Hello, World!"}});
-        x["message2"] = "Hello, World.. Again!";
+        crow::json::wvalue x({
+            {"spread-1", "hi"},
+            {"spread-2", "Hello, World2!"}
+        });
         return x;
     });
 
-    CROW_ROUTE(app, "/json_2")
-    ([] {
-        crow::json::wvalue x({{"zmessage", "Hello, World!"},
-                              {"amessage", "Hello, World2!"}});
-        return x;
+    CROW_ROUTE(app, "/curr_price")
+    ([book] {
+        return to_string(book->most_recent_trade_price);
     });
 
-
-    CROW_ROUTE(app, "/add_json")
+    CROW_ROUTE(app, "/place_order")
     .methods("POST"_method)
-    ([](const crow::request& req){
+    ([book](const crow::request& req){
         auto x = crow::json::load(req.body);
-        if (!x) return crow::response(crow::status::BAD_REQUEST); // same as crow::response(400)
+        if (!x) return crow::response(400);
 
-        std::cout << x << std::endl;
-        std::cout << typeid(x).name() << std::endl;
-        std::cout << x["price"].d() << std::endl;
-        std::cout << x["order_type"].s() << std::endl;
-
-        double price = x["price"].d();
         std::string order_type = x["order_type"].s();
+        double price = x["price"].d();
+        int shares = x["shares"].i();
+
         std::cout << "price: " << price << std::endl;
         std::cout << "order_type: " << order_type << std::endl;
+        std::cout << "shares: " << shares << std::endl;
 
+        std::string order_id = generate_order_id(book);
+        if (book->order_map.find(order_id) != book->order_map.end()){ std::cout << "shit\n"; throw; }
+        m.lock();
+        book->add_order(
+            order_id,                                   // string order_id
+            order_type,                                 // string order_type
+            shares,                                     // int shares
+            price,                                      // double limit price 
+            66666666,                                   // int entry_time
+            99999999                                    // int event_time
+        );
+        m.unlock();
 
-        crow::json::wvalue z({{"Order_placed", "true"},
-                              {"trade_price", "103.22"}});
+        crow::json::wvalue z({
+            {"order_placed", "true"},
+            {"trade_price", "103.22"}
+        });
         return crow::response(z);
     });
 
@@ -250,11 +175,11 @@ void start_socket_server(OrderBook *book, int crow_port){
 int main(){
     OrderBook *book = new OrderBook;
 
-    // std::cout << "starting trading bot threads...\n";
-    // std::thread th1(trading_bot, book, "th1");
-    // std::thread th2(trading_bot, book, "th2");
-    // std::thread th3(trading_bot, book, "th3");
-    // std::cout << "all threads up and running.\n";
+    std::cout << "starting trading bot threads...\n";
+    std::thread th1(trading_bot, book, "th1");
+    std::thread th2(trading_bot, book, "th2");
+    std::thread th3(trading_bot, book, "th3");
+    std::cout << "all threads up and running.\n";
 
     // wscat -c ws://0.0.0.0:5001/ws
     // curl http://0.0.0.0:5001 
