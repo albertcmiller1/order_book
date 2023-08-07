@@ -412,7 +412,7 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
 
         } else if (incomming_order->shares > limit_node->head_order->shares){
             if (this->logging) std::cout << "incoming order (" << incomming_order->order_id <<  ") wants to " << incomming_order->order_type << " more orders than the limit_node->head_order has.\n";
-            if (this->logging) std::cout << "STARTING traversing limit node (" << limit_node->limit_price << ") orders to create matches.\n" << std::endl;
+            if (this->logging) std::cout << "starting to traverse limit node (" << limit_node->limit_price << ") orders to create matches.\n" << std::endl;
             while (limit_node->head_order && incomming_order->shares >= limit_node->head_order->shares){
                 // create a new order (branched from incoming_order) which will match the quantity of the limit_node->head_order 
                 // use this new order to create a perfect match 
