@@ -39,9 +39,9 @@ public:
             order_id,           // order_id
             order_type,         // order_type
             shares,             // shares
-            limit,              // limit
-            curr_time,          // entry_time
-            curr_time           // event_time
+            limit              // limit
+            // curr_time,          // entry_time
+            // curr_time           // event_time
         );
 
         return order_id;
@@ -93,8 +93,7 @@ public:
         
         std::cout << *book << endl;
 
-        // should i traverse the limit prices and delete? 
-        delete book;
+        delete(book);
     }
 
     bool test_1(){

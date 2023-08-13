@@ -20,15 +20,23 @@ std::string OrderBook::generate_order_id() {
     return order_id;
 }
 
-void OrderBook::add_order(string order_id, std::string order_type, int shares, double limit_price, uint64_t entry_time, uint64_t event_time){
+void OrderBook::add_order(string order_id, std::string order_type, int shares, double limit_price){
     Order *new_order_ptr = new Order {
         order_id,
         order_type,
         shares, 
         limit_price,
-        entry_time,
-        event_time
     };
+
+// void OrderBook::add_order(string order_id, std::string order_type, int shares, double limit_price, uint64_t entry_time, uint64_t event_time){
+//     Order *new_order_ptr = new Order {
+//         order_id,
+//         order_type,
+//         shares, 
+//         limit_price,
+//         entry_time,
+//         event_time
+//     };
 
     if (this->logging) {
         std::cout << "_________incoming order________" << std::endl;
@@ -175,8 +183,8 @@ void OrderBook::insert_order_dll(Order *order, Limit *limit_node){
         new_node->order_type = order->order_type;
         new_node->shares = order->shares;
         new_node->limit = order->limit;
-        new_node->entry_time = order->entry_time;
-        new_node->event_time = order->event_time;
+        // new_node->entry_time = order->entry_time;
+        // new_node->event_time = order->event_time;
 
         limit_node->tail_order->next = new_node;
         new_node->prev = limit_node->tail_order;
@@ -190,8 +198,8 @@ void OrderBook::insert_order_dll(Order *order, Limit *limit_node){
         first_node->order_type = order->order_type;
         first_node->shares = order->shares;
         first_node->limit = order->limit;
-        first_node->entry_time = order->entry_time;
-        first_node->event_time = order->event_time;
+        // first_node->entry_time = order->entry_time;
+        // first_node->event_time = order->event_time;
 
         first_node->prev = nullptr;
         first_node->next = nullptr;
@@ -424,8 +432,8 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
                     incomming_order->order_type,        
                     limit_node->head_order->shares,     
                     incomming_order->limit,             
-                    incomming_order->entry_time,        
-                    incomming_order->entry_time         
+                    // incomming_order->entry_time,        
+                    // incomming_order->entry_time         
                 };
 
                 // add new order to order_map
@@ -499,8 +507,8 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
                 limit_node->head_order->order_type,          // order_type
                 incomming_order->shares,                     // shares
                 limit_node->head_order->limit,               // limit
-                limit_node->head_order->entry_time,          // entry_time
-                limit_node->head_order->event_time           // event_time
+                // limit_node->head_order->entry_time,          // entry_time
+                // limit_node->head_order->event_time           // event_time
             };
 
             // update head order of limit node
