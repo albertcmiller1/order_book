@@ -53,3 +53,8 @@ TODO:
 > why is there a bug when i run on ec2
 > why are all rand numbers the same on ec2
 14,080 orders/sec wo logging 
+
+
+do i need asio headers? 
+what happends to valgrind when i only run one thread? 
+what happends to valgrind when i only run one test at a time? 

@@ -108,7 +108,7 @@ Limit* OrderBook::find_best_limit_node_to_match_with(Order *new_order_ptr){
 void OrderBook::update_limit_spread_new(){
     // this is very slow.
 
-    if (this->debug) std::cout << "updating limit spread\n";
+    if (this->debug) std::cout << "\nupdating limit spread\n";
     this->highest_buy_limit = nullptr;
     this->lowest_sell_limit = nullptr;
     Limit *curr = this->sorted_limit_prices_head;
@@ -360,11 +360,11 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
 
             // When a match is created, we will need to send a message about it to both users 
 
-            for (auto user : users){
-                // user->send_text("MATCH CREATED!");
-                std::string s = "most recent trade price: " + to_string(this->most_recent_trade_price);
-                user->send_text(s);
-            }
+            // for (auto user : users){
+            //     // user->send_text("MATCH CREATED!");
+            //     std::string s = "most recent trade price: " + to_string(this->most_recent_trade_price);
+            //     user->send_text(s);
+            // }
 
             // delete head 
             if (this->logging) std::cout << "deleting old order..." << limit_node->head_order->order_id << std::endl;
@@ -385,6 +385,7 @@ int OrderBook::create_match(Order *incomming_order, Limit *limit_node){
 
             if (!limit_node->head_order){
                 // if limit has no orders, delete it
+                // TODO: if original incoming order still has shares to buy/sell, dont delete.
                 if (this->logging) std::cout << "\nlimit node is all out of orders! DELETING LIMIT NODE @ " << limit_node->limit_price << std::endl;
                 if (limit_node->prev && limit_node->next){
                     if (this->logging) std::cout << "\ndeleting middle\n";

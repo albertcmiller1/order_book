@@ -197,8 +197,8 @@ int main(){
 
     std::cout << "starting threads...\n";
     std::thread th1(trading_bot, book, "th1");
-    std::thread th2(trading_bot, book, "th2");
-    std::thread th3(trading_bot, book, "th3");
+    // std::thread th2(trading_bot, book, "th2");
+    // std::thread th3(trading_bot, book, "th3");
     std::cout << "all threads up.\n";
 
     // wscat -c ws://0.0.0.0:5001/ws

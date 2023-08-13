@@ -8,7 +8,7 @@
 #include <random>
 #include <sstream>
 #include <unordered_set>
-#include "crow.h"
+// #include "crow.h"
 
 struct Match {
     int match_id;
@@ -45,7 +45,7 @@ class OrderBook {
 public:
     std::unordered_map<double, Limit*> limit_map = {};          // key is limit price
     std::unordered_map<std::string, Order*> order_map = {};     // key is order_id
-    std::unordered_set<crow::websocket::connection*> users;
+    // std::unordered_set<crow::websocket::connection*> users;
 
     int num_matches {0};
     double most_recent_trade_price {0};
