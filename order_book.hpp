@@ -8,6 +8,7 @@
 #include <random>
 #include <sstream>
 #include <unordered_set>
+#include <unordered_map>
 // #include "crow.h"
 
 struct Match {
