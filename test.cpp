@@ -53,7 +53,6 @@ public:
         book->highest_buy_limit = nullptr;
         book->lowest_sell_limit = nullptr;
 
-
         Limit *curr_limit = book->sorted_limit_prices_head;
         std::cout << "starting limit traversal...\n" << endl;
         while (curr_limit != nullptr) {
@@ -71,7 +70,6 @@ public:
                 curr_order = nxt_order;
             }
             std::cout << "  end order traversal...\n" << endl;
-
 
             std::cout << "deleting limit: " << curr_limit->limit_price << "/" << "\n";
             book->limit_map.erase(curr_limit->limit_price);
