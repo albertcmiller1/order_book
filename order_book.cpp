@@ -20,7 +20,7 @@ std::string OrderBook::generate_order_id() {
     return order_id;
 }
 
-void OrderBook::add_order(string order_id, std::string order_type, int shares, double limit_price, unsigned long long entry_time, unsigned long long event_time){
+void OrderBook::add_order(string order_id, std::string order_type, int shares, double limit_price, uint64_t entry_time, uint64_t event_time){
     Order *new_order_ptr = new Order {
         order_id,
         order_type,
