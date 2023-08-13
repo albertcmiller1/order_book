@@ -120,10 +120,6 @@ public:
             cout << "1.7 failed." << endl; return false;
         }
 
-        string order_id_1 = this->create_order(book, "buy", 1, 23.47);
-        string order_id_2 = this->create_order(book, "buy", 1, 23.48);
-        string order_id_3 = this->create_order(book, "buy", 1, 23.49);
-
         if (this->logging) std::cout << *book << std::endl;
         if (this->logging) std::cout << "\n<-----------------------[ test_1 complete ]------------------------------->\n";
         this->clean_up(book);
