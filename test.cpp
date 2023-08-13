@@ -58,13 +58,13 @@ public:
         std::cout << "starting limit traversal...\n" << endl;
         while (curr_limit != nullptr) {
             Limit *nxt_limit = curr_limit->next;
-            
 
             std::cout << "  starting order traversal..." << endl;
             Order *curr_order = curr_limit->head_order;
             while (curr_order !=nullptr){
                 Order *nxt_order = curr_order->next;
                 std::cout << "    >> deleting order: " << curr_order->order_id << "/" << "\n";
+                book->order_map.erase(curr_order->order_id);
                 delete(curr_order);
                 if (nxt_order){ nxt_order->prev = nullptr; }
                 curr_limit->head_order = nxt_order;
@@ -74,6 +74,7 @@ public:
 
 
             std::cout << "deleting limit: " << curr_limit->limit_price << "/" << "\n";
+            book->limit_map.erase(curr_limit->limit_price);
             delete(curr_limit);
             if (nxt_limit){ nxt_limit->prev = nullptr; }
             book->sorted_limit_prices_head = nxt_limit;
@@ -81,6 +82,12 @@ public:
         }
         std::cout << "done with limits...\n\n" << endl;
         
+        for (auto i : book->order_map)
+            cout << i.first << " \t\t\t " << i.second->limit << endl;
+
+        for (auto i : book->limit_map)
+            cout << i.first << " \t\t\t " << i.second->limit_price << endl;
+
         book->order_map.clear();
         book->limit_map.clear();
         
