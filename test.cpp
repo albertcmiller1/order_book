@@ -50,12 +50,6 @@ public:
     bool doubles_are_same(double a, double b){ return fabs(a - b) < 0.001; }
 
     void clean_up(OrderBook *book){
-        Order *test_order = book->sorted_limit_prices_head->head_order;
-        std::cout << "test_order: " << test_order << " " << test_order->order_id << endl;
-
-        Limit *test_limit = book->sorted_limit_prices_head;
-        std::cout << "test_limit: " << test_limit << " " << test_limit->limit_price << endl << endl;
-
         book->highest_buy_limit = nullptr;
         book->lowest_sell_limit = nullptr;
 
@@ -91,17 +85,7 @@ public:
         book->order_map.clear();
         book->limit_map.clear();
         
-        for (auto i : book->order_map)
-            cout << i.first << " \t\t\t " << i.second->limit << endl;
-
-        for (auto i : book->limit_map)
-            cout << i.first << " \t\t\t " << i.second->limit_price << endl;
-        
         std::cout << *book << endl;
-
-        std::cout << "test_order: " << test_order << " " << test_order->order_id << endl;
-        std::cout << "test_limit: " << test_limit << " " << test_limit->limit_price << endl;
-
 
         delete(book);
         book = nullptr;
