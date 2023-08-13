@@ -50,22 +50,28 @@ public:
     bool doubles_are_same(double a, double b){ return fabs(a - b) < 0.001; }
 
     void clean_up(OrderBook *book){
+        Order *test_order = book->sorted_limit_prices_head->head_order;
+        std::cout << "test_order: " << test_order << " " << test_order->order_id << endl;
+
+        Limit *test_limit = book->sorted_limit_prices_head;
+        std::cout << "test_limit: " << test_limit << " " << test_limit->limit_price << endl << endl;
+
         book->highest_buy_limit = nullptr;
         book->lowest_sell_limit = nullptr;
 
         Limit *curr_limit = book->sorted_limit_prices_head;
         std::cout << "starting limit traversal...\n" << endl;
-        while (curr_limit != nullptr) {
+        while (curr_limit) {
             Limit *nxt_limit = curr_limit->next;
 
             std::cout << "  starting order traversal..." << endl;
             Order *curr_order = curr_limit->head_order;
-            while (curr_order !=nullptr){
+            while (curr_order){
                 Order *nxt_order = curr_order->next;
                 std::cout << "    >> deleting order: " << curr_order->order_id << "/" << "\n";
-                book->order_map.erase(curr_order->order_id);
+                // book->order_map.erase(curr_order->order_id);
                 delete(curr_order);
-                curr_order = NULL;
+                curr_order = nullptr;
                 if (nxt_order){ nxt_order->prev = nullptr; }
                 curr_limit->head_order = nxt_order;
                 curr_order = nxt_order;
@@ -73,27 +79,32 @@ public:
             std::cout << "  end order traversal...\n" << endl;
 
             std::cout << "deleting limit: " << curr_limit->limit_price << "/" << "\n";
-            book->limit_map.erase(curr_limit->limit_price);
+            // book->limit_map.erase(curr_limit->limit_price);
             delete(curr_limit);
-            curr_limit = NULL;
+            curr_limit = nullptr;
             if (nxt_limit){ nxt_limit->prev = nullptr; }
             book->sorted_limit_prices_head = nxt_limit;
             curr_limit = nxt_limit;
         }
         std::cout << "done with limits...\n\n" << endl;
+
+        book->order_map.clear();
+        book->limit_map.clear();
         
         for (auto i : book->order_map)
             cout << i.first << " \t\t\t " << i.second->limit << endl;
 
         for (auto i : book->limit_map)
             cout << i.first << " \t\t\t " << i.second->limit_price << endl;
-
-        book->order_map.clear();
-        book->limit_map.clear();
         
         std::cout << *book << endl;
 
+        std::cout << "test_order: " << test_order << " " << test_order->order_id << endl;
+        std::cout << "test_limit: " << test_limit << " " << test_limit->limit_price << endl;
+
+
         delete(book);
+        book = nullptr;
     }
 
     bool test_1(){

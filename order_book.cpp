@@ -167,39 +167,22 @@ void OrderBook::update_limit_spread_old(Limit *limit, std::string order_type){
     }
 }
 
-void OrderBook::insert_order_dll(Order *order, Limit *limit_node){
+void OrderBook::insert_order_dll(Order *new_order, Limit *limit_node){
     // should guarantee the LL is ordererd from oldest to newest
     if (limit_node->head_order) {
-        Order *new_node = new Order;
-
-        new_node->order_id = order->order_id;
-        new_node->order_type = order->order_type;
-        new_node->shares = order->shares;
-        new_node->limit = order->limit;
-        new_node->entry_time = order->entry_time;
-        new_node->event_time = order->event_time;
-
-        limit_node->tail_order->next = new_node;
-        new_node->prev = limit_node->tail_order;
-        new_node->next = nullptr;
-
-        limit_node->tail_order = new_node;
-    } else {
-        Order *first_node = new Order;
-        
-        first_node->order_id = order->order_id;
-        first_node->order_type = order->order_type;
-        first_node->shares = order->shares;
-        first_node->limit = order->limit;
-        first_node->entry_time = order->entry_time;
-        first_node->event_time = order->event_time;
-
-        first_node->prev = nullptr;
-        first_node->next = nullptr;
-
-        limit_node->head_order = first_node;
-        limit_node->tail_order = first_node;
+        // insert at tail 
+        limit_node->tail_order->next = new_order;
+        new_order->prev = limit_node->tail_order;
+        new_order->next = nullptr;
+        limit_node->tail_order = new_order;
+        return;
     }
+    // first node on limit
+    new_order->prev = nullptr;
+    new_order->next = nullptr;
+    limit_node->head_order = new_order;
+    limit_node->tail_order = new_order;
+    return;
 }
 
 Limit* OrderBook::insert_limit_map(double limit_price, int size, int total_volume){
@@ -217,6 +200,7 @@ Limit* OrderBook::insert_limit_map(double limit_price, int size, int total_volum
     };
     this->limit_map[limit_price] = new_limit_node;
     return limit_map[limit_price];
+    // return new_limit_node;
 }
 
 int OrderBook::insert_limit_dll(Limit *new_limit){
