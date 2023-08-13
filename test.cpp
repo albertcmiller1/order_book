@@ -39,9 +39,9 @@ public:
             order_id,           // order_id
             order_type,         // order_type
             shares,             // shares
-            limit              // limit
-            // curr_time,          // entry_time
-            // curr_time           // event_time
+            limit,              // limit
+            curr_time,          // entry_time
+            curr_time           // event_time
         );
 
         return order_id;
@@ -65,6 +65,7 @@ public:
                 std::cout << "    >> deleting order: " << curr_order->order_id << "/" << "\n";
                 book->order_map.erase(curr_order->order_id);
                 delete(curr_order);
+                curr_order = NULL;
                 if (nxt_order){ nxt_order->prev = nullptr; }
                 curr_limit->head_order = nxt_order;
                 curr_order = nxt_order;
@@ -74,6 +75,7 @@ public:
             std::cout << "deleting limit: " << curr_limit->limit_price << "/" << "\n";
             book->limit_map.erase(curr_limit->limit_price);
             delete(curr_limit);
+            curr_limit = NULL;
             if (nxt_limit){ nxt_limit->prev = nullptr; }
             book->sorted_limit_prices_head = nxt_limit;
             curr_limit = nxt_limit;
