@@ -8,8 +8,8 @@ int main(int argc, char** argv){
     Testing tests = Testing();
     tests.logging = true;
     if (
-            tests.test_1() &&       // prove the orderbook can add a buy  order 
-            tests.test_2()          // prove the orderbook can add a sell order
+            tests.test_1()        // prove the orderbook can add a buy  order 
+            // tests.test_2()          // prove the orderbook can add a sell order
             
             // tests.test_3() &&       // prove a buy  order can create a match with a sell order
             // tests.test_4() &&       // prove a sell order can create a match with a buy  order

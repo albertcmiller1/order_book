@@ -11,7 +11,6 @@ public:
     unsigned int microseconds {10000};
     bool logging = false;
 
-
     std::string generate_uuid_v4() {
         std::stringstream ss;
         int i;
@@ -20,17 +19,6 @@ public:
             ss << dis(gen);
         }
         return ss.str();
-    }
-
-    void clean_up(OrderBook *book){
-        // delete all order pointers 
-        for (auto it = book->order_map.begin(); it != book->order_map.end(); it++){
-            delete it->second;
-        }
-        // should i traverse the limit prices and delete? 
-        book->order_map.clear();
-        book->limit_map.clear();
-        delete book;
     }
 
     int count_digit(int number) {
@@ -59,8 +47,47 @@ public:
         return order_id;
     }
 
-    bool doubles_are_same(double a, double b){
-        return fabs(a - b) < 0.001;
+    bool doubles_are_same(double a, double b){ return fabs(a - b) < 0.001; }
+
+    void clean_up(OrderBook *book){
+        book->highest_buy_limit = nullptr;
+        book->lowest_sell_limit = nullptr;
+
+
+        Limit *curr_limit = book->sorted_limit_prices_head;
+        std::cout << "starting limit traversal...\n" << endl;
+        while (curr_limit != nullptr) {
+            Limit *nxt_limit = curr_limit->next;
+            
+
+            std::cout << "  starting order traversal..." << endl;
+            Order *curr_order = curr_limit->head_order;
+            while (curr_order !=nullptr){
+                Order *nxt_order = curr_order->next;
+                std::cout << "    >> deleting order: " << curr_order->order_id << "/" << "\n";
+                delete(curr_order);
+                if (nxt_order){ nxt_order->prev = nullptr; }
+                curr_limit->head_order = nxt_order;
+                curr_order = nxt_order;
+            }
+            std::cout << "  end order traversal...\n" << endl;
+
+
+            std::cout << "deleting limit: " << curr_limit->limit_price << "/" << "\n";
+            delete(curr_limit);
+            if (nxt_limit){ nxt_limit->prev = nullptr; }
+            book->sorted_limit_prices_head = nxt_limit;
+            curr_limit = nxt_limit;
+        }
+        std::cout << "done with limits...\n\n" << endl;
+        
+        book->order_map.clear();
+        book->limit_map.clear();
+        
+        std::cout << *book << endl;
+
+        // should i traverse the limit prices and delete? 
+        delete book;
     }
 
     bool test_1(){
@@ -92,6 +119,10 @@ public:
         if (book->order_map.size() != 1){ 
             cout << "1.7 failed." << endl; return false;
         }
+
+        string order_id_1 = this->create_order(book, "buy", 1, 23.47);
+        string order_id_2 = this->create_order(book, "buy", 1, 23.48);
+        string order_id_3 = this->create_order(book, "buy", 1, 23.49);
 
         if (this->logging) std::cout << *book << std::endl;
         if (this->logging) std::cout << "\n<-----------------------[ test_1 complete ]------------------------------->\n";
@@ -874,6 +905,4 @@ public:
         this->clean_up(book); 
         return true;
     }
-
-
 };
