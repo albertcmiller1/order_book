@@ -9,7 +9,7 @@
 #include <sstream>
 #include <unordered_set>
 #include <unordered_map>
-// #include "crow.h"
+#include "crow.h"
 
 struct Match {
     int match_id;
@@ -46,7 +46,7 @@ class OrderBook {
 public:
     std::unordered_map<double, Limit*> limit_map = {};          // key is limit price
     std::unordered_map<std::string, Order*> order_map = {};     // key is order_id
-    // std::unordered_set<crow::websocket::connection*> users;
+    std::unordered_set<crow::websocket::connection*> users;
 
     int num_matches {0};
     double most_recent_trade_price {0};
@@ -65,7 +65,13 @@ public:
     Limit* find_best_limit_node_to_match_with(Order *new_order_ptr);
     Limit* insert_limit_map(double limit_price, int size, int total_volume);
     void update_limit_spread_new();
-    int create_match(Order *incomming_order, Limit *limit_node);
+    void broadcast_to_users(std::string message);
+
+    void create_match(Order *incomming_order, Limit *limit_node);
+    void perfect_match(Order *incomming_order, Limit *limit_node, std::string buyers_order_id, std::string sellers_order_id);
+    void branch_from_incoming_order(Order *incomming_order, Limit *limit_node, Limit *tmp_prev, Limit *tmp_next);
+    void branch_from_existing_order(Order *incomming_order, Limit *limit_node);
+
     int insert_limit_dll(Limit *new_limit);
     bool order_crossed_spread(Order *incomming_order);
     int cancel_order();

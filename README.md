@@ -20,7 +20,6 @@ Every 60 seconds the book will post the current price of each stock traded into 
 The book, trading bot threads, api, and websocket will be apart of the same process which will be running on an AWS EC2 instance. 
 
 ## To get started 
-dependencies: [asio](https://think-async.com/Asio/)
 1. clone the repository 
 2. `mkdir build && cd build`
 3. `cmake ..`
@@ -50,11 +49,8 @@ dependencies: [asio](https://think-async.com/Asio/)
 * a seller matches with a  buyer  when the incoming sell price is less    than a buy offer 
 
 TODO: 
-> why is there a bug when i run on ec2
-> why are all rand numbers the same on ec2
 14,080 orders/sec wo logging 
 
-
-do i need asio headers? 
-what happends to valgrind when i only run one thread? 
-what happends to valgrind when i only run one test at a time? 
+to run tests: 
+`g++ -g -Wall -std=c++20 main.cpp order_book.cpp`
+`valgrind --tool=memcheck --leak-check=yes ./a.out`
