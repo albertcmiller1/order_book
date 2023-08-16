@@ -50,8 +50,8 @@ public:
 
     int num_matches {0};
     double most_recent_trade_price {0};
-    bool debug {true};
-    bool logging {true};
+    bool debug {false};
+    bool logging {false};
     
     Limit *sorted_limit_prices_head {nullptr};
     Limit *sorted_limit_prices_tail {nullptr};

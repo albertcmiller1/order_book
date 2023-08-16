@@ -354,7 +354,7 @@ void OrderBook::perfect_match(Order *incomming_order, Limit *limit_node, std::st
     // update most_recent_trade_price
     // this->most_recent_trade_price = incomming_order->limit;
     this->most_recent_trade_price = limit_node->limit_price; 
-    // this->broadcast_to_users("most recent trade price: " + to_string(this->most_recent_trade_price));
+    this->broadcast_to_users("most recent trade price: " + to_string(this->most_recent_trade_price));
 
     // delete head order 
     if (this->logging) std::cout << "deleting old order..." << limit_node->head_order->order_id << std::endl;
@@ -407,7 +407,7 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
         // create a new order (branched from incoming_order) which will match the quantity of the limit_node->head_order 
         // use this new order to create a perfect match 
         // OG incoming_order will still have some leftover shares
-        cout << "creating new order by branching off of og incoming order.\n";
+        if (this->logging) std::cout << "creating new order by branching off of og incoming order.\n";
         Order *new_order_ptr = new Order {
             generate_order_id(),                           
             incomming_order->order_type,        
@@ -467,13 +467,6 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
             this->create_match(incomming_order, tmp_next);
         }
     }
-    
-    cout << "SHITT \n" << endl;
-
-    // if (limit_node->head_order && incomming_order->shares == limit_node->head_order->shares){
-    //     cout << "HEREEEE\n";
-    //     this->create_match(incomming_order, limit_node);
-    // }
     
     // TODO: can clean this up a bit ^ above is under the same condition as below 
     if (incomming_order->shares > 0){
