@@ -367,6 +367,7 @@ void OrderBook::perfect_match(Order *incomming_order, Limit *limit_node, std::st
 
     // delete incomming_order
     if (this->logging) std::cout << "deleting incoming order... " << incomming_order->order_id << std::endl;
+    incomming_order->shares = 0; // IF THIS WORKS ITS A BANDAID 
     this->order_map.erase(incomming_order->order_id);
     delete incomming_order;
     incomming_order = nullptr;
