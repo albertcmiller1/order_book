@@ -108,7 +108,7 @@ void OrderBook::update_limit_spread_new(){
     // this is very slow.
     // TODO: instead of doing this, just update each time we delete or add an order. 
 
-    if (this->debug) std::cout << "\nupdating limit spread\n";
+    if (this->debug) std::cout << "updating limit spread\n\n";
     this->highest_buy_limit = nullptr;
     this->lowest_sell_limit = nullptr;
     Limit *curr = this->sorted_limit_prices_head;
@@ -276,11 +276,11 @@ int OrderBook::validate(){
     return 0;
 }
 
-void OrderBook::broadcast_to_users(std::string message){
-    for (auto user : this->users){
-        user->send_text(message);
-    }
-}
+// void OrderBook::broadcast_to_users(std::string message){
+//     for (auto user : this->users){
+//         user->send_text(message);
+//     }
+// }
 
 bool OrderBook::order_crossed_spread(Order *incomming_order){
     if (!this->lowest_sell_limit && !this->highest_buy_limit){
@@ -354,7 +354,7 @@ void OrderBook::perfect_match(Order *incomming_order, Limit *limit_node, std::st
     // update most_recent_trade_price
     // this->most_recent_trade_price = incomming_order->limit;
     this->most_recent_trade_price = limit_node->limit_price; 
-    this->broadcast_to_users("most recent trade price: " + to_string(this->most_recent_trade_price));
+    // this->broadcast_to_users("most recent trade price: " + to_string(this->most_recent_trade_price));
 
     // delete head order 
     if (this->logging) std::cout << "deleting old order..." << limit_node->head_order->order_id << std::endl;

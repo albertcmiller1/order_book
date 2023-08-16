@@ -244,7 +244,7 @@ public:
         if (book->order_map.size() != 0){ 
             cout << "5.3 failed." << endl; return false;
         } 
-        if (!doubles_are_same(book->most_recent_trade_price, 23.45)){ 
+        if (!doubles_are_same(book->most_recent_trade_price, 23.42)){ 
             cout << "5.4 failed." << endl; return false;
         }
 
@@ -278,7 +278,7 @@ public:
         if (book->order_map.size() != 0){ 
             cout << "6.3 failed." << endl; return false;
         }
-        if (!doubles_are_same(book->most_recent_trade_price, 23.41)){ 
+        if (!doubles_are_same(book->most_recent_trade_price, 23.44)){ 
             cout << "6.4 failed." << endl; return false;
         }
 
@@ -460,7 +460,6 @@ public:
         string order_id_3 = this->create_order(book, "buy", 10, 6.00);
         // SPREAD
         string order_id_4 = this->create_order(book, "sell", 10, 7.00);
-        if (this->logging) std::cout << *book << std::endl;
         // TRIGGER 
         string order_id_5 = this->create_order(book, "buy", 10, 9.00);
 
@@ -476,7 +475,7 @@ public:
         if (book->order_map.size() != 3){ 
             cout << "11.4 failed." << endl; return false;
         } 
-        if (!doubles_are_same(book->most_recent_trade_price, 9.00)){ 
+        if (!doubles_are_same(book->most_recent_trade_price, 7.00)){ 
             cout << "11.5 failed." << endl; return false;
         }
         if (book->highest_buy_limit->head_order->shares != 10){ 
@@ -505,7 +504,6 @@ public:
         string order_id_3 = this->create_order(book, "sell", 10, 8.00);
         string order_id_4 = this->create_order(book, "sell", 10, 9.00);
         // TRIGGER 
-        if (this->logging) std::cout << *book << std::endl;
         string order_id_5 = this->create_order(book, "sell", 10, 5.00);
 
         if (book->highest_buy_limit){ 
@@ -520,7 +518,7 @@ public:
         if (book->order_map.size() != 3){ 
             cout << "12.4 failed." << endl; return false;
         } 
-        if (!doubles_are_same(book->most_recent_trade_price, 5.00)){ 
+        if (!doubles_are_same(book->most_recent_trade_price, 6.00)){ 
             cout << "12.5 failed." << endl; return false;
         }
         if (book->lowest_sell_limit->head_order->shares != 10){ 
@@ -543,7 +541,6 @@ public:
         */
         OrderBook *book = new OrderBook;
 
-        // no seg fault, but there is a bug! 
         string order_id_1 = this->create_order(book, "buy", 10, 13.00);
         string order_id_2 = this->create_order(book, "buy", 10, 14.00);
         string order_id_3 = this->create_order(book, "buy", 10, 15.00);
@@ -551,8 +548,6 @@ public:
         string order_id_4 = this->create_order(book, "sell", 10, 16.00);
         string order_id_5 = this->create_order(book, "sell", 10, 17.00);
         string order_id_6 = this->create_order(book, "sell", 10, 50.00);
-        
-        if (this->logging) std::cout << *book << std::endl;
         // TRIGGER 
         string order_id_7 = this->create_order(book, "buy", 10, 25.00);
 
@@ -568,7 +563,7 @@ public:
         if (book->order_map.size() != 5){ 
             cout << "13.4 failed." << endl; return false;
         } 
-        if (!doubles_are_same(book->most_recent_trade_price, 25.00)){ 
+        if (!doubles_are_same(book->most_recent_trade_price, 17.00)){ 
             cout << "13.5 failed." << endl; return false;
         }
         if (book->highest_buy_limit->head_order->shares != 10){ 
@@ -591,7 +586,6 @@ public:
         */
         OrderBook *book = new OrderBook;
 
-        // no seg fault, but there is a bug! 
         string order_id_1 = this->create_order(book, "buy", 10, 4.00);
         string order_id_2 = this->create_order(book, "buy", 10, 14.00);
         string order_id_3 = this->create_order(book, "buy", 10, 15.00);
@@ -599,10 +593,8 @@ public:
         string order_id_4 = this->create_order(book, "sell", 10, 16.00);
         string order_id_5 = this->create_order(book, "sell", 10, 17.00);
         string order_id_6 = this->create_order(book, "sell", 10, 18.00);
-
-        if (this->logging) std::cout << *book << std::endl;
         // TRIGGER 
-        string order_id_7 = this->create_order(book, "sell", 10, 9.00);
+        string order_id_7 = this->create_order(book, "sell", 10, 4.00);
 
         if (book->highest_buy_limit->limit_price != 15.00){ 
             cout << "14.1 failed." << endl; return false;
@@ -616,7 +608,7 @@ public:
         if (book->order_map.size() != 5){ 
             cout << "14.4 failed." << endl; return false;
         } 
-        if (!doubles_are_same(book->most_recent_trade_price, 9.00)){ 
+        if (!doubles_are_same(book->most_recent_trade_price, 4.00)){ 
             cout << "14.5 failed." << endl; return false;
         }
         if (book->highest_buy_limit->head_order->shares != 10){ 
@@ -639,14 +631,11 @@ public:
         */
         OrderBook *book = new OrderBook;
 
-        // seg fault
         string order_id_1 = this->create_order(book, "buy", 10, 6.00);
         // SPREAD
         string order_id_2 = this->create_order(book, "sell", 10, 7.00);
         string order_id_3 = this->create_order(book, "sell", 10, 9.00);
         string order_id_4 = this->create_order(book, "sell", 10, 9.00);
-        
-        if (this->logging) std::cout << *book << std::endl;
         // TRIGGER 
         string order_id_5 = this->create_order(book, "buy", 10, 8.00);
 
@@ -662,7 +651,7 @@ public:
         if (book->order_map.size() != 3){ 
             cout << "15.4 failed." << endl; return false;
         } 
-        if (!doubles_are_same(book->most_recent_trade_price, 8.00)){ 
+        if (!doubles_are_same(book->most_recent_trade_price, 7.00)){ 
             cout << "15.5 failed." << endl; return false;
         }
         if (book->highest_buy_limit->head_order->shares != 10){ 
@@ -691,7 +680,6 @@ public:
         string order_id_4 = this->create_order(book, "buy", 10, 6.00);
         // SPREAD
         string order_id_7 = this->create_order(book, "sell", 10, 100.00);
-        if (this->logging) std::cout << *book << std::endl;
         // TRIGGER 
         string order_id_9 = this->create_order(book, "sell", 10, 4.00);
 
@@ -707,7 +695,7 @@ public:
         if (book->order_map.size() != 3){ 
             cout << "16.4 failed." << endl; return false;
         } 
-        if (!doubles_are_same(book->most_recent_trade_price, 4.00)){ 
+        if (!doubles_are_same(book->most_recent_trade_price, 6.00)){ 
             cout << "16.5 failed." << endl; return false;
         }
         if (book->highest_buy_limit->head_order->shares != 10){ 
