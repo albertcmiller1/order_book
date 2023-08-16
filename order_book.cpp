@@ -428,7 +428,9 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
         order_map[new_order_ptr->order_id] = new_order_ptr;
 
         // update incoming order 
+        if (this->logging) std::cout << "Decrementing incoming orders shares. Current: " << incomming_order->shares << std::endl;
         incomming_order->shares -= limit_node->head_order->shares; 
+        if (this->logging) std::cout << "Decrementing incoming orders shares. After: " << incomming_order->shares << std::endl;
         if (incomming_order->shares < 0){ cout << "incoming order has negative shares... exiting.\n"; throw; }
 
         // use this new order to create a perfect match via recursion 
@@ -469,7 +471,7 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
     
     // TODO: can clean this up a bit ^ above is under the same condition as below 
     if (incomming_order->shares > 0){
-        if (this->logging) std::cout << "\nincoming order still has" << incomming_order->shares << "shares to buy/sell that cant be matched with." << std::endl;
+        if (this->logging) std::cout << "\nincoming order still has " << incomming_order->shares << " shares to buy/sell that cant be matched with." << std::endl;
         if (this->limit_map.count(incomming_order->limit)){
             Limit *found_limit_node = limit_map.find(incomming_order->limit)->second;  
             if (this->logging) std::cout << ">> limit node " << found_limit_node->limit_price << " already exists... it must have been priviously created during recursion.: ";
