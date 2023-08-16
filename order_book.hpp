@@ -77,8 +77,8 @@ public:
     int cancel_order();
     void insert_order_dll(Order *order, Limit *limit_node);
     void print_orders_dll(Order *n);
-    void print_limits_dll(Limit *n);
-    void print_limits_dll_backwards(Limit *n);
+    void print_limits_dll();
+    void print_limits_dll_backwards();
     int validate();
     void update_limit_spread_old(Limit *limit, std::string order_type);
     std::string generate_order_id();

@@ -224,7 +224,6 @@ public:
         if (this->logging) std::cout << "<-----------------------[ test_5 starting ]------------------------------->\n";
         /* 
             prove a buy order can change limit nodes to fill orders
-            note: the logic assumes most_recent_trade_price is that of the big order that came in, not that of the order it had to adjust to. 
         */
         OrderBook *book = new OrderBook;
 

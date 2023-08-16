@@ -375,6 +375,10 @@ void OrderBook::perfect_match(Order *incomming_order, Limit *limit_node, std::st
         // if limit has no orders, delete it
         // TODO: if original incoming order still has shares to buy/sell, don't delete.
         if (this->logging) std::cout << "\nlimit node is all out of orders! DELETING LIMIT NODE @ " << limit_node->limit_price << std::endl;
+        if (this->logging) std::cout << "\n printing limits before deleting .... " << std::endl;
+        this->print_limits_dll();
+        this->print_limits_dll_backwards();
+
         if (limit_node->prev && limit_node->next){
             if (this->logging) std::cout << "\ndeleting middle\n";
             limit_node->prev->next = limit_node->next;
@@ -396,6 +400,10 @@ void OrderBook::perfect_match(Order *incomming_order, Limit *limit_node, std::st
         delete limit_node; 
         limit_node = nullptr;
     }
+
+    if (this->logging) std::cout << "\n printing limits after deleting .... " << std::endl;
+    this->print_limits_dll();
+    this->print_limits_dll_backwards();
     return;
 }
 
@@ -449,6 +457,7 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
         
         if (tmp_prev && incomming_order->order_type == "buy" && tmp_prev->head_order->order_type == "sell") {
             if (this->logging) std::cout << "changing limit nodes and trying again with: " << tmp_prev->limit_price << std::endl;
+            // HERE 1
             this->create_match(incomming_order, tmp_prev);
         } 
         
@@ -460,7 +469,7 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
     
     // TODO: can clean this up a bit ^ above is under the same condition as below 
     if (incomming_order->shares > 0){
-        if (this->logging) std::cout << "\nincoming order still has shares to buy/sell that cant be matched with." << std::endl;
+        if (this->logging) std::cout << "\nincoming order still has" << incomming_order->shares << "shares to buy/sell that cant be matched with." << std::endl;
         if (this->limit_map.count(incomming_order->limit)){
             Limit *found_limit_node = limit_map.find(incomming_order->limit)->second;  
             if (this->logging) std::cout << ">> limit node " << found_limit_node->limit_price << " already exists... it must have been priviously created during recursion.: ";
@@ -519,8 +528,9 @@ void OrderBook::print_orders_dll(Order *n) {
     cout << "done...\n\n" << endl;
 } 
 
-void OrderBook::print_limits_dll(Limit *n) {
+void OrderBook::print_limits_dll() {
     cout << "\nPrinting list forwards..." << endl;
+    Limit *n = this->sorted_limit_prices_head;
     while (n != nullptr) {
         cout << n->limit_price << "/" << " ";
         n = n->next;
@@ -528,8 +538,9 @@ void OrderBook::print_limits_dll(Limit *n) {
     cout << "done...\n\n" << endl;
 } 
 
-void OrderBook::print_limits_dll_backwards(Limit *n) {
+void OrderBook::print_limits_dll_backwards() {
     cout << "\nPrinting list backwards..." << endl;
+    Limit *n = this->sorted_limit_prices_tail;
     while (n != nullptr) {
         cout << n->limit_price << "/" << " ";
         n = n->prev;
