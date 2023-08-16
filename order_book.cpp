@@ -406,7 +406,7 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
         // create a new order (branched from incoming_order) which will match the quantity of the limit_node->head_order 
         // use this new order to create a perfect match 
         // OG incoming_order will still have some leftover shares
-
+        cout << "creating new order by branching off of og incoming order.\n";
         Order *new_order_ptr = new Order {
             generate_order_id(),                           
             incomming_order->order_type,        
@@ -429,7 +429,11 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
         this->create_match(new_order_ptr, limit_node);
     }
 
-    if (this->logging) std::cout << "DONE traversing orders from the " << limit_node->limit_price << " limit node\n" << std::endl;
+    if (limit_node){
+        if (this->logging) std::cout << "DONE traversing orders from the " << limit_node->limit_price << " limit node\n" << std::endl;
+    } else {
+        if (this->logging) std::cout << "DONE traversing orders from limit node\n" << std::endl;
+    }
 
     if (incomming_order->shares == 0){
         // dont think this code will ever get hit 
@@ -440,7 +444,7 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
         return;
     }  
 
-    if (limit_node->head_order && limit_node->head_order->shares > incomming_order->shares){
+    if (limit_node->head_order && limit_node->head_order->shares >= incomming_order->shares){
         if (this->logging) cout << "partially filled, can still fill more.\n";
         this->create_match(incomming_order, limit_node);
     }  
@@ -461,11 +465,15 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
         }
     }
 
-    cout << "SHITTTTT: " << incomming_order->order_id << endl;
-    if (limit_node->head_order && incomming_order->shares == limit_node->head_order->shares){
-        cout << "HEREEEE\n";
-        this->create_match(incomming_order, limit_node);
+    if (incomming_order){
+        cout << "SHITTTTT: " << incomming_order->order_id << endl;
+    } else {
+        cout << "SHITT \n" << endl;
     }
+    // if (limit_node->head_order && incomming_order->shares == limit_node->head_order->shares){
+    //     cout << "HEREEEE\n";
+    //     this->create_match(incomming_order, limit_node);
+    // }
     
     // TODO: can clean this up a bit ^ above is under the same condition as below 
     if (incomming_order->shares > 0){
