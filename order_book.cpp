@@ -461,8 +461,9 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
         }
     }
 
+    cout << "SHITTTTT: " << incomming_order->order_id << endl;
     if (limit_node->head_order && incomming_order->shares == limit_node->head_order->shares){
-        cout << "SHITTTTT\n";
+        cout << "HEREEEE\n";
         this->create_match(incomming_order, limit_node);
     }
     
