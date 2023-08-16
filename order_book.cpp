@@ -374,11 +374,7 @@ void OrderBook::perfect_match(Order *incomming_order, Limit *limit_node, std::st
     if (!limit_node->head_order){
         // if limit has no orders, delete it
         // TODO: if original incoming order still has shares to buy/sell, don't delete.
-        if (this->logging) std::cout << "\nlimit node is all out of orders! DELETING LIMIT NODE @ " << limit_node->limit_price << std::endl;
-        if (this->logging) std::cout << "\n printing limits before deleting .... " << std::endl;
-        this->print_limits_dll();
-        this->print_limits_dll_backwards();
-
+        if (this->logging) std::cout << "\nlimit node is all out of orders! DELETING " << limit_node->limit_price << " LIMIT NODE" <<  std::endl;
         if (limit_node->prev && limit_node->next){
             if (this->logging) std::cout << "\ndeleting middle\n";
             limit_node->prev->next = limit_node->next;
@@ -400,17 +396,13 @@ void OrderBook::perfect_match(Order *incomming_order, Limit *limit_node, std::st
         delete limit_node; 
         limit_node = nullptr;
     }
-
-    if (this->logging) std::cout << "\n printing limits after deleting .... " << std::endl;
-    this->print_limits_dll();
-    this->print_limits_dll_backwards();
     return;
 }
 
 void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_node, Limit *tmp_prev, Limit *tmp_next){
     if (this->logging) std::cout << "incoming order (" << incomming_order->order_id <<  ") wants to " << incomming_order->order_type << " more orders than the limit_node->head_order has.\n";
-    if (this->logging) std::cout << "starting to traverse limit node (" << limit_node->limit_price << ") orders to create matches.\n" << std::endl;
-    while (limit_node->head_order && incomming_order->shares >= limit_node->head_order->shares){
+    if (this->logging) std::cout << "starting traversing the " << limit_node->limit_price << " limit node's orders.\n" << std::endl;
+    while (limit_node->head_order && incomming_order->shares > limit_node->head_order->shares){
         // create a new order (branched from incoming_order) which will match the quantity of the limit_node->head_order 
         // use this new order to create a perfect match 
         // OG incoming_order will still have some leftover shares
@@ -437,7 +429,7 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
         this->create_match(new_order_ptr, limit_node);
     }
 
-    if (this->logging) std::cout << "DONE traversing limit node's orders.\n" << std::endl;
+    if (this->logging) std::cout << "DONE traversing orders from the " << limit_node->limit_price << " limit node\n" << std::endl;
 
     if (incomming_order->shares == 0){
         // dont think this code will ever get hit 
@@ -467,6 +459,11 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
             if (this->logging) std::cout << "changing limit nodes and trying again with: " << tmp_next->limit_price << std::endl;
             this->create_match(incomming_order, tmp_next);
         }
+    }
+
+    if (limit_node->head_order && incomming_order->shares == limit_node->head_order->shares){
+        cout << "SHITTTTT\n";
+        this->create_match(incomming_order, limit_node);
     }
     
     // TODO: can clean this up a bit ^ above is under the same condition as below 

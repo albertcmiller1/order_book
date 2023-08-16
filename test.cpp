@@ -378,6 +378,7 @@ public:
         // SPREAD
         string order_id_4 = this->create_order(book, "buy", 200, 23.45);
 
+        if (this->logging) std::cout << *book << std::endl;
         if (book->highest_buy_limit){ 
             cout << "9.1 failed." << endl; return false;
         } 
@@ -400,7 +401,6 @@ public:
             cout << "9.6 failed." << endl; return false;
         }
 
-        if (this->logging) std::cout << *book << std::endl;
         if (this->logging) std::cout << "\n<-----------------------[ test_9 complete ]------------------------------->\n";
         this->clean_up(book); 
         return true;
