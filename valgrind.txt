@@ -1,0 +1,441 @@
+==3556643== Memcheck, a memory error detector
+==3556643== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==3556643== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
+==3556643== Command: ./a.out
+==3556643== 
+<-----------------------[ test_5 starting ]------------------------------->
+_________incoming order________
+| shares: 1
+| order_type: sell
+| limit: 23.45
+| order_id: 70aadb9d9f
+
+updating limit spread
+
+_________incoming order________
+| shares: 1
+| order_type: sell
+| limit: 23.44
+| order_id: 9b59d82b3f
+
+inserting new limit node (23.44) at head
+updating limit spread
+
+_________incoming order________
+| shares: 1
+| order_type: sell
+| limit: 23.43
+| order_id: f08457a8ce
+
+inserting new limit node (23.43) at head
+updating limit spread
+
+_________incoming order________
+| shares: 1
+| order_type: sell
+| limit: 23.42
+| order_id: cf699f69d3
+
+inserting new limit node (23.42) at head
+updating limit spread
+
+_________incoming order________
+| shares: 4
+| order_type: buy
+| limit: 23.45
+| order_id: 856780276e
+
+new (first and only) buy order has crossed the spread ...
+attempting to create a match...
+incoming order (856780276e) wants to buy more orders than the limit_node->head_order has.
+starting traversing the 23.45 limit node's orders.
+
+creating new order by branching off of og incoming order.
+Decrementing incoming orders shares. Current: 4
+Decrementing incoming orders shares. After: 3
+attempting to create a match...
+perfect match between buyer (f34b949310) and seller (70aadb9d9f)
+deleting old order...70aadb9d9f
+deleting incoming order... f34b949310
+
+limit node is all out of orders! DELETING 23.45 LIMIT NODE
+
+deleting tail
+==3556643== Invalid read of size 8
+==3556643==    at 0x408554: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:406)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Address 0x4d8f3a8 is 24 bytes inside a block of size 56 free'd
+==3556643==    at 0x48468DD: operator delete(void*, unsigned long) (vg_replace_malloc.c:935)
+==3556643==    by 0x4082A9: OrderBook::perfect_match(Order*, Limit*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (order_book.cpp:397)
+==3556643==    by 0x407D03: OrderBook::create_match(Order*, Limit*) (order_book.cpp:327)
+==3556643==    by 0x40854F: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:430)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Block was alloc'd at
+==3556643==    at 0x4843FF5: operator new(unsigned long) (vg_replace_malloc.c:422)
+==3556643==    by 0x4071C9: OrderBook::insert_limit_map(double, int, int) (order_book.cpp:199)
+==3556643==    by 0x4069ED: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:61)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x404218: Testing::test_5() (test.cpp:230)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643== 
+==3556643== Invalid read of size 8
+==3556643==    at 0x4085A3: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:434)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Address 0x4d8f390 is 0 bytes inside a block of size 56 free'd
+==3556643==    at 0x48468DD: operator delete(void*, unsigned long) (vg_replace_malloc.c:935)
+==3556643==    by 0x4082A9: OrderBook::perfect_match(Order*, Limit*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (order_book.cpp:397)
+==3556643==    by 0x407D03: OrderBook::create_match(Order*, Limit*) (order_book.cpp:327)
+==3556643==    by 0x40854F: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:430)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Block was alloc'd at
+==3556643==    at 0x4843FF5: operator new(unsigned long) (vg_replace_malloc.c:422)
+==3556643==    by 0x4071C9: OrderBook::insert_limit_map(double, int, int) (order_book.cpp:199)
+==3556643==    by 0x4069ED: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:61)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x404218: Testing::test_5() (test.cpp:230)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643== 
+DONE traversing orders from the 23.45 limit node
+
+==3556643== Invalid read of size 8
+==3556643==    at 0x4086A6: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:448)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Address 0x4d8f3a8 is 24 bytes inside a block of size 56 free'd
+==3556643==    at 0x48468DD: operator delete(void*, unsigned long) (vg_replace_malloc.c:935)
+==3556643==    by 0x4082A9: OrderBook::perfect_match(Order*, Limit*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (order_book.cpp:397)
+==3556643==    by 0x407D03: OrderBook::create_match(Order*, Limit*) (order_book.cpp:327)
+==3556643==    by 0x40854F: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:430)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Block was alloc'd at
+==3556643==    at 0x4843FF5: operator new(unsigned long) (vg_replace_malloc.c:422)
+==3556643==    by 0x4071C9: OrderBook::insert_limit_map(double, int, int) (order_book.cpp:199)
+==3556643==    by 0x4069ED: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:61)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x404218: Testing::test_5() (test.cpp:230)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643== 
+
+incoming order still has 3 to deal with.
+changing limit nodes and trying again with: 23.44
+attempting to create a match...
+incoming order (856780276e) wants to buy more orders than the limit_node->head_order has.
+starting traversing the 23.44 limit node's orders.
+
+creating new order by branching off of og incoming order.
+Decrementing incoming orders shares. Current: 3
+Decrementing incoming orders shares. After: 2
+attempting to create a match...
+perfect match between buyer (6dd602e260) and seller (9b59d82b3f)
+deleting old order...9b59d82b3f
+deleting incoming order... 6dd602e260
+
+limit node is all out of orders! DELETING 23.44 LIMIT NODE
+
+deleting tail
+==3556643== Invalid read of size 8
+==3556643==    at 0x408554: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:406)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Address 0x4d8f668 is 24 bytes inside a block of size 56 free'd
+==3556643==    at 0x48468DD: operator delete(void*, unsigned long) (vg_replace_malloc.c:935)
+==3556643==    by 0x4082A9: OrderBook::perfect_match(Order*, Limit*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (order_book.cpp:397)
+==3556643==    by 0x407D03: OrderBook::create_match(Order*, Limit*) (order_book.cpp:327)
+==3556643==    by 0x40854F: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:430)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Block was alloc'd at
+==3556643==    at 0x4843FF5: operator new(unsigned long) (vg_replace_malloc.c:422)
+==3556643==    by 0x4071C9: OrderBook::insert_limit_map(double, int, int) (order_book.cpp:199)
+==3556643==    by 0x4069ED: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:61)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x404293: Testing::test_5() (test.cpp:231)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643== 
+==3556643== Invalid read of size 8
+==3556643==    at 0x4085A3: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:434)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Address 0x4d8f650 is 0 bytes inside a block of size 56 free'd
+==3556643==    at 0x48468DD: operator delete(void*, unsigned long) (vg_replace_malloc.c:935)
+==3556643==    by 0x4082A9: OrderBook::perfect_match(Order*, Limit*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (order_book.cpp:397)
+==3556643==    by 0x407D03: OrderBook::create_match(Order*, Limit*) (order_book.cpp:327)
+==3556643==    by 0x40854F: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:430)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Block was alloc'd at
+==3556643==    at 0x4843FF5: operator new(unsigned long) (vg_replace_malloc.c:422)
+==3556643==    by 0x4071C9: OrderBook::insert_limit_map(double, int, int) (order_book.cpp:199)
+==3556643==    by 0x4069ED: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:61)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x404293: Testing::test_5() (test.cpp:231)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643== 
+DONE traversing orders from the 23.44 limit node
+
+==3556643== Invalid read of size 8
+==3556643==    at 0x4086A6: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:448)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Address 0x4d8f668 is 24 bytes inside a block of size 56 free'd
+==3556643==    at 0x48468DD: operator delete(void*, unsigned long) (vg_replace_malloc.c:935)
+==3556643==    by 0x4082A9: OrderBook::perfect_match(Order*, Limit*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (order_book.cpp:397)
+==3556643==    by 0x407D03: OrderBook::create_match(Order*, Limit*) (order_book.cpp:327)
+==3556643==    by 0x40854F: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:430)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Block was alloc'd at
+==3556643==    at 0x4843FF5: operator new(unsigned long) (vg_replace_malloc.c:422)
+==3556643==    by 0x4071C9: OrderBook::insert_limit_map(double, int, int) (order_book.cpp:199)
+==3556643==    by 0x4069ED: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:61)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x404293: Testing::test_5() (test.cpp:231)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643== 
+
+incoming order still has 2 to deal with.
+changing limit nodes and trying again with: 23.43
+attempting to create a match...
+incoming order (856780276e) wants to buy more orders than the limit_node->head_order has.
+starting traversing the 23.43 limit node's orders.
+
+creating new order by branching off of og incoming order.
+Decrementing incoming orders shares. Current: 2
+Decrementing incoming orders shares. After: 1
+attempting to create a match...
+perfect match between buyer (66bbda3142) and seller (f08457a8ce)
+deleting old order...f08457a8ce
+deleting incoming order... 66bbda3142
+
+limit node is all out of orders! DELETING 23.43 LIMIT NODE
+
+deleting tail
+DONE traversing orders from the 23.43 limit node
+
+
+incoming order still has 1 to deal with.
+changing limit nodes and trying again with: 23.42
+attempting to create a match...
+perfect match between buyer (856780276e) and seller (cf699f69d3)
+deleting old order...cf699f69d3
+deleting incoming order... 856780276e
+
+limit node is all out of orders! DELETING 23.42 LIMIT NODE
+
+deleting only existing
+SHITT 
+
+==3556643== Invalid read of size 4
+==3556643==    at 0x4088B4: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:479)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Address 0x4d8fb90 is 64 bytes inside a block of size 112 free'd
+==3556643==    at 0x48468DD: operator delete(void*, unsigned long) (vg_replace_malloc.c:935)
+==3556643==    by 0x408080: OrderBook::perfect_match(Order*, Limit*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (order_book.cpp:372)
+==3556643==    by 0x407D03: OrderBook::create_match(Order*, Limit*) (order_book.cpp:327)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==  Block was alloc'd at
+==3556643==    at 0x4843FF5: operator new(unsigned long) (vg_replace_malloc.c:422)
+==3556643==    by 0x40677A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:31)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643== 
+==3556643== Invalid read of size 4
+==3556643==    at 0x408A1F: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:491)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Address 0x4d8fb90 is 64 bytes inside a block of size 112 free'd
+==3556643==    at 0x48468DD: operator delete(void*, unsigned long) (vg_replace_malloc.c:935)
+==3556643==    by 0x408080: OrderBook::perfect_match(Order*, Limit*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (order_book.cpp:372)
+==3556643==    by 0x407D03: OrderBook::create_match(Order*, Limit*) (order_book.cpp:327)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==  Block was alloc'd at
+==3556643==    at 0x4843FF5: operator new(unsigned long) (vg_replace_malloc.c:422)
+==3556643==    by 0x40677A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:31)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643== 
+incoming order has been fully filled!
+
+SHITT 
+
+incoming order has been fully filled!
+
+SHITT 
+
+==3556643== Invalid read of size 4
+==3556643==    at 0x4088B4: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:479)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Address 0x4d8fb90 is 64 bytes inside a block of size 112 free'd
+==3556643==    at 0x48468DD: operator delete(void*, unsigned long) (vg_replace_malloc.c:935)
+==3556643==    by 0x408080: OrderBook::perfect_match(Order*, Limit*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (order_book.cpp:372)
+==3556643==    by 0x407D03: OrderBook::create_match(Order*, Limit*) (order_book.cpp:327)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==  Block was alloc'd at
+==3556643==    at 0x4843FF5: operator new(unsigned long) (vg_replace_malloc.c:422)
+==3556643==    by 0x40677A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:31)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643== 
+==3556643== Invalid read of size 4
+==3556643==    at 0x408A1F: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:491)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643==  Address 0x4d8fb90 is 64 bytes inside a block of size 112 free'd
+==3556643==    at 0x48468DD: operator delete(void*, unsigned long) (vg_replace_malloc.c:935)
+==3556643==    by 0x408080: OrderBook::perfect_match(Order*, Limit*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (order_book.cpp:372)
+==3556643==    by 0x407D03: OrderBook::create_match(Order*, Limit*) (order_book.cpp:327)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x4087ED: OrderBook::branch_from_incoming_order(Order*, Limit*, Limit*, Limit*) (order_book.cpp:462)
+==3556643==    by 0x407D6F: OrderBook::create_match(Order*, Limit*) (order_book.cpp:329)
+==3556643==    by 0x40696A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:50)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==  Block was alloc'd at
+==3556643==    at 0x4843FF5: operator new(unsigned long) (vg_replace_malloc.c:422)
+==3556643==    by 0x40677A: OrderBook::add_order(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double, unsigned long, unsigned long) (order_book.cpp:31)
+==3556643==    by 0x403CF5: Testing::create_order(OrderBook*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int, double) (test.cpp:38)
+==3556643==    by 0x4043DD: Testing::test_5() (test.cpp:235)
+==3556643==    by 0x40344F: main (main.cpp:11)
+==3556643== 
+incoming order has been fully filled!
+
+updating limit spread
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+NO BUY OFFERS YET 
+NO SELL OFFERS YET 
+MOST RECENT TRADE PRICE: 23.42
+LIMIT MAP EMPTY
+ORDER MAP EMPTY
+
+<-----------------------[ test_5 complete ]------------------------------->
+starting limit traversal...
+
+done with limits...
+
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~start printing book~~~~~~~~~~~~~~~~~~~~~~~~~~
+NO BUY OFFERS YET 
+NO SELL OFFERS YET 
+MOST RECENT TRADE PRICE: 23.42
+LIMIT MAP EMPTY
+ORDER MAP EMPTY
+<--all tests passed-->
+==3556643== 
+==3556643== HEAP SUMMARY:
+==3556643==     in use at exit: 0 bytes in 0 blocks
+==3556643==   total heap usage: 29 allocs, 29 frees, 75,776 bytes allocated
+==3556643== 
+==3556643== All heap blocks were freed -- no leaks are possible
+==3556643== 
+==3556643== For lists of detected and suppressed errors, rerun with: -s
+==3556643== ERROR SUMMARY: 15 errors from 10 contexts (suppressed: 0 from 0)

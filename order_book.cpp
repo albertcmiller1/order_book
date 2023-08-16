@@ -276,11 +276,11 @@ int OrderBook::validate(){
     return 0;
 }
 
-// void OrderBook::broadcast_to_users(std::string message){
-//     for (auto user : this->users){
-//         user->send_text(message);
-//     }
-// }
+void OrderBook::broadcast_to_users(std::string message){
+    for (auto user : this->users){
+        user->send_text(message);
+    }
+}
 
 bool OrderBook::order_crossed_spread(Order *incomming_order){
     if (!this->lowest_sell_limit && !this->highest_buy_limit){
