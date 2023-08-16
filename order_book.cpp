@@ -455,7 +455,9 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
         
         if (tmp_prev && incomming_order->order_type == "buy" && tmp_prev->head_order->order_type == "sell") {
             if (this->logging) std::cout << "changing limit nodes and trying again with: " << tmp_prev->limit_price << std::endl;
-            // HERE 1
+            // OG LOGIC GOES IN HERE, we deleted 23.45, we still have 3 shares
+            // 2nd LOGIC GOES IN HERE, we deleted 23.44, we still have 2 shares
+            // 3nd LOGIC GOES IN HERE, we deleted 23.43, we still have 1 shares -> goes to perfect match and deletes 23.42
             this->create_match(incomming_order, tmp_prev);
         } 
         
@@ -464,12 +466,9 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
             this->create_match(incomming_order, tmp_next);
         }
     }
+    
+    cout << "SHITT \n" << endl;
 
-    if (incomming_order){
-        cout << "SHITTTTT: " << incomming_order->order_id << endl;
-    } else {
-        cout << "SHITT \n" << endl;
-    }
     // if (limit_node->head_order && incomming_order->shares == limit_node->head_order->shares){
     //     cout << "HEREEEE\n";
     //     this->create_match(incomming_order, limit_node);
