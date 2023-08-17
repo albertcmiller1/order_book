@@ -128,8 +128,7 @@ void OrderBook::update_limit_spread_new(){
         };
 
         if (!all_same){
-            std::cout << "not all orders on a limit have the same order_type\n" << endl;
-            throw;
+            std::cout << "not all orders on a limit have the same order_type\n" << endl; throw;
         } else if (this->highest_buy_limit == nullptr && curr->head_order->order_type == "buy"){
             this->highest_buy_limit = curr;
         } else if (this->lowest_sell_limit == nullptr && curr->head_order->order_type == "sell"){
@@ -426,14 +425,8 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
         if (this->logging) std::cout << "Decrementing incoming orders shares. After: " << incomming_order->shares << std::endl;
         if (incomming_order->shares < 0){ cout << "incoming order has negative shares... exiting.\n"; throw; }
 
-        // use this new order to create a perfect match via recursion 
+        // recursion to create a perfect match with new, branched order
         this->create_match(new_order_ptr, limit_node);
-    }
-
-    if (limit_node){
-        if (this->logging) std::cout << "DONE traversing orders from the " << limit_node->limit_price << " limit node\n" << std::endl;
-    } else {
-        if (this->logging) std::cout << "DONE traversing orders from limit node\n" << std::endl;
     }
 
     if (incomming_order->shares == 0){
@@ -456,9 +449,6 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
         
         if (tmp_prev && incomming_order->order_type == "buy" && tmp_prev->head_order->order_type == "sell") {
             if (this->logging) std::cout << "changing limit nodes and trying again with: " << tmp_prev->limit_price << std::endl;
-            // OG LOGIC GOES IN HERE, we deleted 23.45, we still have 3 shares
-            // 2nd LOGIC GOES IN HERE, we deleted 23.44, we still have 2 shares
-            // 3nd LOGIC GOES IN HERE, we deleted 23.43, we still have 1 shares -> goes to perfect match and deletes 23.42
             this->create_match(incomming_order, tmp_prev);
         } 
         
@@ -492,7 +482,7 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
 void OrderBook::branch_from_existing_order(Order *incomming_order, Limit *limit_node){
     if (this->logging) std::cout << "incoming " << incomming_order->order_type << " order does not have enough shares to completely fill limit_node->head_order.\n";
 
-    // create a new order branched off of limit_node.head order 
+    // create a new order branched off of limit_node->head order 
     Order *new_order_ptr = new Order {
         generate_order_id(),                         
         limit_node->head_order->order_type,          

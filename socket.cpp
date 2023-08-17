@@ -11,6 +11,7 @@ std::string generate_order_id(OrderBook *book) {
     ss << std::hex;
     for (i = 0; i < 10; i++) { ss << dis(gen); }
     std::string order_id = ss.str();
+    // i think this can just be an if statement? 
     while (book->order_map.find(order_id) != book->order_map.end()){
         // order id already exists. try a new one.
         order_id = generate_order_id(book);
@@ -79,6 +80,12 @@ void trading_bot(OrderBook *book, std::string thread_id){
     }
 }
 
+// void broadcast_to_users(std::string message){
+//     for (auto user : users){
+//         user->send_text(message);
+//     }
+// }
+
 void send_spread_to_users(OrderBook *book){
     while (true){
         sleep(5);
@@ -106,20 +113,20 @@ void start_socket_server(OrderBook *book, int crow_port){
     // might want multiple wesbocket routs? 
     // each book should have a unique websocket rout -> might need to move this over to the book itself. 
     CROW_WEBSOCKET_ROUTE(app, "/ws")
-      .onopen([&](crow::websocket::connection& conn) {
-          CROW_LOG_INFO << "new websocket connection from " << conn.get_remote_ip();
-          std::lock_guard<std::mutex> _(mtx);
-          book->users.insert(&conn);
-      })
-      .onclose([&](crow::websocket::connection& conn, const std::string& reason) {
-          CROW_LOG_INFO << "websocket connection closed: " << reason;
-          std::lock_guard<std::mutex> _(mtx);
-          book->users.erase(&conn);
-      })
-      .onmessage([&](crow::websocket::connection& /*conn*/, const std::string& data, bool is_binary) {
-          std::lock_guard<std::mutex> _(mtx);
-            // no reason for users to send messages         
-      });
+    .onopen([&](crow::websocket::connection& conn) {
+        CROW_LOG_INFO << "new websocket connection from " << conn.get_remote_ip();
+        std::lock_guard<std::mutex> _(mtx);
+        book->users.insert(&conn);
+    })
+    .onclose([&](crow::websocket::connection& conn, const std::string& reason) {
+        CROW_LOG_INFO << "websocket connection closed: " << reason;
+        std::lock_guard<std::mutex> _(mtx);
+        book->users.erase(&conn);
+    })
+    .onmessage([&](crow::websocket::connection& /*conn*/, const std::string& data, bool is_binary) {
+        std::lock_guard<std::mutex> _(mtx);
+        // no reason for users to send messages         
+    });
 
     CROW_ROUTE(app, "/ipo")([](){
         // create a book, add to set, start trading bot threads @ ipo price
@@ -158,25 +165,26 @@ void start_socket_server(OrderBook *book, int crow_port){
         auto x = crow::json::load(req.body);
         if (!x) return crow::response(400);
 
-        std::string order_type = x["order_type"].s();
-        double price = x["price"].d();
-        int shares = x["shares"].i();
+        string order_type  = x["order_type"].s();
+        double price       = x["price"].d();
+        int    shares      = x["shares"].i();
 
         std::cout << "price: " << price << std::endl;
         std::cout << "order_type: " << order_type << std::endl;
         std::cout << "shares: " << shares << std::endl;
 
-        std::string order_id = generate_order_id(book);
-        if (book->order_map.find(order_id) != book->order_map.end()){ std::cout << "shit\n"; throw; }
         m.lock();
         book->add_order(
-            order_id,                                   // string order_id
+            generate_order_id(book),                    // string order_id
             order_type,                                 // string order_type
             shares,                                     // int shares
             price,                                      // double limit price 
             66666666,                                   // int entry_time
             99999999                                    // int event_time
         );
+        // maybe book->add_order returns an array of matches that were created. 
+        // post in dynmao
+        // send out via socket 
         m.unlock();
 
         crow::json::wvalue z({
@@ -200,6 +208,5 @@ int main(){
     for(auto &thread : threads){ thread.join(); }
 
     // wscat -c ws://0.0.0.0:5001/ws
-    // curl http://0.0.0.0:5001 
-    // nohup 
+    // curl http://0.0.0.0:5001/curr_price
 }

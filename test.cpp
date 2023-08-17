@@ -21,15 +21,6 @@ public:
         return ss.str();
     }
 
-    int count_digit(int number) {
-        int count = 0;
-        while(number != 0) {
-            number = number / 10;
-            count++;
-        }
-        return count;
-    }
-
     std::string create_order(OrderBook *book, string order_type, int shares, double limit){
         std::string order_id = generate_uuid_v4();
         uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
