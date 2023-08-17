@@ -75,7 +75,6 @@ void trading_bot(OrderBook *book, std::string thread_id){
         // std::cout << *book << std::endl;
         // std::cout << "<--------------------------------------------------------------------------------------------------------------------------------------------------------------------------->\n\n\n";
         cnt++;
-        if (cnt == 1000000){ throw; }
         m.unlock();
     }
 }
@@ -192,51 +191,15 @@ void start_socket_server(OrderBook *book, int crow_port){
 
 int main(){
     OrderBook *book = new OrderBook;
-
-    std::cout << "starting threads...\n";
-
-    int crow_port = 5001;
     std::vector<std::thread> threads;
+    int crow_port = 5001;
 
-    // std::cout << "starting api + websocket on port: " << crow_port << std::endl;
     threads.push_back(std::thread(trading_bot, book, "th1"));
     threads.push_back(std::thread(start_socket_server, book, crow_port));
 
-
-    for(auto& thread : threads){
-        thread.join();
-    }
-
-
-    // std::thread th1(trading_bot, book, "th1");
-    // std::thread th2(trading_bot, book, "th2");
-    // std::thread th3(trading_bot, book, "th3");
+    for(auto &thread : threads){ thread.join(); }
 
     // wscat -c ws://0.0.0.0:5001/ws
     // curl http://0.0.0.0:5001 
-
-
-    // std::thread th2(start_socket_server, book, crow_port);
-
-    // start_socket_server(book, crow_port);
-    // std::cout << "webserver up.\n";
-
-
-    std::vector<std::thread> my_threads;
-    // my_threads.emplace_back(th1);
-    // my_threads.emplace_back(th2);
-
-
-    // std::async(start_socket_server, book, crow_port);
-    // std::async(trading_bot, book, "th1");
-
-    std::cout << "all threads up.\n";
-
-
-    // for (int i=0; i<my_threads.size(); i++){
-    //     my_threads[i].join();
-    // }
-
-
-
+    // nohup 
 }
