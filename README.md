@@ -56,5 +56,7 @@ to run tests:
 * `valgrind --tool=memcheck --leak-check=yes ./a.out`
 
 why am i still able to access garbage after i delete a pointer. 
+wscat -c 3.95.214.132:5001/ws
+curl http://3.95.214.132:5001/order_status
 
 would be cool to have some kinda load balancer if too many order requests are coming in at the same time. if the book is getting so much traffic that's its slowing down, maybe have multiple processes of the same stock, and somehow ensure the price is always the same. not sure if this is possible or not 
