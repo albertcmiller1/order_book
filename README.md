@@ -54,7 +54,7 @@ TODO:
 14,080 orders/sec wo logging 
 
 to run tests: 
-* `g++ -g -Wall -std=c++20 main.cpp order_book.cpp`
+* `g++ -g -Wall -std=c++20 main.cpp order_book.cpp -o tests`
 * `valgrind --tool=memcheck --leak-check=yes ./a.out`
 
 why am i still able to access garbage after i delete a pointer
