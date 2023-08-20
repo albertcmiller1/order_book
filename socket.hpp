@@ -1,5 +1,5 @@
 #include "order_book.hpp"
-// #include "crow.h"
+#include "crow.h"
 #include <iostream> 
 #include <unordered_set>
 #include <unordered_map>
@@ -13,6 +13,7 @@
 #include <random>
 #include <atomic>
 #include <future>
+#include <algorithm>
 
 // std::unordered_set<crow::websocket::connection*> users;
 // std::unordered_map<std::string, std::string> parse_args(std::vector <std::string> v);

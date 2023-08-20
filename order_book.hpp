@@ -9,7 +9,6 @@
 #include <sstream>
 #include <unordered_set>
 #include <unordered_map>
-#include "crow.h"
 
 struct Match {
     int match_id;
@@ -22,11 +21,10 @@ struct Match {
 struct Order {
     std::string order_id;
     std::string order_type;
-    // int customer_id;
+    std::string user_id;
     int shares;
     double limit;
     uint64_t entry_time;
-    uint64_t event_time;
     Order* next {nullptr};
     Order* prev {nullptr};
 };
@@ -46,7 +44,6 @@ class OrderBook {
 public:
     std::unordered_map<double, Limit*> limit_map = {};          // key is limit price
     std::unordered_map<std::string, Order*> order_map = {};     // key is order_id
-    std::unordered_set<crow::websocket::connection*> users;
 
     int num_matches {0};
     double most_recent_trade_price {0};
@@ -60,7 +57,7 @@ public:
     Limit *highest_buy_limit {nullptr}; 
     Limit *lowest_sell_limit {nullptr};
 
-    void add_order(std::string order_id, std::string order_type, int shares, double limit, uint64_t entry_time, uint64_t event_time);
+    void add_order(std::string order_id, std::string order_type, std::string user_id, int shares, double limit, uint64_t entry_time);
     double find_best_limit_node_to_match_with_new(std::string incoming_order_type, double incoming_order_limit);
     Limit* find_best_limit_node_to_match_with(Order *new_order_ptr);
     Limit* insert_limit_map(double limit_price, int size, int total_volume);
@@ -72,6 +69,7 @@ public:
     void branch_from_incoming_order(Order *incomming_order, Limit *limit_node, Limit *tmp_prev, Limit *tmp_next);
     void branch_from_existing_order(Order *incomming_order, Limit *limit_node);
 
+    std::string get_spread_data();
     int insert_limit_dll(Limit *new_limit);
     bool order_crossed_spread(Order *incomming_order);
     int cancel_order();

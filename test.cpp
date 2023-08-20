@@ -31,8 +31,7 @@ public:
             order_type,         // order_type
             shares,             // shares
             limit,              // limit
-            curr_time,          // entry_time
-            curr_time           // event_time
+            curr_time           // entry_time
         );
 
         return order_id;

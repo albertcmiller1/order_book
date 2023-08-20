@@ -20,14 +20,14 @@ std::string OrderBook::generate_order_id() {
     return order_id;
 }
 
-void OrderBook::add_order(string order_id, std::string order_type, int shares, double limit_price, uint64_t entry_time, uint64_t event_time){
+void OrderBook::add_order(string order_id, std::string order_type, string user_id, int shares, double limit_price, uint64_t entry_time){
     Order *new_order_ptr = new Order {
         order_id,
         order_type,
+        user_id,
         shares, 
         limit_price,
-        entry_time,
-        event_time
+        entry_time
     };
 
     if (this->logging) {
@@ -36,6 +36,7 @@ void OrderBook::add_order(string order_id, std::string order_type, int shares, d
         std::cout << "| order_type: "   << new_order_ptr->order_type    << std::endl;
         std::cout << "| limit: "        << new_order_ptr->limit         << std::endl;
         std::cout << "| order_id: "     << new_order_ptr->order_id      << std::endl << std::endl;
+        std::cout << "| user_id: "      << new_order_ptr->user_id      << std::endl << std::endl;
     }
     
     // add new order to order_map
@@ -275,12 +276,6 @@ int OrderBook::validate(){
     return 0;
 }
 
-void OrderBook::broadcast_to_users(std::string message){
-    for (auto user : this->users){
-        user->send_text(message);
-    }
-}
-
 bool OrderBook::order_crossed_spread(Order *incomming_order){
     if (!this->lowest_sell_limit && !this->highest_buy_limit){
         return false;
@@ -360,7 +355,6 @@ void OrderBook::perfect_match(Order *incomming_order, Limit *limit_node, std::st
     // update most_recent_trade_price
     // this->most_recent_trade_price = incomming_order->limit;
     this->most_recent_trade_price = limit_node->limit_price; 
-    this->broadcast_to_users("most recent trade price: " + to_string(this->most_recent_trade_price));
 
     // delete head order 
     if (this->logging) std::cout << "deleting old order..." << limit_node->head_order->order_id << std::endl;
@@ -417,10 +411,10 @@ void OrderBook::branch_from_incoming_order(Order *incomming_order, Limit *limit_
         Order *new_order_ptr = new Order {
             generate_order_id(),                           
             incomming_order->order_type,        
+            incomming_order->user_id,
             limit_node->head_order->shares,     
             incomming_order->limit,             
-            incomming_order->entry_time,        
-            incomming_order->entry_time         
+            incomming_order->entry_time
         };
 
         // add new order to order_map
@@ -492,11 +486,11 @@ void OrderBook::branch_from_existing_order(Order *incomming_order, Limit *limit_
     // create a new order branched off of limit_node->head order 
     Order *new_order_ptr = new Order {
         generate_order_id(),                         
-        limit_node->head_order->order_type,          
+        limit_node->head_order->order_type,  
+        limit_node->head_order->user_id,        
         incomming_order->shares,                     
         limit_node->head_order->limit,               
-        limit_node->head_order->entry_time,          
-        limit_node->head_order->event_time           
+        limit_node->head_order->entry_time
     };
 
     // update head order of limit node
@@ -511,6 +505,57 @@ void OrderBook::branch_from_existing_order(Order *incomming_order, Limit *limit_
     if (this->logging) std::cout << "\n\n";
     return;
 }
+
+std::string OrderBook::get_spread_data(){
+    // no data to boradcast yet
+    if (!this->limit_map.size()){ return ""; }
+
+    // boradcast all limits
+    if (this->limit_map.size() <= 10){ 
+        std::string ans = "";
+        Limit *n = this->sorted_limit_prices_head;
+        while (n) {
+            string tmp = to_string(n->limit_price) + "-" + n->head_order->order_type + " ";
+            ans.append(tmp);
+            n = n->next;
+        }
+        return ans;
+    }
+
+    // return 5 limits before most_recent_trade_price limit and 5 limits after it. 
+    // if (this->limit_map.count(this->most_recent_trade_price)){
+    //     Limit *m = this->limit_map.find(this->most_recent_trade_price)->second;
+    //     int cnt = 0;
+    //     while (m && cnt < 5){ m = m->prev; cnt++; }
+    //     cnt = 0;
+    //     std::string ans = "";
+    //     while (m && cnt < 10){
+    //         ans.append(to_string(m->limit_price) + "-" + m->head_order->order_type + " ");
+    //         m = m->next;
+    //         cnt++;
+    //     }
+    //     return ans;
+    // } 
+
+    // iterate over limit DLL until we find middle 
+    Limit *n = this->sorted_limit_prices_head;
+    std::string first_order_type = this->sorted_limit_prices_head->head_order->order_type;
+    while (n) {
+        if (n->head_order->order_type != first_order_type){ break; }
+        n = n->next;
+    }
+    int cnt = 0;
+    while (n && cnt < 5){ n = n->prev; cnt++; }
+    cnt = 0;
+    std::string ans = "";
+    while (n && cnt < 10){
+        ans.append(to_string(n->limit_price) + "-" + n->head_order->order_type + " ");
+        n = n->next;
+        cnt++;
+    }
+    return ans;
+}
+
 
 int OrderBook::cancel_order(){
     return 0;
@@ -610,56 +655,56 @@ std::ostream& operator<<(std::ostream& os, const OrderBook &book){
         }
     }
 
-    if (book.debug){
-        cout << "\nPrinting all orders..." << endl;
-        Limit *curr = book.sorted_limit_prices_head;
-        int num_limits = 0;
-        int num_orders = 0;
-        while (curr != nullptr) {
-            num_limits++;
-            std::string s = " ";
-            Order *n = curr->head_order;
-            while (n != nullptr) {
-                num_orders++;
-                s = s + n->order_id + "/" + n->order_type + "/" + std::to_string(n->shares) + "/" + std::to_string(n->limit) + " ";
-                // s = s + std::to_string(n->order_id) + "/" + n->order_type + "/" + std::to_string(n->shares) + "/" + std::to_string(n->limit) + " ";
-                n = n->next;
-            };
-            cout << curr->limit_price << ": " << s << endl;
-            curr = curr->next;
-        }
-    
-        std::cout << "\nnum_orders: " << num_orders << std::endl;
-        std::cout << "num_limits: " << num_limits << std::endl;
-    
-        if (num_orders != book.order_map.size()){
-            std::cout << "num_oders counted: " << num_orders << std::endl;
-            std::cout << "book.order_map.size: " << book.order_map.size() << std::endl;
-            throw;
-        }
+    cout << "\nPrinting all orders..." << endl;
+    Limit *curr = book.sorted_limit_prices_head;
+    int num_limits = 0;
+    int num_orders = 0;
+    while (curr != nullptr) {
+        num_limits++;
+        std::string s = " ";
+        Order *n = curr->head_order;
+        while (n != nullptr) {
+            num_orders++;
+            s = s + n->order_id + "/" + n->order_type + "/" + std::to_string(n->shares) + "/" + std::to_string(n->limit) + " ";
+            // s = s + std::to_string(n->order_id) + "/" + n->order_type + "/" + std::to_string(n->shares) + "/" + std::to_string(n->limit) + " ";
+            n = n->next;
+        };
+        cout << curr->limit_price << ": " << s << endl;
+        curr = curr->next;
+    }
+
+    std::cout << "\nnum_orders: " << num_orders << std::endl;
+    std::cout << "num_limits: " << num_limits << std::endl;
+
+    if (num_orders != book.order_map.size()){
+        std::cout << "num_oders counted: " << num_orders << std::endl;
+        std::cout << "book.order_map.size: " << book.order_map.size() << std::endl;
+        throw;
     }
 
     int num_limits_cnt_forwards = 0;
     int num_limits_cnt_backwards = 0;
 
-    std::cout << "\nPrinting list forwards..." << endl;
-    Limit *n = book.sorted_limit_prices_head;
-    while (n != nullptr) {
-        num_limits_cnt_forwards++;
-        std::cout << n->limit_price << "/" << " ";
-        n = n->next;
-    }
-    std::cout << "done...\n\n" << endl;
+    if (book.debug){
+        std::cout << "\nPrinting list forwards..." << endl;
+        Limit *n = book.sorted_limit_prices_head;
+        while (n != nullptr) {
+            num_limits_cnt_forwards++;
+            std::cout << n->limit_price << "/" << " ";
+            n = n->next;
+        }
+        std::cout << "done...\n\n" << endl;
 
-    std::cout << "\nPrinting list backwards..." << endl;
-    Limit *p = book.sorted_limit_prices_tail;
+        std::cout << "\nPrinting list backwards..." << endl;
+        Limit *p = book.sorted_limit_prices_tail;
 
-    while (p != nullptr) {
-        num_limits_cnt_backwards++;
-        cout << p->limit_price << "/" << " ";
-        p = p->prev;
+        while (p != nullptr) {
+            num_limits_cnt_backwards++;
+            cout << p->limit_price << "/" << " ";
+            p = p->prev;
+        }
+        std::cout << "done...\n\n" << endl;
     }
-    std::cout << "done...\n\n" << endl;
 
     if (num_limits_cnt_forwards != num_limits_cnt_backwards){
         std::cout << "num_limits_cnt_forwards: " << num_limits_cnt_forwards << std::endl;

@@ -1,6 +1,9 @@
 #include "socket.hpp"
 #define CROW_JSON_USE_MAP
 using namespace std;
+std::unordered_set<crow::websocket::connection*> users;
+std::mutex mtx;
+
 
 static std::random_device              rd;
 static std::mt19937                    gen(rd());
@@ -67,11 +70,11 @@ void trading_bot(OrderBook *book, std::string thread_id){
         // std::cout << "<--------------------------------------------------------------------------" << thread_id << "-" << cnt << "--------------------------------------------------------------------------------------->\n";
         book->add_order(
             order_id,           
-            order_type,        
+            order_type,      
+            thread_id,  
             shares,            
             offer,             
-            curr_time,         
-            curr_time          
+            curr_time
         );
         // std::cout << *book << std::endl;
         // std::cout << "<--------------------------------------------------------------------------------------------------------------------------------------------------------------------------->\n\n\n";
@@ -80,48 +83,39 @@ void trading_bot(OrderBook *book, std::string thread_id){
     }
 }
 
-// void broadcast_to_users(std::string message){
-//     for (auto user : users){
-//         user->send_text(message);
-//     }
-// }
-
-void send_spread_to_users(OrderBook *book){
+void send_spread_to_users(OrderBook *book, int sleep_time){
     while (true){
-        sleep(5);
-        std::string spread_data = "spread info";
-        for (auto user : book->users) {
-            user->send_text(spread_data);
-        }
+        sleep(sleep_time);
+        m.lock();
+        std::string spread_data = book->get_spread_data();
+        for (auto user : users) { user->send_text(spread_data); }
+        m.unlock();
     }
 }
 
-void send_curr_price_to_users(OrderBook *book){
+void send_curr_price_to_users(OrderBook *book, int sleep_time){
     while (true){
-        sleep(5);
+        sleep(sleep_time);
         std::string curr_price = to_string(book->most_recent_trade_price);
-        for (auto user : book->users) {
+        for (auto user : users) {
             user->send_text(curr_price);
         }
     }
 }
 
-void start_socket_server(OrderBook *book, int crow_port){
-    crow::SimpleApp app;
-    std::mutex mtx;
-
+void create_socket(OrderBook *book, crow::SimpleApp &app){
     // might want multiple wesbocket routs? 
     // each book should have a unique websocket rout -> might need to move this over to the book itself. 
     CROW_WEBSOCKET_ROUTE(app, "/ws")
     .onopen([&](crow::websocket::connection& conn) {
         CROW_LOG_INFO << "new websocket connection from " << conn.get_remote_ip();
         std::lock_guard<std::mutex> _(mtx);
-        book->users.insert(&conn);
+        users.insert(&conn);
     })
     .onclose([&](crow::websocket::connection& conn, const std::string& reason) {
         CROW_LOG_INFO << "websocket connection closed: " << reason;
         std::lock_guard<std::mutex> _(mtx);
-        book->users.erase(&conn);
+        users.erase(&conn);
     })
     .onmessage([&](crow::websocket::connection& /*conn*/, const std::string& data, bool is_binary) {
         std::lock_guard<std::mutex> _(mtx);
@@ -134,65 +128,144 @@ void start_socket_server(OrderBook *book, int crow_port){
         std::unordered_map<std::string, OrderBook*> books;  // ticker, associated book
         return "Hello world\n";
     });
+}
 
-    CROW_ROUTE(app, "/cancel_order")([](){
-        // build function to remove order from limit's dll and order_map
-        return "Hello world\n";
-    });
-    
-    CROW_ROUTE(app, "/order_status")([](){
-        // show order type, current trading price
-        return "Hello world\n";
-    });
+void create_cancel_order_route(OrderBook *book, crow::SimpleApp &app){
+    CROW_ROUTE(app, "/cancel_order")
+    .methods("POST"_method)
+    ([book](const crow::request& req){
+        auto x = crow::json::load(req.body);
+        if (!x) return crow::response(400);
+        string      order_id    = x["order_id"].s();
+        std::string status = "";
+        m.lock();
+        if (book->order_map.count(order_id)){
+            std::cout << "canceling order...\n";
+            // book->cancel_order()
+            status = "canceled";
+        } else {
+            status = "filled";
+        }
+        m.unlock();
 
+        crow::json::wvalue z({
+            {"order_id", order_id},
+            {"status", status}
+        });
+        return crow::response(z);
+    });
+}
+
+void create_order_status_route(OrderBook *book, crow::SimpleApp &app){
+    CROW_ROUTE(app, "/order_status")
+    .methods("POST"_method)
+    ([book](const crow::request& req){
+        auto x = crow::json::load(req.body);
+        if (!x) return crow::response(400);
+
+        string      order_id    = x["order_id"].s();
+        std::cout << "checking on status of order...\n";
+        std::string status = "";
+        m.lock();
+        if (book->order_map.count(order_id)){
+            status = "pending";
+        } else {
+            status = "filled";
+        }
+        m.unlock();
+
+        crow::json::wvalue res({
+            {"order_id", order_id},
+            {"status", status}
+        });
+        return crow::response(res);
+    });
+}
+
+void create_get_spread_route(OrderBook *book, crow::SimpleApp &app){
     CROW_ROUTE(app, "/spread")
     ([]{
         crow::json::wvalue x({
-            {"spread-1", "hi"},
-            {"spread-2", "Hello, World2!"}
+            {"buy-4", "hi"},
+            {"buy-5", "hi"},
+            {"sell-1", "hi"}
         });
         return x;
     });
+}
 
+void create_get_curr_price_route(OrderBook *book, crow::SimpleApp &app){
     CROW_ROUTE(app, "/curr_price")
     ([book] {
         return to_string(book->most_recent_trade_price);
     });
+}
 
+void create_place_order_route(OrderBook *book, crow::SimpleApp &app){
     CROW_ROUTE(app, "/place_order")
     .methods("POST"_method)
     ([book](const crow::request& req){
         auto x = crow::json::load(req.body);
         if (!x) return crow::response(400);
 
-        string order_type  = x["order_type"].s();
-        double price       = x["price"].d();
-        int    shares      = x["shares"].i();
+        string      order_type  = x["order_type"].s();
+        string      user_id     = x["user_id"].s();
+        double      price       = x["price"].d();
+        int         shares      = x["shares"].i();
+        string      order_id    = generate_order_id(book);
+        uint64_t    curr_time   = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-        std::cout << "price: " << price << std::endl;
-        std::cout << "order_type: " << order_type << std::endl;
-        std::cout << "shares: " << shares << std::endl;
+        std::vector<std::string> v = {"buy", "sell"};
+        if (!std::count(v.begin(), v.end(), order_type)) { return crow::response(400); }
+
+        if (false){
+            std::cout << "placing order...\n";
+            std::cout << "  >> user_id: "       << user_id << std::endl;
+            std::cout << "  >> price: "         << price << std::endl;
+            std::cout << "  >> order_type: "    << order_type << std::endl;
+            std::cout << "  >> shares: "        << shares << std::endl;
+            std::cout << "  >> curr_time: "     << curr_time << std::endl;
+        }
 
         m.lock();
         book->add_order(
-            generate_order_id(book),                    // string order_id
-            order_type,                                 // string order_type
-            shares,                                     // int shares
-            price,                                      // double limit price 
-            66666666,                                   // int entry_time
-            99999999                                    // int event_time
+            order_id,            
+            order_type,          
+            user_id,             
+            shares,              
+            price,               
+            curr_time                          
         );
         // maybe book->add_order returns an array of matches that were created. 
         // post in dynmao
         // send out via socket 
+
+        // cout << "===========================================\n";
+        std::cout << *book << std::endl;
+        // cout << "===========================================\n";
+
         m.unlock();
 
         crow::json::wvalue z({
             {"order_placed", "true"},
-            {"trade_price", "103.22"}
+            {"trade_price", price},
+            {"shares", shares},
+            {"user_id", user_id},
+            {"user_id", user_id}
         });
         return crow::response(z);
     });
+}
+
+void start_crow_app(OrderBook *book, int crow_port){
+    crow::SimpleApp app;
+
+    create_socket(book, app);
+    create_cancel_order_route(book, app);
+    create_order_status_route(book, app);
+    create_get_spread_route(book, app);
+    create_get_curr_price_route(book, app);
+    create_place_order_route(book, app);
 
     app.port(crow_port).multithreaded().run();
 }
@@ -200,10 +273,10 @@ void start_socket_server(OrderBook *book, int crow_port){
 int main(){
     OrderBook *book = new OrderBook;
     std::vector<std::thread> threads;
-    int crow_port = 5001;
 
     threads.push_back(std::thread(trading_bot, book, "th1"));
-    threads.push_back(std::thread(start_socket_server, book, crow_port));
+    threads.push_back(std::thread(start_crow_app, book, 5001));
+    threads.push_back(std::thread(send_spread_to_users, book, 3));
 
     for(auto &thread : threads){ thread.join(); }
 

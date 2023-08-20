@@ -47,6 +47,8 @@ The book, trading bot threads, api, and websocket will be apart of the same proc
 ## notes 
 * a buyer  matches with a  seller when the incoming buy  price is greater than a sell offer
 * a seller matches with a  buyer  when the incoming sell price is less    than a buy offer 
+* buy  offers will generally be under the spread, and at the beginning of the limit DLL
+* sell offers will generally be above the spread, and at the end       of the lmit DLL
 
 TODO: 
 14,080 orders/sec wo logging 
@@ -61,3 +63,5 @@ why am i still able to access garbage after i delete a pointer
 * `curl http://3.95.214.132:5001/curr_price`
 
 would be cool to have some kinda load balancer if too many order requests are coming in at the same time. if the book is getting so much traffic that's its slowing down, maybe have multiple processes of the same stock, and somehow ensure the price is always the same. not sure if this is possible or not 
+
+why isnt most recent trade price always in the middle of the spread? 
