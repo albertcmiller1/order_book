@@ -314,17 +314,24 @@ void OrderBook::create_match(Order *incomming_order, Limit *limit_node){
         string sellers_order_id;
 
         // set buyer and seller
-        if (incomming_order->order_type == "buy"){
+        if (incomming_order->order_type == "buy")
+        {
             buyers_order_id = incomming_order->order_id;
             sellers_order_id = limit_node->head_order->order_id;
-        } else {
+        } 
+        else 
+        {
             buyers_order_id = limit_node->head_order->order_id;
             sellers_order_id = incomming_order->order_id;
         }
 
-        if (incomming_order->shares == limit_node->head_order->shares){
+        if (incomming_order->shares == limit_node->head_order->shares)
+        {
             this->perfect_match(incomming_order, limit_node, buyers_order_id, sellers_order_id);
-        } else if (incomming_order->shares > limit_node->head_order->shares){
+        } 
+        else if (incomming_order->shares > limit_node->head_order->shares)
+        {
+            // TODO: is there a chance we pass in a new limit node of the wrong order_type? 
             this->branch_from_incoming_order(incomming_order, limit_node, limit_node->prev, limit_node->next);
         } else {
             this->branch_from_existing_order(incomming_order, limit_node);
