@@ -25,35 +25,14 @@ The book, trading bot threads, api, and websocket will be apart of the same proc
 3. `cmake ..`
 4. `make` 
 
-## Future ideas
-* convert limit DLL to tree
-* how to build a driver/buffer for much faster performance
-* frontend to view the spread. broadcast the needed info using socket [example](https://www.youtube.com/watch?v=hgOXY-r3xJM&ab_channel=ChadThackray)
-* only run the bots during market hours
-* maybe using an AWS SQS would be better for holding buy and sell orders? then we could have a more distrubuted matching service aka more scalable 
-* would be cool to host a small websocket (python) on the EC2 to show how much memory/cpu the server has used 
-* [stock exchange design](https://www.youtube.com/watch?v=XuKs2kWH0mQ&ab_channel=System-Design)
-* load balancer for incoming requests to distributed order_book processes 
-
-## Todo 
-* more tests 
-* destructors
-* speed up update_limit_spread_new()
-* counts (num orders, num limits, volumes, etc)
-* aws sdk or http library for posting matches
-* remove total_volume and num_limit_nodes?
-* python program to test multiple users firing off orders 
-
 ## Notes 
+book 
 * a buyer  matches with a seller when the incoming buy  price is higher than a sell offer
 * a seller matches with a buyer  when the incoming sell price is lower  than a buy offer 
 * buy  offers will be higher than the spread, and at the front of the limit DLL
 * sell offers will be lower  than the spread, and at the back  of the lmit DLL
 
-speed 
-* 14,080 orders/sec wo logging (average after 1M orders)
-
-to run tests: 
+run tests: 
 * `g++ -g -Wall -std=c++20 main.cpp order_book.cpp -o tests`
 * `valgrind --tool=memcheck --leak-check=yes ./tests`
 
@@ -66,6 +45,28 @@ start and connect to server
 * `wscat -c 3.95.214.132:5001/ws`
 * `curl http://3.95.214.132:5001/curr_price`
 
+speed 
+* 14,080 orders/sec wo logging (average after 1M orders)
+
 questions 
-* why isnt most recent trade price always in the middle of the spread? 
+* why isnt most recent trade price always in the middle of the spread
 * xhy am i still able to access garbage after i delete a pointer
+
+## Todo 
+* more tests 
+* destructors
+* speed up update_limit_spread_new()
+* counts (num orders, num limits, volumes, etc)
+* aws sdk or http library for posting matches
+* remove total_volume and num_limit_nodes?
+* python program to test multiple users firing off orders 
+
+## Future ideas
+* convert limit DLL to tree
+* how to build a driver/buffer for much faster performance
+* frontend to view the spread. broadcast the needed info using socket [example](https://www.youtube.com/watch?v=hgOXY-r3xJM&ab_channel=ChadThackray)
+* only run the bots during market hours
+* maybe using an AWS SQS would be better for holding buy and sell orders? then we could have a more distrubuted matching service aka more scalable 
+* would be cool to host a small websocket (python) on the EC2 to show how much memory/cpu the server has used 
+* [stock exchange design](https://www.youtube.com/watch?v=XuKs2kWH0mQ&ab_channel=System-Design)
+* load balancer for incoming requests to distributed order_book processes 
