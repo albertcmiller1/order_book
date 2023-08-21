@@ -33,31 +33,29 @@ The book, trading bot threads, api, and websocket will be apart of the same proc
 * maybe using an AWS SQS would be better for holding buy and sell orders? then we could have a more distrubuted matching service aka more scalable 
 * would be cool to host a small websocket (python) on the EC2 to show how much memory/cpu the server has used 
 * [stock exchange design](https://www.youtube.com/watch?v=XuKs2kWH0mQ&ab_channel=System-Design)
+* load balancer for incoming requests to distributed order_book processes 
 
 ## Todo 
 * more tests 
+* destructors
 * speed up update_limit_spread_new()
-* print 100 as 100.00
-* validate api request inputs 
 * counts (num orders, num limits, volumes, etc)
-* aws sdk to post transaction (updated price) to dynamodb
+* aws sdk or http library for posting matches
 * remove total_volume and num_limit_nodes?
 * python program to test multiple users firing off orders 
 
-## notes 
-* a buyer  matches with a  seller when the incoming buy  price is greater than a sell offer
-* a seller matches with a  buyer  when the incoming sell price is less    than a buy offer 
-* buy  offers will generally be under the spread, and at the beginning of the limit DLL
-* sell offers will generally be above the spread, and at the end       of the lmit DLL
+## Notes 
+* a buyer  matches with a seller when the incoming buy  price is higher than a sell offer
+* a seller matches with a buyer  when the incoming sell price is lower  than a buy offer 
+* buy  offers will be higher than the spread, and at the front of the limit DLL
+* sell offers will be lower  than the spread, and at the back  of the lmit DLL
 
-TODO: 
-14,080 orders/sec wo logging 
+speed 
+* 14,080 orders/sec wo logging (average after 1M orders)
 
 to run tests: 
 * `g++ -g -Wall -std=c++20 main.cpp order_book.cpp -o tests`
-* `valgrind --tool=memcheck --leak-check=yes ./a.out`
-
-why am i still able to access garbage after i delete a pointer
+* `valgrind --tool=memcheck --leak-check=yes ./tests`
 
 connect locally
 * `wscat -c ws://0.0.0.0:5001/ws`
@@ -68,6 +66,6 @@ start and connect to server
 * `wscat -c 3.95.214.132:5001/ws`
 * `curl http://3.95.214.132:5001/curr_price`
 
-would be cool to have some kinda load balancer if too many order requests are coming in at the same time. if the book is getting so much traffic that's its slowing down, maybe have multiple processes of the same stock, and somehow ensure the price is always the same. not sure if this is possible or not 
-
-why isnt most recent trade price always in the middle of the spread? 
+questions 
+* why isnt most recent trade price always in the middle of the spread? 
+* xhy am i still able to access garbage after i delete a pointer
