@@ -556,7 +556,6 @@ std::string OrderBook::get_spread_data(){
     return ans;
 }
 
-
 int OrderBook::cancel_order(){
     return 0;
 }

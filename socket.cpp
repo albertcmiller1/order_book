@@ -3,28 +3,11 @@
 using namespace std;
 std::unordered_set<crow::websocket::connection*> users;
 std::mutex mtx;
-
-
-static std::random_device              rd;
-static std::mt19937                    gen(rd());
-static std::uniform_int_distribution<> dis(0, 15);
-std::string generate_order_id(OrderBook *book) {
-    std::stringstream ss;
-    int i;
-    ss << std::hex;
-    for (i = 0; i < 10; i++) { ss << dis(gen); }
-    std::string order_id = ss.str();
-    // i think this can just be an if statement? 
-    while (book->order_map.find(order_id) != book->order_map.end()){
-        // order id already exists. try a new one.
-        order_id = generate_order_id(book);
-    }
-    return order_id;
-}
-
 std::mutex m;
+
 std::atomic<int> cnt = 1;
-void trading_bot(OrderBook *book, std::string thread_id){
+void trading_bot(OrderBook *book, std::string thread_id, int cycle_time){
+    bool logging = false;
     /*
         TODO:
         > bot should realize how many orders/limits there are. 
@@ -35,10 +18,10 @@ void trading_bot(OrderBook *book, std::string thread_id){
     double ipo = 100.00;
 
     while (true){
-        sleep(0);  
+        sleep(cycle_time);  
 
         uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        std::string order_id = generate_order_id(book);
+        std::string order_id = book->generate_order_id();
         if (book->order_map.find(order_id) != book->order_map.end()){std::cout << "shit\n"; throw;}
 
         double offer;
@@ -67,7 +50,7 @@ void trading_bot(OrderBook *book, std::string thread_id){
         curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
         m.lock();
-        // std::cout << "<--------------------------------------------------------------------------" << thread_id << "-" << cnt << "--------------------------------------------------------------------------------------->\n";
+        if (logging) std::cout << "<--------------------------------------------------------------------------" << thread_id << "-" << cnt << "--------------------------------------------------------------------------------------->\n";
         book->add_order(
             order_id,           
             order_type,      
@@ -76,16 +59,16 @@ void trading_bot(OrderBook *book, std::string thread_id){
             offer,             
             curr_time
         );
-        // std::cout << *book << std::endl;
-        // std::cout << "<--------------------------------------------------------------------------------------------------------------------------------------------------------------------------->\n\n\n";
+        if (logging) std::cout << *book << std::endl;
+        if (logging) std::cout << "<--------------------------------------------------------------------------------------------------------------------------------------------------------------------------->\n\n\n";
         cnt++;
         m.unlock();
     }
 }
 
-void send_spread_to_users(OrderBook *book, int sleep_time){
+void send_spread_to_users(OrderBook *book, int cycle_time){
     while (true){
-        sleep(sleep_time);
+        sleep(cycle_time);
         m.lock();
         std::string spread_data = book->get_spread_data();
         for (auto user : users) { user->send_text(spread_data); }
@@ -93,9 +76,9 @@ void send_spread_to_users(OrderBook *book, int sleep_time){
     }
 }
 
-void send_curr_price_to_users(OrderBook *book, int sleep_time){
+void send_curr_price_to_users(OrderBook *book, int cycle_time){
     while (true){
-        sleep(sleep_time);
+        sleep(cycle_time);
         std::string curr_price = to_string(book->most_recent_trade_price);
         for (auto user : users) {
             user->send_text(curr_price);
@@ -212,7 +195,7 @@ void create_place_order_route(OrderBook *book, crow::SimpleApp &app){
         string      user_id     = x["user_id"].s();
         double      price       = x["price"].d();
         int         shares      = x["shares"].i();
-        string      order_id    = generate_order_id(book);
+        string      order_id    = book->generate_order_id();
         uint64_t    curr_time   = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
         std::vector<std::string> v = {"buy", "sell"};
@@ -274,12 +257,9 @@ int main(){
     OrderBook *book = new OrderBook;
     std::vector<std::thread> threads;
 
-    threads.push_back(std::thread(trading_bot, book, "th1"));
+    threads.push_back(std::thread(trading_bot, book, "th1", 0));
     threads.push_back(std::thread(start_crow_app, book, 5001));
     threads.push_back(std::thread(send_spread_to_users, book, 3));
 
     for(auto &thread : threads){ thread.join(); }
-
-    // wscat -c ws://0.0.0.0:5001/ws
-    // curl http://0.0.0.0:5001/curr_price
 }

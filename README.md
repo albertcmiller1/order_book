@@ -58,6 +58,12 @@ to run tests:
 * `valgrind --tool=memcheck --leak-check=yes ./a.out`
 
 why am i still able to access garbage after i delete a pointer
+
+connect locally
+* `wscat -c ws://0.0.0.0:5001/ws`
+* `curl http://0.0.0.0:5001/curr_price`
+
+start and connect to server 
 * `nohup ./socket &> socket.log &`
 * `wscat -c 3.95.214.132:5001/ws`
 * `curl http://3.95.214.132:5001/curr_price`
