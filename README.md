@@ -14,7 +14,7 @@ The orderbook hosts a websocket, also made with [crow](https://github.com/CrowCp
 To simulate market activity, 3 threads will continuously post buy and sell orders at random prices for each stock listed. This will stimulate the book enough for users to stream live prices, and enable a user to activly post buy and sell orders with paper stocks using the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository. 
 
 ### Price data API
-Every 60 seconds the book will post the current price of each stock traded into a dynamodb table. This information will be accessable to users via an API hosted with AWS API Gateway + lambda created with the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository.
+Every 60 seconds the book will use an [HTTP header](https://github.com/elnormous/HTTPRequest) to post the current price of each stock to an AWS lambda which will prost to an AWS dynamodb table. This AWS lambda and price history data will be built and accessable in the [paper_trader](https://github.com/albertcmiller1/paper_trader) repository.
 
 ### Infrastructure 
 The book, trading bot threads, api, and websocket will be apart of the same process which will be running on an AWS EC2 instance. 
@@ -46,11 +46,11 @@ start and connect to server
 * `curl http://3.95.214.132:5001/curr_price`
 
 speed 
-* 14,080 orders/sec wo logging (average after 1M orders)
+* 14,080 orders/sec w/o logging (average after 1M orders)
 
 questions 
 * why isnt most recent trade price always in the middle of the spread
-* xhy am i still able to access garbage after i delete a pointer
+* why am i still able to access garbage after i delete a pointer
 
 ## Todo 
 * more tests 
@@ -60,11 +60,12 @@ questions
 * aws sdk or http library for posting matches
 * remove total_volume and num_limit_nodes?
 * python program to test multiple users firing off orders 
+* either configure Dynamo for CPP or use [MySQL](https://dev.mysql.com/doc/mysql-getting-started/en/)
 
 ## Future ideas
 * convert limit DLL to tree
 * how to build a driver/buffer for much faster performance
-* frontend to view the spread. broadcast the needed info using socket [example](https://www.youtube.com/watch?v=hgOXY-r3xJM&ab_channel=ChadThackray)
+* frontend to view the spread. broadcast the needed info using socket. [example](https://www.youtube.com/watch?v=hgOXY-r3xJM&ab_channel=ChadThackray)
 * only run the bots during market hours
 * maybe using an AWS SQS would be better for holding buy and sell orders? then we could have a more distrubuted matching service aka more scalable 
 * would be cool to host a small websocket (python) on the EC2 to show how much memory/cpu the server has used 
