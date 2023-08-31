@@ -71,3 +71,10 @@ questions
 * would be cool to host a small websocket (python) on the EC2 to show how much memory/cpu the server has used 
 * [stock exchange design](https://www.youtube.com/watch?v=XuKs2kWH0mQ&ab_channel=System-Design)
 * load balancer for incoming requests to distributed order_book processes 
+
+https://docs.aws.amazon.com/sdk-for-cpp/v1/developer-guide/getting-started.html
+https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/cpp/example_code/s3/list_buckets.cpp
+https://github.com/awsdocs/aws-doc-sdk-examples/blob/6a3ab3b2c742ebe96c97b23f715a7a5b6a69548c/cpp/example_code/s3/include/awsdoc/s3/s3_examples.h#L4
+
+
+
