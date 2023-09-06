@@ -66,7 +66,16 @@ void OrderBook::add_order(string order_id, std::string order_type, string user_i
     }
 
     this->update_limit_spread_new();
+    if (this->maches.size()) { this->send_maches(); }
 }
+
+void OrderBook::send_maches(){
+    for (auto match : this->maches){
+        std::cout << "match id: " << match.match_id << endl;
+    }
+    this->maches.clear();
+}
+
 
 Limit* OrderBook::find_best_limit_node_to_match_with(Order *new_order_ptr){
     if (this->logging) std::cout << "find and return the most appropriate limit for the new " << new_order_ptr->order_type << " order to match with. \n";
@@ -355,6 +364,8 @@ void OrderBook::perfect_match(Order *incomming_order, Limit *limit_node, std::st
     // update most_recent_trade_price
     // this->most_recent_trade_price = incomming_order->limit;
     this->most_recent_trade_price = limit_node->limit_price; 
+    this->maches.push_back(new_match);
+
 
     // delete head order 
     if (this->logging) std::cout << "deleting old order..." << limit_node->head_order->order_id << std::endl;
@@ -609,6 +620,10 @@ std::ostream& operator<<(std::ostream& os, const OrderBook &book){
         std::cout << "MOST RECENT TRADE PRICE: " << book.most_recent_trade_price << std::endl;
     } else {
         std::cout << "NO TRADES YET " << std::endl;
+    }
+
+    if (book.maches.size()){
+        std::cout << "NUM MACHES: " << book.maches.size() << std::endl;
     }
 
     if (book.limit_map.empty()){

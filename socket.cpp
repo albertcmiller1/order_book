@@ -6,8 +6,7 @@ std::mutex mtx;
 std::mutex m;
 
 std::atomic<int> cnt = 1;
-void trading_bot(OrderBook *book, std::string thread_id, int cycle_time){
-    bool logging = false;
+void trading_bot(OrderBook *book, std::string thread_id, int cycle_time, bool logging){
     /*
         TODO:
         > bot should realize how many orders/limits there are. 
@@ -257,9 +256,9 @@ int main(){
     OrderBook *book = new OrderBook;
     std::vector<std::thread> threads;
 
-    threads.push_back(std::thread(trading_bot, book, "th1", 0));
-    threads.push_back(std::thread(start_crow_app, book, 5001));
-    threads.push_back(std::thread(send_spread_to_users, book, 3));
+    threads.push_back(std::thread(trading_bot, book, "th1", 2, true));
+    // threads.push_back(std::thread(start_crow_app, book, 5001));
+    // threads.push_back(std::thread(send_spread_to_users, book, 3));
 
     for(auto &thread : threads){ thread.join(); }
 }
