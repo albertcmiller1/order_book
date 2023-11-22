@@ -27,7 +27,7 @@ set(CMAKE_BUILD_TYPE "Release") # "debug"
 #####################################
 # Define Options
 #####################################
-option(CROW_INSTALL            "Add install step for Crow"              ON )
+option(CROW_INSTALL "Add install step for Crow" ON )
 
 # Possible values: ssl, compression
 # option(CROW_FEATURES					 "Enable features extending Crow's abilities" "")

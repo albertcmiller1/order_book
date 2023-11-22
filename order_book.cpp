@@ -20,7 +20,7 @@ std::string OrderBook::generate_order_id() {
     return order_id;
 }
 
-void OrderBook::add_order(string order_id, std::string order_type, string user_id, int shares, double limit_price, uint64_t entry_time){
+std::vector<std::string> OrderBook::add_order(string order_id, std::string order_type, string user_id, int shares, double limit_price, uint64_t entry_time){
     Order *new_order_ptr = new Order {
         order_id,
         order_type,
@@ -46,7 +46,7 @@ void OrderBook::add_order(string order_id, std::string order_type, string user_i
         // limit already exists in limit_map
         Limit *existing_limit_node = limit_map.find(limit_price)->second;  
 
-        // check if order crosses the spread 
+        // check if order crossed the spread 
         if (this->order_crossed_spread(new_order_ptr)){
             this->create_match(new_order_ptr, existing_limit_node);
         } else {
@@ -66,16 +66,28 @@ void OrderBook::add_order(string order_id, std::string order_type, string user_i
     }
 
     this->update_limit_spread_new();
-    if (this->maches.size()) { this->send_maches(); }
+    return this->build_matches_string();
 }
 
-void OrderBook::send_maches(){
+std::vector<std::string> OrderBook::build_matches_string(){
+    std::vector<std::string> all_matches;
+
     for (auto match : this->maches){
-        std::cout << "match id: " << match.match_id << endl;
+        std::string match_str = "{";
+        
+        match_str += "'match_id': " +  std::to_string(match.match_id) + ", ";
+        match_str += "'buying_order_id': '" +  match.buying_order_id + "', ";
+        match_str += "'selling_order_id': '" + match.selling_order_id + "', ";
+        match_str += "'sale_quantity': '" + std::to_string(match.sale_quantity) + "', ";
+        match_str += "'sale_price': '" + std::to_string(match.sale_price) + "' ";
+        match_str += "}";
+        
+        all_matches.push_back(match_str);
     }
+    
     this->maches.clear();
+    return all_matches;
 }
-
 
 Limit* OrderBook::find_best_limit_node_to_match_with(Order *new_order_ptr){
     if (this->logging) std::cout << "find and return the most appropriate limit for the new " << new_order_ptr->order_type << " order to match with. \n";

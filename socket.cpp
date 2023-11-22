@@ -1,7 +1,8 @@
 #include "socket.hpp"
 #define CROW_JSON_USE_MAP
 using namespace std;
-std::unordered_set<crow::websocket::connection*> users;
+std::unordered_set<crow::websocket::connection*> spread_users;
+std::unordered_set<crow::websocket::connection*> match_users;
 std::mutex mtx;
 std::mutex m;
 
@@ -50,7 +51,9 @@ void trading_bot(OrderBook *book, std::string thread_id, int cycle_time, bool lo
 
         m.lock();
         if (logging) std::cout << "<--------------------------------------------------------------------------" << thread_id << "-" << cnt << "--------------------------------------------------------------------------------------->\n";
-        book->add_order(
+        
+        std::vector<std::string> all_matches;
+        all_matches = book->add_order(
             order_id,           
             order_type,      
             thread_id,  
@@ -58,6 +61,14 @@ void trading_bot(OrderBook *book, std::string thread_id, int cycle_time, bool lo
             offer,             
             curr_time
         );
+        
+        for (auto match_str : all_matches){
+            std::cout << match_str << endl;
+            for (auto user : match_users) { 
+               user->send_text(match_str); 
+            }
+        }
+
         if (logging) std::cout << *book << std::endl;
         if (logging) std::cout << "<--------------------------------------------------------------------------------------------------------------------------------------------------------------------------->\n\n\n";
         cnt++;
@@ -65,50 +76,65 @@ void trading_bot(OrderBook *book, std::string thread_id, int cycle_time, bool lo
     }
 }
 
-void send_spread_to_users(OrderBook *book, int cycle_time){
+void send_spread_to_spread_users(OrderBook *book, int cycle_time){
     while (true){
         sleep(cycle_time);
         m.lock();
         std::string spread_data = book->get_spread_data();
-        for (auto user : users) { user->send_text(spread_data); }
+
+        std::string bs_string = "{'Nikhil' : 1, 'Akshat' : 2, 'Akash' : 3}";
+
+        for (auto user : spread_users) { 
+            // user->send_text(spread_data); 
+            user->send_text(bs_string); 
+        }
         m.unlock();
     }
 }
 
-void send_curr_price_to_users(OrderBook *book, int cycle_time){
+void send_curr_price_to_spread_users(OrderBook *book, int cycle_time){
     while (true){
         sleep(cycle_time);
         std::string curr_price = to_string(book->most_recent_trade_price);
-        for (auto user : users) {
+        for (auto user : spread_users) {
             user->send_text(curr_price);
         }
     }
 }
 
 void create_socket(OrderBook *book, crow::SimpleApp &app){
-    // might want multiple wesbocket routs? 
-    // each book should have a unique websocket rout -> might need to move this over to the book itself. 
     CROW_WEBSOCKET_ROUTE(app, "/ws")
     .onopen([&](crow::websocket::connection& conn) {
         CROW_LOG_INFO << "new websocket connection from " << conn.get_remote_ip();
         std::lock_guard<std::mutex> _(mtx);
-        users.insert(&conn);
+        spread_users.insert(&conn);
     })
     .onclose([&](crow::websocket::connection& conn, const std::string& reason) {
         CROW_LOG_INFO << "websocket connection closed: " << reason;
         std::lock_guard<std::mutex> _(mtx);
-        users.erase(&conn);
+        spread_users.erase(&conn);
     })
     .onmessage([&](crow::websocket::connection& /*conn*/, const std::string& data, bool is_binary) {
         std::lock_guard<std::mutex> _(mtx);
-        // no reason for users to send messages         
+        // no reason for spread_users to send messages         
     });
+}
 
-    CROW_ROUTE(app, "/ipo")([](){
-        // create a book, add to set, start trading bot threads @ ipo price
-        std::string ticker;
-        std::unordered_map<std::string, OrderBook*> books;  // ticker, associated book
-        return "Hello world\n";
+void create_matches_socket(OrderBook *book, crow::SimpleApp &app){
+    CROW_WEBSOCKET_ROUTE(app, "/matches")
+    .onopen([&](crow::websocket::connection& conn) {
+        CROW_LOG_INFO << "new (matches) websocket connection from " << conn.get_remote_ip();
+        std::lock_guard<std::mutex> _(mtx);
+        match_users.insert(&conn);
+    })
+    .onclose([&](crow::websocket::connection& conn, const std::string& reason) {
+        CROW_LOG_INFO << "websocket (matches) connection closed: " << reason;
+        std::lock_guard<std::mutex> _(mtx);
+        match_users.erase(&conn);
+    })
+    .onmessage([&](crow::websocket::connection& /*conn*/, const std::string& data, bool is_binary) {
+        std::lock_guard<std::mutex> _(mtx);
+        // no reason for spread_users to send messages         
     });
 }
 
@@ -210,7 +236,9 @@ void create_place_order_route(OrderBook *book, crow::SimpleApp &app){
         }
 
         m.lock();
-        book->add_order(
+        std::vector<std::string> all_matches;
+
+        all_matches = book->add_order(
             order_id,            
             order_type,          
             user_id,             
@@ -222,9 +250,26 @@ void create_place_order_route(OrderBook *book, crow::SimpleApp &app){
         // post in dynmao
         // send out via socket 
 
-        // cout << "===========================================\n";
+
+       for (auto match_str : all_matches){
+            cout << "ALBERTTT\n";
+            std::cout << match_str << endl;
+        }
+
+
+        cout << "===========================================\n";
         std::cout << *book << std::endl;
-        // cout << "===========================================\n";
+        cout << "===========================================\n";
+
+        // std::vector<std::string> all_matches;
+        // if (book->maches.size()) { 
+        //     all_matches = book->build_matches_string(); 
+        // }
+
+        // for (auto match_str : all_matches){
+        //     std::cout << match_str << endl;
+        // }
+
 
         m.unlock();
 
@@ -243,6 +288,7 @@ void start_crow_app(OrderBook *book, int crow_port){
     crow::SimpleApp app;
 
     create_socket(book, app);
+    create_matches_socket(book, app);
     create_cancel_order_route(book, app);
     create_order_status_route(book, app);
     create_get_spread_route(book, app);
@@ -256,9 +302,9 @@ int main(){
     OrderBook *book = new OrderBook;
     std::vector<std::thread> threads;
 
-    threads.push_back(std::thread(trading_bot, book, "th1", 2, true));
-    // threads.push_back(std::thread(start_crow_app, book, 5001));
-    // threads.push_back(std::thread(send_spread_to_users, book, 3));
+    threads.push_back(std::thread(trading_bot, book, "th1", 1, true));
+    threads.push_back(std::thread(start_crow_app, book, 5001));
+    threads.push_back(std::thread(send_spread_to_spread_users, book, 3));
 
     for(auto &thread : threads){ thread.join(); }
 }

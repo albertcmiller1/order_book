@@ -30,15 +30,15 @@ public:
         book->lowest_sell_limit = nullptr;
 
         Limit *curr_limit = book->sorted_limit_prices_head;
-        std::cout << "starting limit traversal...\n" << endl;
+        // std::cout << "starting limit traversal...\n" << endl;
         while (curr_limit) {
             Limit *nxt_limit = curr_limit->next;
 
-            std::cout << "  starting order traversal..." << endl;
+            // std::cout << "  starting order traversal..." << endl;
             Order *curr_order = curr_limit->head_order;
             while (curr_order){
                 Order *nxt_order = curr_order->next;
-                std::cout << "    >> deleting order: " << curr_order->order_id << "/" << "\n";
+                // std::cout << "    >> deleting order: " << curr_order->order_id << "/" << "\n";
                 // book->order_map.erase(curr_order->order_id);
                 delete(curr_order);
                 curr_order = nullptr;
@@ -46,9 +46,9 @@ public:
                 curr_limit->head_order = nxt_order;
                 curr_order = nxt_order;
             }
-            std::cout << "  end order traversal...\n" << endl;
+            // std::cout << "  end order traversal...\n" << endl;
 
-            std::cout << "deleting limit: " << curr_limit->limit_price << "/" << "\n";
+            // std::cout << "deleting limit: " << curr_limit->limit_price << "/" << "\n";
             // book->limit_map.erase(curr_limit->limit_price);
             delete(curr_limit);
             curr_limit = nullptr;
@@ -56,12 +56,12 @@ public:
             book->sorted_limit_prices_head = nxt_limit;
             curr_limit = nxt_limit;
         }
-        std::cout << "done with limits...\n\n" << endl;
+        // std::cout << "done with limits...\n\n" << endl;
 
         book->order_map.clear();
         book->limit_map.clear();
         
-        std::cout << *book << endl;
+        // std::cout << *book << endl;
 
         delete(book);
         book = nullptr;

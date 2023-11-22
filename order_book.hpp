@@ -59,13 +59,13 @@ public:
     Limit *highest_buy_limit {nullptr}; 
     Limit *lowest_sell_limit {nullptr};
 
-    void add_order(std::string order_id, std::string order_type, std::string user_id, int shares, double limit, uint64_t entry_time);
+    std::vector<std::string> add_order(std::string order_id, std::string order_type, std::string user_id, int shares, double limit, uint64_t entry_time);
     double find_best_limit_node_to_match_with_new(std::string incoming_order_type, double incoming_order_limit);
     Limit* find_best_limit_node_to_match_with(Order *new_order_ptr);
     Limit* insert_limit_map(double limit_price, int size, int total_volume);
     void update_limit_spread_new();
     void broadcast_to_users(std::string message);
-    void send_maches();
+    std::vector<std::string> build_matches_string();
 
     void create_match(Order *incomming_order, Limit *limit_node);
     void perfect_match(Order *incomming_order, Limit *limit_node, std::string buyers_order_id, std::string sellers_order_id);

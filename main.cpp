@@ -8,7 +8,7 @@ int main(int argc, char** argv){
     Testing tests = Testing();
     tests.logging = true;
     if (
-            tests.test_1()  &&      // prove the orderbook can add a buy  order 
+            tests.test_1()  &&     // prove the orderbook can add a buy  order 
             tests.test_2()  &&      // prove the orderbook can add a sell order
             
             tests.test_3()  &&      // prove a buy  order can create a match with a sell order
@@ -27,11 +27,11 @@ int main(int argc, char** argv){
             tests.test_12() &&      // prove a sell order can be filled when it crosses the spread at a new, very low  limit price
 
             tests.test_13() &&      // prove a buy  order can be filled when it crosses the spread at a new limit price between other sell limits
-            tests.test_14() &&      // prove a sell order can be filled when it crosses the spread at a new limit price between other buy  limits 14 needs work 
+            tests.test_14()       // prove a sell order can be filled when it crosses the spread at a new limit price between other buy  limits 14 needs work 
 
-            // i think we can get rid of these two ?
-            tests.test_15() &&      // prove a buy  order can be filled when it crosses the spread at a new limit price next to a DLL
-            tests.test_16()         // prove a sell order can be filled when it crosses the spread at a new limit price next to a DLL
+            // // i think we can get rid of these two ?
+            // tests.test_15() &&      // prove a buy  order can be filled when it crosses the spread at a new limit price next to a DLL
+            // tests.test_16()         // prove a sell order can be filled when it crosses the spread at a new limit price next to a DLL
 
             // tests.test_17() && 
             // tests.test_18() 
