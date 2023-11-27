@@ -531,7 +531,9 @@ void OrderBook::branch_from_existing_order(Order *incomming_order, Limit *limit_
 
 std::string OrderBook::get_spread_data(){
     // no data to boradcast yet
-    if (!this->limit_map.size()){ return ""; }
+    if (!this->limit_map.size()){ 
+        return ""; 
+    }
 
     // boradcast all limits
     if (this->limit_map.size() <= 10){ 
@@ -562,9 +564,11 @@ std::string OrderBook::get_spread_data(){
 
     // iterate over limit DLL until we find middle 
     Limit *n = this->sorted_limit_prices_head;
-    std::string first_order_type = this->sorted_limit_prices_head->head_order->order_type;
+    std::string first_order_type = n->head_order->order_type;
     while (n) {
-        if (n->head_order->order_type != first_order_type){ break; }
+        if (n->head_order->order_type != first_order_type){ 
+            break; 
+        }
         n = n->next;
     }
     int cnt = 0;

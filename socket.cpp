@@ -85,25 +85,25 @@ void send_spread_to_spread_users(OrderBook *book, int cycle_time){
         std::string bs_string = "{'Nikhil' : 1, 'Akshat' : 2, 'Akash' : 3}";
 
         for (auto user : spread_users) { 
-            // user->send_text(spread_data); 
-            user->send_text(bs_string); 
+            user->send_text(spread_data); 
+            // user->send_text(bs_string); 
         }
         m.unlock();
     }
 }
 
-void send_curr_price_to_spread_users(OrderBook *book, int cycle_time){
-    while (true){
-        sleep(cycle_time);
-        std::string curr_price = to_string(book->most_recent_trade_price);
-        for (auto user : spread_users) {
-            user->send_text(curr_price);
-        }
-    }
-}
+// void send_curr_price_to_spread_users(OrderBook *book, int cycle_time){
+//     while (true){
+//         sleep(cycle_time);
+//         std::string curr_price = to_string(book->most_recent_trade_price);
+//         for (auto user : spread_users) {
+//             user->send_text(curr_price);
+//         }
+//     }
+// }
 
-void create_socket(OrderBook *book, crow::SimpleApp &app){
-    CROW_WEBSOCKET_ROUTE(app, "/ws")
+void create_spread_socket(OrderBook *book, crow::SimpleApp &app){
+    CROW_WEBSOCKET_ROUTE(app, "/spread")
     .onopen([&](crow::websocket::connection& conn) {
         CROW_LOG_INFO << "new websocket connection from " << conn.get_remote_ip();
         std::lock_guard<std::mutex> _(mtx);
@@ -191,7 +191,7 @@ void create_order_status_route(OrderBook *book, crow::SimpleApp &app){
 }
 
 void create_get_spread_route(OrderBook *book, crow::SimpleApp &app){
-    CROW_ROUTE(app, "/spread")
+    CROW_ROUTE(app, "/get_spread")
     ([]{
         crow::json::wvalue x({
             {"buy-4", "hi"},
@@ -287,7 +287,7 @@ void create_place_order_route(OrderBook *book, crow::SimpleApp &app){
 void start_crow_app(OrderBook *book, int crow_port){
     crow::SimpleApp app;
 
-    create_socket(book, app);
+    create_spread_socket(book, app);
     create_matches_socket(book, app);
     create_cancel_order_route(book, app);
     create_order_status_route(book, app);
