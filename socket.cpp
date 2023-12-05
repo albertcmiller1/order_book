@@ -3,6 +3,7 @@
 using namespace std;
 std::unordered_set<crow::websocket::connection*> spread_users;
 std::unordered_set<crow::websocket::connection*> match_users;
+std::unordered_set<crow::websocket::connection*> curr_price_users;
 std::mutex mtx;
 std::mutex m;
 
@@ -92,15 +93,18 @@ void send_spread_to_spread_users(OrderBook *book, int cycle_time){
     }
 }
 
-// void send_curr_price_to_spread_users(OrderBook *book, int cycle_time){
-//     while (true){
-//         sleep(cycle_time);
-//         std::string curr_price = to_string(book->most_recent_trade_price);
-//         for (auto user : spread_users) {
-//             user->send_text(curr_price);
-//         }
-//     }
-// }
+void send_curr_price_to_spread_users(OrderBook *book, int cycle_time){
+    while (true){
+        sleep(cycle_time);
+        std::string curr_price = to_string(book->most_recent_trade_price);
+        uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        std::string time = to_string(curr_time);
+        std::string price_obj = "{'date_time': '" + time + "', 'curr_price': '" + curr_price + "'}";
+        for (auto user : curr_price_users) {
+            user->send_text(price_obj);
+        }
+    }
+}
 
 void create_spread_socket(OrderBook *book, crow::SimpleApp &app){
     CROW_WEBSOCKET_ROUTE(app, "/spread")
@@ -117,6 +121,24 @@ void create_spread_socket(OrderBook *book, crow::SimpleApp &app){
     .onmessage([&](crow::websocket::connection& /*conn*/, const std::string& data, bool is_binary) {
         std::lock_guard<std::mutex> _(mtx);
         // no reason for spread_users to send messages         
+    });
+}
+
+void create_price_socket(OrderBook *book, crow::SimpleApp &app){
+    CROW_WEBSOCKET_ROUTE(app, "/price")
+    .onopen([&](crow::websocket::connection& conn) {
+        CROW_LOG_INFO << "new websocket connection from " << conn.get_remote_ip();
+        std::lock_guard<std::mutex> _(mtx);
+        curr_price_users.insert(&conn);
+    })
+    .onclose([&](crow::websocket::connection& conn, const std::string& reason) {
+        CROW_LOG_INFO << "websocket connection closed: " << reason;
+        std::lock_guard<std::mutex> _(mtx);
+        curr_price_users.erase(&conn);
+    })
+    .onmessage([&](crow::websocket::connection& /*conn*/, const std::string& data, bool is_binary) {
+        std::lock_guard<std::mutex> _(mtx);
+        // no reason for curr_price_users to send messages         
     });
 }
 
@@ -289,6 +311,7 @@ void start_crow_app(OrderBook *book, int crow_port){
 
     create_spread_socket(book, app);
     create_matches_socket(book, app);
+    create_price_socket(book, app);
     create_cancel_order_route(book, app);
     create_order_status_route(book, app);
     create_get_spread_route(book, app);
@@ -305,6 +328,7 @@ int main(){
     threads.push_back(std::thread(trading_bot, book, "th1", 1, true));
     threads.push_back(std::thread(start_crow_app, book, 5001));
     threads.push_back(std::thread(send_spread_to_spread_users, book, 3));
+    threads.push_back(std::thread(send_curr_price_to_spread_users, book, 5));
 
     for(auto &thread : threads){ thread.join(); }
 }
