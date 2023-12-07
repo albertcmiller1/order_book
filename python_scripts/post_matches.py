@@ -25,10 +25,8 @@ def put_message_in_table(message):
         Item=message
     )
 
-wsapp = websocket.WebSocketApp("ws://0.0.0.0:5001/matches", on_message=parse_message)
+HOST="ws://0.0.0.0:5001"
+
+
+wsapp = websocket.WebSocketApp(f"{HOST}/matches", on_message=parse_message)
 wsapp.run_forever() 
-
-
-
-# match = {'match_id': '1899894091', 'buying_order_id': 'c1278d6e85', 'selling_order_id': '5a3fdfbbed', 'sale_quantity': '1', 'sale_price': '100.040000'}
-# put_message_in_table(match)

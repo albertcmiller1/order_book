@@ -78,3 +78,5 @@ https://github.com/awsdocs/aws-doc-sdk-examples/blob/6a3ab3b2c742ebe96c97b23f715
 
 
 
+Change everything to bid and ask 
+add user_id to the Orders / Matches 
