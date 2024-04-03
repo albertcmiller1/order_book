@@ -36,9 +36,17 @@ run tests:
 * `g++ -g -Wall -std=c++20 main.cpp order_book.cpp -o tests`
 * `valgrind --tool=memcheck --leak-check=yes ./tests`
 
-connect locally
-* `wscat -c ws://0.0.0.0:5001/ws`
+socket endpoints
+* `wscat -c ws://0.0.0.0:5001/spread`
+* `wscat -c ws://0.0.0.0:5001/matches`
+* `wscat -c ws://0.0.0.0:5001/price`
+
+api endpoints
 * `curl http://0.0.0.0:5001/curr_price`
+* `curl http://0.0.0.0:5001/place_order`
+* `curl http://0.0.0.0:5001/order_status`
+* `curl http://0.0.0.0:5001/cancel_order`
+* `curl http://0.0.0.0:5001/get_spread`
 
 start and connect to server 
 * `nohup ./socket &> socket.log &`

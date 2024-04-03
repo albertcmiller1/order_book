@@ -12,7 +12,7 @@ void trading_bot(OrderBook *book, std::string thread_id, int cycle_time, bool lo
     /*
         TODO:
         > bot should realize how many orders/limits there are. 
-        > keep set limits on most_recent_trade price so stock price doesnt go negative or blow up
+        > set limits on most_recent_trade price so stock price doesnt go negative or blow up
         >> if the number of orders/limits is getting too big, slightly influence the book to create matches so we dont run out of memory 
     */
 
@@ -312,10 +312,11 @@ void start_crow_app(OrderBook *book, int crow_port){
     create_spread_socket(book, app);
     create_matches_socket(book, app);
     create_price_socket(book, app);
-    create_cancel_order_route(book, app);
-    create_order_status_route(book, app);
-    create_get_spread_route(book, app);
+
     create_get_curr_price_route(book, app);
+    create_order_status_route(book, app);
+    create_cancel_order_route(book, app);
+    create_get_spread_route(book, app);
     create_place_order_route(book, app);
 
     app.port(crow_port).multithreaded().run();
