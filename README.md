@@ -20,10 +20,11 @@ Every 60 seconds the book will use an [HTTP header](https://github.com/elnormous
 The book, trading bot threads, api, and websocket will be apart of the same process which will be running on an AWS EC2 instance. 
 
 ## To get started 
-1. clone the repository 
-2. `mkdir build && cd build`
-3. `cmake ..`
-4. `make` 
+1. clone the repository and cd into it 
+2. bring in the pybind11 dependency via: `git clone git@github.com:pybind/pybind11.git`
+3. `mkdir build && cd build`
+4. `cmake ..`
+5. `make` 
 
 ## Notes 
 book 
