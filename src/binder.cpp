@@ -1,5 +1,5 @@
 #include <pybind11/pybind11.h>
-#include "mymath.hpp"
+#include "book/mymath.hpp"
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
