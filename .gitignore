@@ -5,6 +5,7 @@ logs/
 aws/
 .vscode/
 shit/
+test.a*
 
 
 # Prerequisites

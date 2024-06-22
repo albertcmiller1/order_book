@@ -26,8 +26,8 @@ struct Order {
     int shares;
     double limit;
     uint64_t entry_time;
-    Order* next {nullptr};
-    Order* prev {nullptr};
+    Order* next = nullptr;
+    Order* prev = nullptr;
 };
 
 struct Limit {
@@ -43,22 +43,22 @@ struct Limit {
 
 class OrderBook {
 public:
-    std::unordered_map<double, Limit*> limit_map = {};          // key is limit price
-    std::unordered_map<std::string, Order*> order_map = {};     // key is order_id
+    std::unordered_map<double, Limit*> limit_map;          // key is limit price
+    std::unordered_map<std::string, Order*> order_map;     // key is order_id
     std::vector<Match> maches;
 
-    int num_matches {0};
-    double most_recent_trade_price {0};
-    bool debug {false};
-    bool logging {false};
+    int num_matches = 0;
+    bool debug = false;
+    bool logging = false;
     
-    Limit *sorted_limit_prices_head {nullptr};
-    Limit *sorted_limit_prices_tail {nullptr};
-    int num_limit_nodes {0}; 
+    Limit *sorted_limit_prices_head = nullptr;
+    Limit *sorted_limit_prices_tail = nullptr;
+    int num_limit_nodes = 0; 
 
-    Limit *highest_buy_limit {nullptr}; 
-    Limit *lowest_sell_limit {nullptr};
+    Limit *highest_buy_limit = nullptr; 
+    Limit *lowest_sell_limit = nullptr;
 
+    double most_recent_trade_price = 0;
     std::vector<std::string> add_order(std::string order_id, std::string order_type, std::string user_id, int shares, double limit, uint64_t entry_time);
     double find_best_limit_node_to_match_with_new(std::string incoming_order_type, double incoming_order_limit);
     Limit* find_best_limit_node_to_match_with(Order *new_order_ptr);
