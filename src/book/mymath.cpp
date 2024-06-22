@@ -9,7 +9,6 @@ std::string return_str(std::string var){
 }
 
 
-
 bool val_in_set(){
     std::set<int> set;
     set.insert(1);

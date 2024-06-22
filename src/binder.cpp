@@ -6,12 +6,12 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(cmake_example, m) {
+PYBIND11_MODULE(order_book, m) {
     m.doc() = R"pbdoc(
-        Pybind11 example plugin
+        Pybind11 example plugin 
         -----------------------
 
-        .. currentmodule:: cmake_example
+        .. currentmodule:: order_book
 
         .. autosummary::
            :toctree: _generate
