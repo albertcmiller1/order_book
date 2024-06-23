@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.4...3.18)
 set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ version selection")
 
 project(book)
-add_library(mymath STATIC src/book/order_book.cpp)
-set_target_properties(mymath PROPERTIES POSITION_INDEPENDENT_CODE ON)
+add_library(order_book STATIC src/book/order_book.cpp)
+set_target_properties(order_book PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_subdirectory(pybind11) 
 pybind11_add_module(book src/binder.cpp) # pybind wrapper around add_library cmake function
 
-target_link_libraries(book PRIVATE mymath)
+target_link_libraries(book PRIVATE order_book)
