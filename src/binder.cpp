@@ -1,12 +1,13 @@
 #include <pybind11/pybind11.h>
-#include "book/mymath.hpp"
+#include "book/order_book.hpp"
+// #include "book/order_book.hpp"
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(order_book, m) {
+PYBIND11_MODULE(book, m) {
     m.doc() = R"pbdoc(
         Pybind11 example plugin 
         -----------------------
@@ -21,33 +22,9 @@ PYBIND11_MODULE(order_book, m) {
            val_in_set
     )pbdoc";
 
-    m.def("add", &add, R"pbdoc(
-        Add two numbers
-
-        Some other explanation about the add function.
-    )pbdoc");
-
-
-    m.def("return_str", &return_str, "return the string!");
-
-
-
-    m.def("subtract", [](int i, int j) { return i - j; }, R"pbdoc(
-        Subtract two numbers
-
-        Some other explanation about the subtract function.
-    )pbdoc");
-
-    m.def("val_in_set", &val_in_set, R"pbdoc(
-        val in set
-    )pbdoc");
-
-    py::class_<Pet>(m, "Pet")
-        .def(py::init<const std::string &>())   // constructor
-        .def("setName", &Pet::setName)          // expose member methods
-        .def("getName", &Pet::getName)          
-        .def_readwrite("name", &Pet::name);     // expose member variables
-
+    py::class_<OrderBook>(m, "OrderBook")
+        .def(py::init<>())  
+        .def("generate_order_id", &OrderBook::generate_order_id);
 
     m.attr("__version__") = "0.0.1";
 }

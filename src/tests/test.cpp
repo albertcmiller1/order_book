@@ -2,20 +2,7 @@
 using namespace std;
 
 std::string Testing::build_order(OrderBook *book, string order_type, int shares, double limit){
-    std::string order_id = book->generate_order_id();
-    uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    usleep(this->microseconds);
-    curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    book->add_order(
-        order_id,           // order_id
-        order_type,         // order_type
-        "albert",
-        shares,             // shares
-        limit,              // limit
-        curr_time           // entry_time
-    );
-
-    return order_id;
+    return book->add_order(order_type, "albert", shares, limit);
 }
 
 bool Testing::doubles_are_same(double a, double b){ return fabs(a - b) < 0.001; }

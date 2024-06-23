@@ -20,14 +20,17 @@ std::string OrderBook::generate_order_id() {
     return order_id;
 }
 
-std::vector<std::string> OrderBook::add_order(string order_id, std::string order_type, string user_id, int shares, double limit_price, uint64_t entry_time){
+std::string OrderBook::add_order(std::string order_type, string user_id, int shares, double limit_price){
+    std::string order_id = this->generate_order_id();
+    uint64_t curr_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    
     Order *new_order_ptr = new Order {
         order_id,
         order_type,
         user_id,
         shares, 
         limit_price,
-        entry_time
+        curr_time
     };
 
     if (this->logging) {
@@ -66,7 +69,7 @@ std::vector<std::string> OrderBook::add_order(string order_id, std::string order
     }
 
     this->update_limit_spread_new();
-    return this->build_matches_string();
+    return new_order_ptr->order_id;
 }
 
 std::vector<std::string> OrderBook::build_matches_string(){
