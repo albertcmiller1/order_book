@@ -1,7 +1,4 @@
-from build import order_book
-soln = order_book.add(2, 3)
-print(soln)
+from build import book
 
-
-p = order_book.Pet("albert")
-print(p.name)
+ob = book.OrderBook()
+print(ob.generate_order_id())

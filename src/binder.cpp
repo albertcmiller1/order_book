@@ -1,6 +1,5 @@
 #include <pybind11/pybind11.h>
 #include "book/order_book.hpp"
-// #include "book/order_book.hpp"
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
