@@ -1,7 +1,7 @@
 #include "run_tests.hpp"
 using namespace std;
 
-// g++ -g -Wall -std=c++20 tests2/run_tests.cpp tests2/test.cpp book/order_book.cpp -o test.a
+// g++ -g -Wall -std=c++20 tests/run_tests.cpp tests/test.cpp book/order_book.cpp -o test.a
 int main(){
     Testing tests = Testing();
     if (

@@ -6,7 +6,7 @@ aws/
 .vscode/
 shit/
 test.a*
-
+__pycache__
 
 # Prerequisites
 *.d
