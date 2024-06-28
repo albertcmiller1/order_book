@@ -128,9 +128,9 @@ class CMakeBuild(build_ext):
 setup(
     name="book",
     version="0.0.1",
-    author="Dean Moldovan",
-    author_email="dean0x7d@gmail.com",
-    description="A test project using pybind11 and CMake",
+    author="Albert Miller",
+    author_email="albertcmiller1.com",
+    description="A python interface to interact with the c++ order book",
     long_description="",
     ext_modules=[CMakeExtension("book")],
     cmdclass={"build_ext": CMakeBuild},
