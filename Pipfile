@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pandas = "*"
+pytest = "*"
+pylint = "*"
+setuptools = "*"
+book = {file = "dist/book-0.0.4-cp312-cp312-macosx_13_0_arm64.whl"}
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"

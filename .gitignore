@@ -1,11 +1,16 @@
+
+book.egg-info/
+dist/
+.pytest_cache
+old/
+pybind11/
 build/
-build2/
 logs/
 aws/
 .vscode/
 shit/
-tests*/
-tests*
+test.a*
+__pycache__
 
 # Prerequisites
 *.d

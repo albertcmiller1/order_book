@@ -20,10 +20,11 @@ Every 60 seconds the book will use an [HTTP header](https://github.com/elnormous
 The book, trading bot threads, api, and websocket will be apart of the same process which will be running on an AWS EC2 instance. 
 
 ## To get started 
-1. clone the repository 
-2. `mkdir build && cd build`
-3. `cmake ..`
-4. `make` 
+1. clone the repository and cd into it 
+2. bring in the pybind11 dependency via: `git clone git@github.com:pybind/pybind11.git`
+3. `mkdir build && cd build`
+4. `cmake ..`
+5. `make` 
 
 ## Notes 
 book 
@@ -85,7 +86,7 @@ https://docs.aws.amazon.com/sdk-for-cpp/v1/developer-guide/getting-started.html
 https://github.com/awsdocs/aws-doc-sdk-examples/blob/main/cpp/example_code/s3/list_buckets.cpp
 https://github.com/awsdocs/aws-doc-sdk-examples/blob/6a3ab3b2c742ebe96c97b23f715a7a5b6a69548c/cpp/example_code/s3/include/awsdoc/s3/s3_examples.h#L4
 
-test change
+weird thing with pip when using python3.12: https://stackoverflow.com/questions/77364550/attributeerror-module-pkgutil-has-no-attribute-impimporter-did-you-mean
 
 Change everything to bid and ask 
 add user_id to the Orders / Matches 
