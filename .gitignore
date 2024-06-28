@@ -1,3 +1,7 @@
+
+book.egg-info/
+dist/
+.pytest_cache
 old/
 pybind11/
 build/

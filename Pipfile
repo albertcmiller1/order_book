@@ -5,6 +5,10 @@ name = "pypi"
 
 [packages]
 pandas = "*"
+pytest = "*"
+pylint = "*"
+setuptools = "*"
+book = {file = "dist/book-0.0.1-cp312-cp312-macosx_13_0_arm64.whl"}
 
 [dev-packages]
 
