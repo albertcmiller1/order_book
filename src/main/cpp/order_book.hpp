@@ -80,6 +80,9 @@ public:
     void print_orders_dll(Order *n);
     void print_limits_dll();
     void print_limits_dll_backwards();
+    
+    std::string get_limits_dll();
+
     int validate();
     void update_limit_spread_old(Limit *limit, std::string order_type);
     std::string generate_order_id();

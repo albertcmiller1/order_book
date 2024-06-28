@@ -3,14 +3,22 @@ testcpp:
 	./test.a
 	rm -rf ./test.a*
 
-build: 
+compile: 
 	rm -rf ./build
 	mkdir build
 	cd ./build/; cmake ..; make;
 
 wheel: 
+	pipenv uninstall book 
 	rm -rf dist/
 	python3 setup.py bdist_wheel
 	pipenv install dist/*
 
+run: 
+	python3 src/main/py/main.py   
 
+check: 
+	ls -l ~/.local/share/virtualenvs/order_book*/lib/python3.12/site-packages 
+
+book-version: 
+	pip list | grep book | awk '{print $$2}'

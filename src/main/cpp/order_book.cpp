@@ -600,6 +600,16 @@ void OrderBook::print_orders_dll(Order *n) {
     cout << "done...\n\n" << endl;
 } 
 
+std::string OrderBook::get_limits_dll(){
+    std::string soln;
+    Limit *n = this->sorted_limit_prices_head;
+    while (n != nullptr) {
+        soln += std::to_string(n->limit_price) + " ";
+        n = n->next;
+    }
+    return soln;
+}
+
 void OrderBook::print_limits_dll() {
     cout << "\nPrinting list forwards..." << endl;
     Limit *n = this->sorted_limit_prices_head;
