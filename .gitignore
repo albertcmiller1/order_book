@@ -1,9 +1,8 @@
-
+pybind11/
 book.egg-info/
+old/
 dist/
 .pytest_cache
-old/
-pybind11/
 build/
 logs/
 aws/
