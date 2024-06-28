@@ -18,7 +18,7 @@ run:
 	python3 src/main/py/main.py   
 
 check: 
-	ls -l ~/.local/share/virtualenvs/order_book*/lib/python3.12/site-packages 
+	ls -l ~/.local/share/virtualenvs/order_book*/lib/python3.12/site-packages | grep book
 
 book-version: 
 	pip list | grep book | awk '{print $$2}'

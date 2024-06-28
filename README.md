@@ -10,7 +10,10 @@ This repo simulates an order book using a doubly linked list of unique limit pri
 5. compile the C++ library and create pybind module: `make compile`
 6. create a python wheel and install it: `make wheel`
 7. run the entry function: `make run`
-8. note: May need to remove the book's wheel from the pipfile if it has not been created yet. 
+
+### Other notes
+* May need to remove the book's wheel from the pipfile if it has not been created yet
+* If you are trying to compile and build the wheel but not noticing changes being reflected, you might need to either remove the physical dependency which can be found with `make check` or bump the code version inside the setup.py file before running `make wheel`
 
 
 ### Notes on the book 
