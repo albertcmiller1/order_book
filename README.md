@@ -3,14 +3,14 @@ This repo simulates an order book using a doubly linked list of unique limit pri
 
 
 ### To get started 
-1. clone the repository
+1. clone the repository and `cd order_book`
 2. bring in the pybind11 dependency: `git clone git@github.com:pybind/pybind11.git`
 3. start a python virual enviornment: `pipenv shell`
 4. install python dependencies: `pipenv install`
 5. compile the C++ library and create pybind module: `make compile`
 6. create a python wheel and install it: `make wheel`
 7. run the entry function: `make run`
-
+note: May need to remove the book's wheel from the pipfile if it has not been created yet. 
 
 
 ### Notes on the book 

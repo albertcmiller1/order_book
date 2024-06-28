@@ -27,7 +27,7 @@
         "book": {
             "file": "dist/book-0.0.4-cp312-cp312-macosx_13_0_arm64.whl",
             "hashes": [
-                "sha256:6ab98ec6782f70854e53b8731dc4c8b1775090602774a52232c13c1ea3c00ec3"
+                "sha256:3621d90582c909c2f8968b2534ea478b8a8ebd193f91c5022df1da1d522f845c"
             ]
         },
         "dill": {
