@@ -22,3 +22,6 @@ check:
 
 book-version: 
 	pip list | grep book | awk '{print $$2}'
+
+test2: 
+	g++ -std=c++20 src/main/cpp/order_book2.cpp && ./a.out
