@@ -41,7 +41,7 @@ struct CompareLimitHeap {
         if (p1->type == OrderType::bid){
             return p1->limit_price < p2->limit_price;
         }
-        throw;
+        throw std::invalid_argument("Comparing two limits of non uniform type");;
     }
 };
 
@@ -64,6 +64,13 @@ private:
     // why cant i &type
     template<typename Map, typename Heap>
     std::shared_ptr<Limit> get_or_create_limit(Map &limit_map, Heap &heap, OrderType type, double limit_price);
+
+    /*
+    if i have a function like 
+    &Limit dostuff();
+    Limit& dostuff(); ??
+    does that return an address or a reference? 
+    */
 
     std::priority_queue<
         std::shared_ptr<Limit>, 

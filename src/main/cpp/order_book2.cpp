@@ -27,6 +27,7 @@ std::string OrderBook2::add_order(
         );
         return newOrderPtr->order_id;
     } 
+    // will this crash python or reset the book?
     throw std::invalid_argument("Invalid order type");
 }
 
