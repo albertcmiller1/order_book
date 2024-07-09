@@ -3,6 +3,11 @@ testcpp:
 	./test.a
 	rm -rf ./test.a*
 
+testcpp2: 
+	g++ -g -Wall -std=c++20 src/test/cpp/run_tests2.cpp src/test/cpp/test2.cpp src/main/cpp/order_book2.cpp -o test2.a
+	./test2.a
+	rm -rf ./test.a*
+
 compile: 
 	rm -rf ./build
 	mkdir build
