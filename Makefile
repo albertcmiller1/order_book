@@ -30,3 +30,6 @@ book-version:
 
 test2: 
 	g++ -std=c++20 src/main/cpp/order_book2.cpp && ./a.out
+
+lint: 
+	pipenv run pylint --verbose src/

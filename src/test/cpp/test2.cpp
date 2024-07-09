@@ -25,7 +25,7 @@ bool Testing::ob_can_add_orders(){
     assert(std::equal(expected_bid_limits.begin(), expected_bid_limits.end(), bid_limits.begin()));
 
     std::vector<double> expected_ask_limits {101, 102, 103, 104};
-    std::vector<double> ask_limits = ob.get_limits(OrderType::ask, 5);
+    std::vector<double> ask_limits = ob.get_limits(OrderType::ask);
     assert(expected_ask_limits.size() == ask_limits.size());
     assert(std::equal(expected_ask_limits.begin(), expected_ask_limits.end(), ask_limits.begin()));
 

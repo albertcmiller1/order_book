@@ -71,10 +71,10 @@ public:
     void perfect_match(Order *incomming_order, Limit *limit_node, std::string buyers_order_id, std::string sellers_order_id);
     void branch_from_incoming_order(Order *incomming_order, Limit *limit_node, Limit *tmp_prev, Limit *tmp_next);
     void branch_from_existing_order(Order *incomming_order, Limit *limit_node);
+    bool order_crossed_spread(Order *incomming_order);
 
     std::string get_spread_data();
     int insert_limit_dll(Limit *new_limit);
-    bool order_crossed_spread(Order *incomming_order);
     int cancel_order();
     void insert_order_dll(Order *order, Limit *limit_node);
     void print_orders_dll(Order *n);

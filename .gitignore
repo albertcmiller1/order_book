@@ -1,4 +1,5 @@
 pybind11/
+test2.a.dSYM/
 book.egg-info/
 old/
 dist/
