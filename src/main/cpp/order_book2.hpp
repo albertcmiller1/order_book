@@ -36,12 +36,18 @@ struct Limit {
 };
 
 struct Match {
-    int match_id;
+    std::string match_id;
     std::string bid_order_id;
     std::string ask_order_id;
     int shares;
     double limit_price;
-    Match(int m_id, std::string b_id, std::string a_id, int s, double lp): 
+    Match(): 
+        match_id(std::move("Unknown")),
+        bid_order_id(std::move("Unknown")),
+        ask_order_id(std::move("Unknown")),
+        shares(std::move(-1)),
+        limit_price(std::move(-1)) {}
+    Match(std::string m_id, std::string b_id, std::string a_id, int s, double lp): 
         match_id(std::move(m_id)),
         bid_order_id(std::move(b_id)),
         ask_order_id(std::move(a_id)),
@@ -77,11 +83,13 @@ private:
     // why cant i &type on get_or_create_limit
     template<typename Map, typename Set>
     std::shared_ptr<Limit> get_or_create_limit(Map &limit_map, Set &set, OrderType type, double limit_price);
-    std::shared_ptr<Limit> prominent_limit_ptr(OrderType type); //TODO test this 
     std::string generate_order_id();
     std::string get_cur_time();
+    
+    
+    std::shared_ptr<Limit> prominent_limit_ptr(OrderType type); //TODO test this 
     std::vector<Match> process();
-    Match create_match(std::shared_ptr<Limit> ask_limit, std::shared_ptr<Limit> bid_limit);
+    Match create_match(std::shared_ptr<Limit> &ask_limit, std::shared_ptr<Limit> &bid_limit);
     bool can_match();
 
     std::set<std::shared_ptr<Limit>, CompareLimit> bid_limits; // O(log(N)) insertions, deletions, searches

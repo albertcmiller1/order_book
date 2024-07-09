@@ -32,3 +32,26 @@ bool Testing::ob_can_add_orders(){
     std::cout << "ob_can_add_orders: Passed" << std::endl;
     return true;
 }
+
+
+bool Testing::ob_can_match_one_order_equal_shares(){
+    OrderBook2 ob = OrderBook2();
+    ob.add_order(OrderType::ask, "user1", 3, 100);
+    ob.add_order(OrderType::bid, "user1", 3, 100);
+
+    ob.process();
+
+    assert(ob.num_limits(OrderType::bid) == 0);
+    assert(ob.num_orders(OrderType::bid) == 0);
+    assert(ob.prominent_limit(OrderType::bid) == -1);
+
+    assert(ob.num_limits(OrderType::ask) == 0);
+    assert(ob.num_orders(OrderType::ask) == 0);
+    assert(ob.prominent_limit(OrderType::ask) == -1);
+
+    assert(ob.get_limits(OrderType::bid).empty());
+    assert(ob.get_limits(OrderType::ask).empty());
+
+    std::cout << "ob_can_match_one_order_equal_shares: Passed" << std::endl;
+    return true;
+}

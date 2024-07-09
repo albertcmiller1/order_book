@@ -28,6 +28,7 @@ std::string OrderBook2::add_order(
             OrderType::bid, 
             limit_price
         );
+        limitPtr->orders.push_back(newOrderPtr);
         return newOrderPtr->order_id;
     } 
     throw std::invalid_argument("Order type must be instance of enum OrderType"); // will this crash python or reset the book?
@@ -67,6 +68,7 @@ double OrderBook2::prominent_limit(OrderType type){
 }
 
 std::shared_ptr<Limit> OrderBook2::prominent_limit_ptr(OrderType type){
+    // std::cout << "starting prominent_limit_ptr" << std::endl;
     auto &limits = (type==OrderType::bid) ? this->bid_limits : this->ask_limits;
     if (!limits.empty()){
         return *limits.begin(); 
@@ -109,6 +111,7 @@ std::string OrderBook2::get_cur_time(){
 }
 
 std::vector<Match> OrderBook2::process(){
+    // std::cout << "starting process" << std::endl;
     std::vector<Match> soln;
     while (this->can_match()){
         auto lowest_ask_limit  = prominent_limit_ptr(OrderType::ask);
@@ -119,8 +122,12 @@ std::vector<Match> OrderBook2::process(){
 }
 
 bool OrderBook2::can_match(){
+    // std::cout << "starting can_match" << std::endl;
     double high_bid = this->prominent_limit(OrderType::bid);
     double low_ask = this->prominent_limit(OrderType::ask);
+    if (std::min(high_bid, low_ask) < 0){
+        return false;
+    }
     double spread = low_ask - high_bid;
     if (spread <= 0){
         return true;
@@ -128,12 +135,66 @@ bool OrderBook2::can_match(){
     return false;
 }
 
-Match OrderBook2::create_match(std::shared_ptr<Limit> ask_limit, std::shared_ptr<Limit> bid_limit){
-    // take in two limit pointers of opposite OrderTypes
-    // pop_left their orders
-    // if p1.order1.shares==p2.order2.shares: create match and return 
-    // if p1.order1.shares>p2.order2.shares: fill order2's request, and update order1
-    // if p1.order1.shares<p2.order2.shares: fill order1's request, and update order2
+Match OrderBook2::create_match(std::shared_ptr<Limit> &ask_limit, std::shared_ptr<Limit> &bid_limit){
+    // std::cout << "starting create_match" << std::endl;
+    // std::cout << "num bid orders: " << this->num_orders(OrderType::bid) << std::endl;
+    // std::cout << "num ask orders: " << this->num_orders(OrderType::ask) << std::endl;
+    // std::cout << "ask_limit: " << ask_limit->orders.size() << std::endl;
+    // std::cout << "bid_limit: " << bid_limit->orders.size() << std::endl;
+    
+    
+    Match soln;
 
-    return Match(123, "bid_id", "ask_id", 3, 33.33);
+    auto ask_order_ptr = ask_limit->orders.front();
+    ask_limit->orders.pop_front();
+
+    auto bid_order_ptr = bid_limit->orders.front();
+    bid_limit->orders.pop_front();
+    
+    // std::cout << "got both orders" << std::endl;
+
+    double match_price = std::min(ask_limit->limit_price, bid_limit->limit_price);
+    int matchable_shares = std::min(ask_order_ptr->shares, bid_order_ptr->shares);
+
+    if (ask_order_ptr->shares > bid_order_ptr->shares){
+        ask_order_ptr->shares -= matchable_shares;
+        soln = Match(
+            this->generate_order_id(),
+            bid_order_ptr->order_id,
+            ask_order_ptr->order_id, 
+            matchable_shares,
+            match_price
+        );
+    } else if (ask_order_ptr->shares < bid_order_ptr->shares){
+        bid_order_ptr->shares -= matchable_shares;
+        soln = Match(
+            this->generate_order_id(),
+            bid_order_ptr->order_id,
+            ask_order_ptr->order_id, 
+            matchable_shares,
+            match_price
+        );
+    } else {
+        soln = Match(
+            this->generate_order_id(),
+            bid_order_ptr->order_id,
+            ask_order_ptr->order_id, 
+            matchable_shares, 
+            match_price
+        );
+    }
+
+    this->bid_order_map.erase(bid_order_ptr->order_id);
+    this->ask_order_map.erase(ask_order_ptr->order_id);
+
+    if (ask_limit->orders.size()==0){
+        this->ask_limit_map.erase(ask_limit->limit_price);
+        this->ask_limits.erase(ask_limit);
+    }
+    if (bid_limit->orders.size()==0){
+        this->bid_limit_map.erase(bid_limit->limit_price);
+        this->bid_limits.erase(bid_limit);
+    }
+
+    return soln;
 }
