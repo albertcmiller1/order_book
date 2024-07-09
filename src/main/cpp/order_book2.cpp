@@ -68,7 +68,6 @@ double OrderBook2::prominent_limit(OrderType type){
 }
 
 std::shared_ptr<Limit> OrderBook2::prominent_limit_ptr(OrderType type){
-    // std::cout << "starting prominent_limit_ptr" << std::endl;
     auto &limits = (type==OrderType::bid) ? this->bid_limits : this->ask_limits;
     if (!limits.empty()){
         return *limits.begin(); 
@@ -111,7 +110,6 @@ std::string OrderBook2::get_cur_time(){
 }
 
 std::vector<Match> OrderBook2::process(){
-    // std::cout << "starting process" << std::endl;
     std::vector<Match> soln;
     while (this->can_match()){
         auto lowest_ask_limit  = prominent_limit_ptr(OrderType::ask);
@@ -122,7 +120,6 @@ std::vector<Match> OrderBook2::process(){
 }
 
 bool OrderBook2::can_match(){
-    // std::cout << "starting can_match" << std::endl;
     double high_bid = this->prominent_limit(OrderType::bid);
     double low_ask = this->prominent_limit(OrderType::ask);
     if (std::min(high_bid, low_ask) < 0){
@@ -136,13 +133,6 @@ bool OrderBook2::can_match(){
 }
 
 Match OrderBook2::create_match(std::shared_ptr<Limit> &ask_limit, std::shared_ptr<Limit> &bid_limit){
-    // std::cout << "starting create_match" << std::endl;
-    // std::cout << "num bid orders: " << this->num_orders(OrderType::bid) << std::endl;
-    // std::cout << "num ask orders: " << this->num_orders(OrderType::ask) << std::endl;
-    // std::cout << "ask_limit: " << ask_limit->orders.size() << std::endl;
-    // std::cout << "bid_limit: " << bid_limit->orders.size() << std::endl;
-    
-    
     Match soln;
 
     auto ask_order_ptr = ask_limit->orders.front();
@@ -151,8 +141,6 @@ Match OrderBook2::create_match(std::shared_ptr<Limit> &ask_limit, std::shared_pt
     auto bid_order_ptr = bid_limit->orders.front();
     bid_limit->orders.pop_front();
     
-    // std::cout << "got both orders" << std::endl;
-
     double match_price = std::min(ask_limit->limit_price, bid_limit->limit_price);
     int matchable_shares = std::min(ask_order_ptr->shares, bid_order_ptr->shares);
 
@@ -197,6 +185,5 @@ Match OrderBook2::create_match(std::shared_ptr<Limit> &ask_limit, std::shared_pt
         this->bid_limit_map.erase(bid_limit->limit_price);
         this->bid_limits.erase(bid_limit);
     }
-
     return soln;
 }

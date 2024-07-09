@@ -32,7 +32,6 @@ void Testing::ob_can_add_orders(){
     std::cout << "[ PASSED ] ob_can_add_orders" << std::endl;
 }
 
-
 void Testing::ob_can_match_one_order_equal_shares(){
     OrderBook2 ob = OrderBook2();
     ob.add_order(OrderType::ask, "user1", 3, 100);
@@ -77,7 +76,6 @@ void Testing::ob_can_match_one_order_non_equal_shares_asks(){
     std::cout << "[ PASSED ] ob_can_match_one_order_non_equal_shares_asks" << std::endl;
 }
 
-
 void Testing::ob_can_match_one_order_non_equal_shares_bids(){
     OrderBook2 ob = OrderBook2();
     ob.add_order(OrderType::ask, "user1", 5, 100);
@@ -98,4 +96,98 @@ void Testing::ob_can_match_one_order_non_equal_shares_bids(){
     assert(ob.get_limits(OrderType::ask).empty());
 
     std::cout << "[ PASSED ] ob_can_match_one_order_non_equal_shares_bids" << std::endl;
+}
+
+void Testing::ob_can_traverse_bid_limit_deque(){
+    OrderBook2 ob = OrderBook2();
+    ob.add_order(OrderType::ask, "user1", 30, 100);
+    ob.add_order(OrderType::bid, "user1", 10, 100);
+    ob.add_order(OrderType::bid, "user1", 10, 100);
+    ob.add_order(OrderType::bid, "user1", 10, 100);
+
+    std::vector<Match> matches = ob.process();
+    assert(matches.size() == 3);
+
+    assert(ob.num_limits(OrderType::bid) == 0);
+    assert(ob.num_orders(OrderType::bid) == 0);
+    assert(ob.prominent_limit(OrderType::bid) == -1);
+
+    assert(ob.num_limits(OrderType::ask) == 0);
+    assert(ob.num_orders(OrderType::ask) == 0);
+    assert(ob.prominent_limit(OrderType::ask) == -1);
+
+    assert(ob.get_limits(OrderType::bid).empty());
+    assert(ob.get_limits(OrderType::ask).empty());
+
+    std::cout << "[ PASSED ] ob_can_traverse_bid_limit_deque" << std::endl;
+}
+
+void Testing::ob_can_traverse_ask_limit_deque(){
+    OrderBook2 ob = OrderBook2();
+    ob.add_order(OrderType::ask, "user1", 10, 100);
+    ob.add_order(OrderType::ask, "user1", 10, 100);
+    ob.add_order(OrderType::ask, "user1", 10, 100);
+    ob.add_order(OrderType::bid, "user1", 30, 100);
+
+    std::vector<Match> matches = ob.process();
+    assert(matches.size() == 3);
+
+    assert(ob.num_limits(OrderType::bid) == 0);
+    assert(ob.num_orders(OrderType::bid) == 0);
+    assert(ob.prominent_limit(OrderType::bid) == -1);
+
+    assert(ob.num_limits(OrderType::ask) == 0);
+    assert(ob.num_orders(OrderType::ask) == 0);
+    assert(ob.prominent_limit(OrderType::ask) == -1);
+
+    assert(ob.get_limits(OrderType::bid).empty());
+    assert(ob.get_limits(OrderType::ask).empty());
+
+    std::cout << "[ PASSED ] ob_can_traverse_ask_limit_deque" << std::endl;
+}
+
+void Testing::ob_can_traverse_bid_limits(){
+    OrderBook2 ob = OrderBook2();
+    ob.add_order(OrderType::ask, "user1", 20, 99);
+    ob.add_order(OrderType::bid, "user1", 10, 101);
+    ob.add_order(OrderType::bid, "user1", 10, 100);
+
+    std::vector<Match> matches = ob.process();
+    assert(matches.size() == 2);
+
+    assert(ob.num_limits(OrderType::bid) == 0);
+    assert(ob.num_orders(OrderType::bid) == 0);
+    assert(ob.prominent_limit(OrderType::bid) == -1);
+
+    assert(ob.num_limits(OrderType::ask) == 0);
+    assert(ob.num_orders(OrderType::ask) == 0);
+    assert(ob.prominent_limit(OrderType::ask) == -1);
+
+    assert(ob.get_limits(OrderType::bid).empty());
+    assert(ob.get_limits(OrderType::ask).empty());
+
+    std::cout << "[ PASSED ] ob_can_traverse_bid_limits" << std::endl;
+}
+
+void Testing::ob_can_traverse_ask_limits(){
+    OrderBook2 ob = OrderBook2();
+    ob.add_order(OrderType::ask, "user1", 10, 101);
+    ob.add_order(OrderType::ask, "user1", 10, 100);
+    ob.add_order(OrderType::bid, "user1", 20, 103);
+
+    std::vector<Match> matches = ob.process();
+    assert(matches.size() == 2);
+
+    assert(ob.num_limits(OrderType::bid) == 0);
+    assert(ob.num_orders(OrderType::bid) == 0);
+    assert(ob.prominent_limit(OrderType::bid) == -1);
+
+    assert(ob.num_limits(OrderType::ask) == 0);
+    assert(ob.num_orders(OrderType::ask) == 0);
+    assert(ob.prominent_limit(OrderType::ask) == -1);
+
+    assert(ob.get_limits(OrderType::bid).empty());
+    assert(ob.get_limits(OrderType::ask).empty());
+
+    std::cout << "[ PASSED ] ob_can_traverse_ask_limits" << std::endl;
 }
