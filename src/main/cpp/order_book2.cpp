@@ -158,6 +158,8 @@ Match OrderBook2::create_match(std::shared_ptr<Limit> &ask_limit, std::shared_pt
 
     if (ask_order_ptr->shares > bid_order_ptr->shares){
         ask_order_ptr->shares -= matchable_shares;
+        ask_limit->orders.push_front(ask_order_ptr);
+        this->bid_order_map.erase(bid_order_ptr->order_id);
         soln = Match(
             this->generate_order_id(),
             bid_order_ptr->order_id,
@@ -167,6 +169,8 @@ Match OrderBook2::create_match(std::shared_ptr<Limit> &ask_limit, std::shared_pt
         );
     } else if (ask_order_ptr->shares < bid_order_ptr->shares){
         bid_order_ptr->shares -= matchable_shares;
+        this->ask_order_map.erase(ask_order_ptr->order_id);
+        bid_limit->orders.push_front(bid_order_ptr);
         soln = Match(
             this->generate_order_id(),
             bid_order_ptr->order_id,
@@ -175,6 +179,8 @@ Match OrderBook2::create_match(std::shared_ptr<Limit> &ask_limit, std::shared_pt
             match_price
         );
     } else {
+        this->bid_order_map.erase(bid_order_ptr->order_id);
+        this->ask_order_map.erase(ask_order_ptr->order_id);
         soln = Match(
             this->generate_order_id(),
             bid_order_ptr->order_id,
@@ -183,10 +189,6 @@ Match OrderBook2::create_match(std::shared_ptr<Limit> &ask_limit, std::shared_pt
             match_price
         );
     }
-
-    this->bid_order_map.erase(bid_order_ptr->order_id);
-    this->ask_order_map.erase(ask_order_ptr->order_id);
-
     if (ask_limit->orders.size()==0){
         this->ask_limit_map.erase(ask_limit->limit_price);
         this->ask_limits.erase(ask_limit);

@@ -5,6 +5,8 @@
 class Testing {
 public: 
     bool logging;
-    bool ob_can_add_orders();
-    bool ob_can_match_one_order_equal_shares();
+    void ob_can_add_orders();
+    void ob_can_match_one_order_equal_shares();
+    void ob_can_match_one_order_non_equal_shares_asks();
+    void ob_can_match_one_order_non_equal_shares_bids();
 };

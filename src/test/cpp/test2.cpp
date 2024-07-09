@@ -1,6 +1,6 @@
 #include "test2.hpp"
 
-bool Testing::ob_can_add_orders(){
+void Testing::ob_can_add_orders(){
     OrderBook2 ob = OrderBook2();
     ob.add_order(OrderType::ask, "user1", 3, 104);
     ob.add_order(OrderType::ask, "user1", 3, 103);
@@ -29,17 +29,17 @@ bool Testing::ob_can_add_orders(){
     assert(expected_ask_limits.size() == ask_limits.size());
     assert(std::equal(expected_ask_limits.begin(), expected_ask_limits.end(), ask_limits.begin()));
 
-    std::cout << "ob_can_add_orders: Passed" << std::endl;
-    return true;
+    std::cout << "[ PASSED ] ob_can_add_orders" << std::endl;
 }
 
 
-bool Testing::ob_can_match_one_order_equal_shares(){
+void Testing::ob_can_match_one_order_equal_shares(){
     OrderBook2 ob = OrderBook2();
     ob.add_order(OrderType::ask, "user1", 3, 100);
     ob.add_order(OrderType::bid, "user1", 3, 100);
 
-    ob.process();
+    std::vector<Match> matches = ob.process();
+    assert(matches.size() == 1);
 
     assert(ob.num_limits(OrderType::bid) == 0);
     assert(ob.num_orders(OrderType::bid) == 0);
@@ -52,6 +52,50 @@ bool Testing::ob_can_match_one_order_equal_shares(){
     assert(ob.get_limits(OrderType::bid).empty());
     assert(ob.get_limits(OrderType::ask).empty());
 
-    std::cout << "ob_can_match_one_order_equal_shares: Passed" << std::endl;
-    return true;
+    std::cout << "[ PASSED ] ob_can_match_one_order_equal_shares" << std::endl;
+}
+
+void Testing::ob_can_match_one_order_non_equal_shares_asks(){
+    OrderBook2 ob = OrderBook2();
+    ob.add_order(OrderType::ask, "user1", 10, 100);
+    ob.add_order(OrderType::bid, "user1", 5, 100);
+
+    std::vector<Match> matches = ob.process();
+    assert(matches.size() == 1);
+
+    assert(ob.num_limits(OrderType::bid) == 0);
+    assert(ob.num_orders(OrderType::bid) == 0);
+    assert(ob.prominent_limit(OrderType::bid) == -1);
+
+    assert(ob.num_limits(OrderType::ask) == 1);
+    assert(ob.num_orders(OrderType::ask) == 1);
+    assert(ob.prominent_limit(OrderType::ask) == 100);
+
+    assert(ob.get_limits(OrderType::bid).empty());
+    assert(!ob.get_limits(OrderType::ask).empty());
+
+    std::cout << "[ PASSED ] ob_can_match_one_order_non_equal_shares_asks" << std::endl;
+}
+
+
+void Testing::ob_can_match_one_order_non_equal_shares_bids(){
+    OrderBook2 ob = OrderBook2();
+    ob.add_order(OrderType::ask, "user1", 5, 100);
+    ob.add_order(OrderType::bid, "user1", 10, 100);
+
+    std::vector<Match> matches = ob.process();
+    assert(matches.size() == 1);
+
+    assert(ob.num_limits(OrderType::bid) == 1);
+    assert(ob.num_orders(OrderType::bid) == 1);
+    assert(ob.prominent_limit(OrderType::bid) == 100);
+
+    assert(ob.num_limits(OrderType::ask) == 0);
+    assert(ob.num_orders(OrderType::ask) == 0);
+    assert(ob.prominent_limit(OrderType::ask) == -1);
+
+    assert(!ob.get_limits(OrderType::bid).empty());
+    assert(ob.get_limits(OrderType::ask).empty());
+
+    std::cout << "[ PASSED ] ob_can_match_one_order_non_equal_shares_bids" << std::endl;
 }
