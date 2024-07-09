@@ -53,7 +53,7 @@ public:
     int num_orders(OrderType type);
     int num_limits(OrderType type);
     double prominent_limit(OrderType type);
-    std::vector<double> get_limits(OrderType type, int n);
+    std::vector<double> get_limits(OrderType type, int n=10);
     std::string add_order(
         const OrderType &order_type, 
         const std::string &user_id, 

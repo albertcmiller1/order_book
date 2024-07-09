@@ -66,7 +66,7 @@ double OrderBook2::prominent_limit(OrderType type){
     return -1;
 }
 
-std::vector<double> OrderBook2::get_limits(OrderType type, int n=10){
+std::vector<double> OrderBook2::get_limits(OrderType type, int n){
     std::vector<double> soln;
     int num_limits  = (type==OrderType::bid) ? this->num_limits(OrderType::bid) : this->num_limits(OrderType::ask);
     auto &limits    = (type==OrderType::bid) ? this->bid_limits : this->ask_limits;
