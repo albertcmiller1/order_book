@@ -88,11 +88,11 @@ private:
     std::string get_cur_time();
     
     
-    std::shared_ptr<Limit> prominent_limit_ptr(OrderType type); //TODO test this 
+    std::shared_ptr<Limit> prominent_limit_ptr(OrderType type);
     Match create_match(std::shared_ptr<Limit> &ask_limit, std::shared_ptr<Limit> &bid_limit);
     bool can_match();
 
-    std::set<std::shared_ptr<Limit>, CompareLimit> bid_limits; // O(log(N)) insertions, deletions, searches
+    std::set<std::shared_ptr<Limit>, CompareLimit> bid_limits; 
     std::unordered_map<double, std::shared_ptr<Limit>> bid_limit_map;
     std::unordered_map<std::string, std::shared_ptr<Order>> bid_order_map;
     

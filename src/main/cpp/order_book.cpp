@@ -6,7 +6,6 @@ std::string OrderBook::add_order(
     const int &shares, 
     const double &limit_price
 ){
-    // O(1) if limit exists, else O(log(n))
     std::shared_ptr<Order> newOrderPtr = std::make_shared<Order>(this->generate_order_id(), user_id, shares, this->get_cur_time());
     std::shared_ptr<Limit> limitPtr;
     if (order_type==OrderType::ask){
@@ -59,6 +58,7 @@ int OrderBook::num_orders(OrderType type){
     return orders.size();
 }
 
+// dont really need this
 double OrderBook::prominent_limit(OrderType type){
     auto &limits = (type==OrderType::bid) ? this->bid_limits : this->ask_limits;
     if (!limits.empty()){
@@ -132,6 +132,7 @@ bool OrderBook::can_match(){
     return false;
 }
 
+// function too big, refactor 
 Match OrderBook::create_match(std::shared_ptr<Limit> &ask_limit, std::shared_ptr<Limit> &bid_limit){
     Match soln;
 

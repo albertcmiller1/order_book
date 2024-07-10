@@ -10,12 +10,13 @@ This repo simulates an order book using a red black tree to hold pointers to lim
 6. start a python repl and: `import book`
 
 ### Time, Space, and Data Structures
-* let n and k represent the number of limits and the number of orders per limit, respectivly.
-* std::set will be of size O(n)
-* std::unordered_map will be of size O(n)
-* best case O(1) time to add an order, worst case O(log(n))
-* worst case O(1) time to process matches, worst canse O(n*k). Such a large variance exists because one bid order could potentially match with n ask orders, or visa versa. 
-
+* let N represent the number of limits 
+* let K represent the average number of orders per limit
+* let J represent the number of matches required to process orders that crossed the spread
+* red black tree will be of size O(N), and take O(log(N)) to insert, remove, and seach
+* unordered hash map will be of size O(N), and take amortized O(1) to insert, delete, and update
+* to add an Order to the book: best case O(1) time, and worst case O(log(n))
+* to process J matches: best case O(J) time, worst case of O(J x (K+log(N))) 
 
 ### Other Notes
 * May need to remove the book's wheel from the pipfile if it has not been created yet
