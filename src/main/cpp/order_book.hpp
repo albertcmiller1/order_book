@@ -84,13 +84,11 @@ private:
     // why cant i &type on get_or_create_limit
     template<typename Map, typename Set>
     std::shared_ptr<Limit> get_or_create_limit(Map &limit_map, Set &set, OrderType type, double limit_price);
-    std::string generate_order_id();
-    std::string get_cur_time();
-    
-    
     std::shared_ptr<Limit> prominent_limit_ptr(OrderType type);
     Match create_match(std::shared_ptr<Limit> &ask_limit, std::shared_ptr<Limit> &bid_limit);
     bool can_match();
+    std::string generate_order_id();
+    std::string get_cur_time();
 
     std::set<std::shared_ptr<Limit>, CompareLimit> bid_limits; 
     std::unordered_map<double, std::shared_ptr<Limit>> bid_limit_map;

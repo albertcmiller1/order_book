@@ -127,7 +127,7 @@ class CMakeBuild(build_ext):
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="book",
-    version="0.0.4",
+    version="0.0.7",
     author="Albert Miller",
     author_email="albertcmiller1.com",
     description="A python interface to interact with the c++ order book",

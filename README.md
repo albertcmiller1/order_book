@@ -18,6 +18,16 @@ This repo simulates an order book using a red black tree to hold pointers to lim
 * to add an Order to the book: best case O(1) time, and worst case O(log(n))
 * to process J matches: best case O(J) time, worst case of O(J x (K+log(N))) 
 
+### Using the Book 
+* instantiate the book: `ob = book.OrderBook()`
+* add a bid:  `ob.add_order(book.OrderType.bid, "albert", 6, 100.23)`
+* add an ask: `ob.add_order(book.OrderType.ask, "albert", 6, 100.23)`
+* get the number of orders: `ob.num_orders(book.OrderType.bid)`
+* get the number of limits: `ob.num_limits(book.OrderType.bid)`
+* get the lowest ask limit price: `ob.prominent_limit(book.OrderType.bid)`
+* get the highest bid limit price: `ob.prominent_limit(book.OrderType.ask)`
+* return 10 most prominent limits: `ob.get_limits(book.OrderType.bid, 10)`
+
 ### Other Notes
 * May need to remove the book's wheel from the pipfile if it has not been created yet
 * If you are trying to compile and build the wheel but not noticing changes being reflected, you might need to either remove the physical dependency which can be found with `make check` or bump the code version inside the setup.py file before running `make wheel`
@@ -29,7 +39,6 @@ This repo simulates an order book using a red black tree to hold pointers to lim
 * cancel order 
 * python stuff
 * intermediary class between the book and python
-
 
 #### Future ideas
 * only run the bots during market hours

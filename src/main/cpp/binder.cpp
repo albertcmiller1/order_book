@@ -1,4 +1,7 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
+
 #include "order_book.hpp"
 
 #define STRINGIFY(x) #x
@@ -15,12 +18,17 @@ PYBIND11_MODULE(book, m) {
            generate_order_id
     )pbdoc";
 
+    py::enum_<OrderType>(m, "OrderType")
+        .value("bid", OrderType::bid)
+        .value("ask", OrderType::ask);
+
+
     py::class_<OrderBook>(m, "OrderBook")
         .def(py::init<>())  
-        // .def("num_orders", &OrderBook::num_orders)
-        // .def("num_limits", &OrderBook::num_limits)
-        // .def("prominent_limit", &OrderBook::prominent_limit)
-        // .def("get_limits", &OrderBook::get_limits)
+        .def("num_orders", &OrderBook::num_orders)
+        .def("num_limits", &OrderBook::num_limits)
+        .def("prominent_limit", &OrderBook::prominent_limit)
+        .def("get_limits", &OrderBook::get_limits)
         // .def("process", &OrderBook::process)
         .def("add_order", &OrderBook::add_order);
         // need to expose an enum class
