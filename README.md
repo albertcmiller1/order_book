@@ -1,5 +1,5 @@
 # Fast Limit Order Book
-This repo simulates an order book using a red black tree to hold pointers to limit structs, and two hash maps - one for all orders and one for all limits. I found some information about how an order book may be designed [here](https://web.archive.org/web/20110219163448/http://howtohft.wordpress.com/2011/02/15/how-to-build-a-fast-limit-order-book/). The order book is coded in C++ and compiled into a library. Incorporating [pybind11](https://github.com/pybind/pybind11) into the project allows us to expose the C++ order book class to python. Pybind11 allows us to either create a .so or wheel file. Either of which can then be imported from the python runtime.
+This repo simulates an order book using a red black tree to hold pointers to limit structures, and two hash maps - one for all orders and one for all limits. I found some information about how an order book may be designed [here](https://web.archive.org/web/20110219163448/http://howtohft.wordpress.com/2011/02/15/how-to-build-a-fast-limit-order-book/). The order book is coded in C++ and compiled into a library. [pybind11](https://github.com/pybind/pybind11)  allows us to either create a shared object or wheel file which can then be installed, imported, and called from python.
 
 ### To get started 
 1. clone the repository and `cd order_book`
