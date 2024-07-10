@@ -17,9 +17,13 @@ PYBIND11_MODULE(book, m) {
 
     py::class_<OrderBook>(m, "OrderBook")
         .def(py::init<>())  
-        .def("generate_order_id", &OrderBook::generate_order_id)
-        .def("add_order", &OrderBook::add_order)
-        .def("get_limits_dll", &OrderBook::get_limits_dll);
+        // .def("num_orders", &OrderBook::num_orders)
+        // .def("num_limits", &OrderBook::num_limits)
+        // .def("prominent_limit", &OrderBook::prominent_limit)
+        // .def("get_limits", &OrderBook::get_limits)
+        // .def("process", &OrderBook::process)
+        .def("add_order", &OrderBook::add_order);
+        // need to expose an enum class
 
     m.attr("__version__") = "0.0.1";
 }
