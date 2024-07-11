@@ -31,13 +31,12 @@ This repo simulates an order book using a red black tree to hold pointers to lim
 ### Other Notes
 * May need to remove the book's wheel from the pipfile if it has not been created yet
 * If you are trying to compile and build the wheel but not noticing changes being reflected, you might need to either remove the physical dependency which can be found with `make check` or bump the code version inside the setup.py file before running `make wheel`
-* a buyer  matches with a seller when the incoming buy  price is higher than a sell offer
-* a seller matches with a buyer  when the incoming sell price is lower  than a buy offer 
+* a bid matches with one or many asks when the incoming bid price is higher than the most prominent (lowest) asks
+* an ask matches with one or many bids when the incoming ask price is lower than the most prominent (highest) bids
 
 #### Todo 
 * what to do with extra money 
-* cancel order 
-* python stuff
+* python api
 * intermediary class between the book and python
 
 #### Future ideas
