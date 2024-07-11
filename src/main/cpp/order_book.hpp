@@ -75,15 +75,15 @@ public:
     int num_limits(OrderType type);
     double prominent_limit(OrderType type);
     std::vector<double> get_limits(OrderType type, int n=10);
+    std::vector<Match> process();
     std::string add_order(
         const OrderType &order_type, 
         const std::string &user_id, 
         const int &shares, 
         const double &limit_price
     );
-    std::vector<Match> process();
-    bool order_in_queue(std::string &order_id);
     void cancel_order(std::string order_id);
+    bool order_in_queue(std::string &order_id);
 
 private: 
     template<typename Map, typename Set>

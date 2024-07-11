@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "3d01a0c9342b8e865226bb06b6acaea457dcb4a17f88af3ad41f744b3111eed7"
+            "sha256": "c3fb06c0685b6827f2e8d41ee8b6280718d4d99f7838ea2cd4744dae1d83f596"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -18,16 +18,16 @@
     "default": {
         "astroid": {
             "hashes": [
-                "sha256:8ead48e31b92b2e217b6c9733a21afafe479d52d6e164dd25fb1a770c7c3cf94",
-                "sha256:e8a0083b4bb28fcffb6207a3bfc9e5d0a68be951dd7e336d5dcf639c682388c0"
+                "sha256:3eae9ea67c11c858cdd2c91337d2e816bd019ac897ca07d7b346ac10105fceb3",
+                "sha256:7099b5a60985529d8d46858befa103b82d0d05a5a5e8b816b5303ed96075e1d9"
             ],
             "markers": "python_full_version >= '3.8.0'",
-            "version": "==3.2.2"
+            "version": "==3.2.3"
         },
         "book": {
-            "file": "dist/book-0.0.11-cp312-cp312-macosx_13_0_arm64.whl",
+            "file": "dist/book-0.0.12-cp312-cp312-macosx_13_0_arm64.whl",
             "hashes": [
-                "sha256:56d5aeac4964facdce31d585c0d1d75f4a0684f2948387fc5d136c00ee147f02"
+                "sha256:30cde239d9716b576d649b3f2a64bce1968ae729587c33e77d1420d9e8ca7de4"
             ]
         },
         "dill": {
