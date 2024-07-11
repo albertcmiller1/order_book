@@ -58,21 +58,12 @@ int OrderBook::num_orders(OrderType type){
     return orders.size();
 }
 
-// dont really need this
 double OrderBook::prominent_limit(OrderType type){
     auto &limits = (type==OrderType::bid) ? this->bid_limits : this->ask_limits;
     if (!limits.empty()){
         return (*limits.begin())->limit_price;
     }
     return -1;
-}
-
-std::shared_ptr<Limit> OrderBook::prominent_limit_ptr(OrderType type){
-    auto &limits = (type==OrderType::bid) ? this->bid_limits : this->ask_limits;
-    if (!limits.empty()){
-        return *limits.begin(); 
-    }
-    return nullptr;
 }
 
 std::vector<double> OrderBook::get_limits(OrderType type, int n){
@@ -112,8 +103,8 @@ std::string OrderBook::get_cur_time(){
 std::vector<Match> OrderBook::process(){
     std::vector<Match> soln;
     while (this->can_match()){
-        auto lowest_ask_limit  = prominent_limit_ptr(OrderType::ask);
-        auto highest_bid_limit = prominent_limit_ptr(OrderType::bid);
+        auto lowest_ask_limit  = this->ask_limit_map[this->prominent_limit(OrderType::ask)];
+        auto highest_bid_limit = this->bid_limit_map[this->prominent_limit(OrderType::bid)];
         soln.push_back(this->create_match(lowest_ask_limit, highest_bid_limit));
     }
     return soln;
@@ -132,10 +123,7 @@ bool OrderBook::can_match(){
     return false;
 }
 
-// function too big, refactor 
-Match OrderBook::create_match(std::shared_ptr<Limit> &ask_limit, std::shared_ptr<Limit> &bid_limit){
-    Match soln;
-
+Match OrderBook::create_match(std::shared_ptr<Limit> ask_limit, std::shared_ptr<Limit> bid_limit){
     auto ask_order_ptr = ask_limit->orders.front();
     ask_limit->orders.pop_front();
 
@@ -148,8 +136,8 @@ Match OrderBook::create_match(std::shared_ptr<Limit> &ask_limit, std::shared_ptr
     if (ask_order_ptr->shares > bid_order_ptr->shares){
         ask_order_ptr->shares -= matchable_shares;
         ask_limit->orders.push_front(ask_order_ptr);
-        this->bid_order_map.erase(bid_order_ptr->order_id);
-        soln = Match(
+        this->cancel_order(bid_order_ptr->order_id);
+        return Match(
             this->generate_order_id(),
             bid_order_ptr->order_id,
             ask_order_ptr->order_id, 
@@ -158,9 +146,9 @@ Match OrderBook::create_match(std::shared_ptr<Limit> &ask_limit, std::shared_ptr
         );
     } else if (ask_order_ptr->shares < bid_order_ptr->shares){
         bid_order_ptr->shares -= matchable_shares;
-        this->ask_order_map.erase(ask_order_ptr->order_id);
         bid_limit->orders.push_front(bid_order_ptr);
-        soln = Match(
+        this->cancel_order(ask_order_ptr->order_id);
+        return Match(
             this->generate_order_id(),
             bid_order_ptr->order_id,
             ask_order_ptr->order_id, 
@@ -168,9 +156,9 @@ Match OrderBook::create_match(std::shared_ptr<Limit> &ask_limit, std::shared_ptr
             match_price
         );
     } else {
-        this->bid_order_map.erase(bid_order_ptr->order_id);
-        this->ask_order_map.erase(ask_order_ptr->order_id);
-        soln = Match(
+        this->cancel_order(ask_order_ptr->order_id);
+        this->cancel_order(bid_order_ptr->order_id);
+        return Match(
             this->generate_order_id(),
             bid_order_ptr->order_id,
             ask_order_ptr->order_id, 
@@ -178,15 +166,6 @@ Match OrderBook::create_match(std::shared_ptr<Limit> &ask_limit, std::shared_ptr
             match_price
         );
     }
-    if (ask_limit->orders.size()==0){
-        this->ask_limit_map.erase(ask_limit->limit_price);
-        this->ask_limits.erase(ask_limit);
-    }
-    if (bid_limit->orders.size()==0){
-        this->bid_limit_map.erase(bid_limit->limit_price);
-        this->bid_limits.erase(bid_limit);
-    }
-    return soln;
 }
 
 bool OrderBook::order_in_queue(std::string &order_id){
@@ -195,7 +174,7 @@ bool OrderBook::order_in_queue(std::string &order_id){
     );
 }
 
-void OrderBook::cancel_order(std::string &order_id){
+void OrderBook::cancel_order(std::string order_id){
     if (!this->order_in_queue(order_id)){
         return;
     } else if (this->bid_order_map.count(order_id)){

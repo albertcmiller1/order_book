@@ -82,22 +82,21 @@ public:
         const double &limit_price
     );
     std::vector<Match> process();
-    
     bool order_in_queue(std::string &order_id);
-    void cancel_order(std::string &order_id);
+    void cancel_order(std::string order_id);
 
 private: 
     template<typename Map, typename Set>
     std::shared_ptr<Limit> get_or_create_limit(Map &limit_map, Set &set, OrderType type, double limit_price);
-    std::shared_ptr<Limit> prominent_limit_ptr(OrderType type);
-    Match create_match(std::shared_ptr<Limit> &ask_limit, std::shared_ptr<Limit> &bid_limit);
-    bool can_match();
-    std::string generate_order_id();
-    std::string get_cur_time();
     
     template<typename OrderMap, typename LimitMap, typename Set>
     void remove_order(OrderMap &order_map, LimitMap &limit_map, Set &limits, std::string &order_id);
 
+    bool can_match();
+    std::string get_cur_time();
+    std::string generate_order_id();
+    Match create_match(std::shared_ptr<Limit> ask_limit, std::shared_ptr<Limit> bid_limit);
+    
     std::set<std::shared_ptr<Limit>, CompareLimit> bid_limits; 
     std::unordered_map<double, std::shared_ptr<Limit>> bid_limit_map;
     std::unordered_map<std::string, std::shared_ptr<Order>> bid_order_map;
