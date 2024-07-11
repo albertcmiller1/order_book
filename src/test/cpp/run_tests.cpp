@@ -11,7 +11,8 @@ int main(){
     tests.ob_can_traverse_ask_limit_deque();
     tests.ob_can_traverse_bid_limits();
     tests.ob_can_traverse_ask_limits();
-    tests.ob_can_cancel_an_order();
+    tests.ob_can_cancel_an_order_bid();
+    tests.ob_can_cancel_an_order_ask();
 
     return 0;
 }

@@ -195,38 +195,42 @@ bool OrderBook::order_in_queue(std::string &order_id){
     );
 }
 
-
 void OrderBook::cancel_order(std::string &order_id){
-    if (this->bid_order_map.count(order_id)){
-        auto order_ptr = bid_order_map[order_id];
-        auto limit_ptr = this->bid_limit_map[order_ptr->limit_price];
-
-        auto it = std::find(limit_ptr->orders.begin(), limit_ptr->orders.end(), order_ptr);
-        if (it != limit_ptr->orders.end()) {
-            limit_ptr->orders.erase(it);
-        }
-
-        if (limit_ptr->orders.size()==0){
-            this->bid_limit_map.erase(order_ptr->limit_price);
-            this->bid_limits.erase(limit_ptr);
-        }
-        this->bid_order_map.erase(order_id); 
+    if (!this->order_in_queue(order_id)){
         return;
-    } 
-    if (this->ask_order_map.count(order_id)){
-        auto order_ptr = ask_order_map[order_id];
-        auto limit_ptr = this->ask_limit_map[order_ptr->limit_price];
-        
-        auto it = std::find(limit_ptr->orders.begin(), limit_ptr->orders.end(), order_ptr);
-        if (it != limit_ptr->orders.end()) {
-            limit_ptr->orders.erase(it);
-        }
-
-        if (limit_ptr->orders.size()==0){
-            this->ask_limit_map.erase(order_ptr->limit_price);
-            this->ask_limits.erase(limit_ptr);
-        }
-        this->ask_order_map.erase(order_id); 
-        return;
+    } else if (this->bid_order_map.count(order_id)){
+        this->remove_order(
+            this->bid_order_map, 
+            this->bid_limit_map, 
+            this->bid_limits, 
+            order_id
+        );
+    } else if (this->ask_order_map.count(order_id)){
+        this->remove_order(
+            this->ask_order_map, 
+            this->ask_limit_map, 
+            this->ask_limits, 
+            order_id
+        );
+    } else {
+        throw std::invalid_argument("Issue trying to cancel an order.");
     }
+}
+
+template<typename OrderMap, typename LimitMap, typename Set>
+void OrderBook::remove_order(OrderMap &order_map, LimitMap &limit_map, Set &limits, std::string &order_id){
+    auto order_ptr = order_map[order_id];
+    auto limit_ptr = limit_map[order_ptr->limit_price];
+
+    auto it = std::find(limit_ptr->orders.begin(), limit_ptr->orders.end(), order_ptr);
+    if (it != limit_ptr->orders.end()) {
+        limit_ptr->orders.erase(it);
+    }
+
+    if (limit_ptr->orders.size()==0){
+        limit_map.erase(order_ptr->limit_price);
+        limits.erase(limit_ptr);
+    }
+    
+    order_map.erase(order_id); 
 }

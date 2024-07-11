@@ -94,6 +94,9 @@ private:
     bool can_match();
     std::string generate_order_id();
     std::string get_cur_time();
+    
+    template<typename OrderMap, typename LimitMap, typename Set>
+    void remove_order(OrderMap &order_map, LimitMap &limit_map, Set &limits, std::string &order_id);
 
     std::set<std::shared_ptr<Limit>, CompareLimit> bid_limits; 
     std::unordered_map<double, std::shared_ptr<Limit>> bid_limit_map;

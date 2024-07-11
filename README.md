@@ -1,7 +1,7 @@
 # Fast Limit Order Book
 This repo simulates an order book using a red black tree to hold pointers to limit structures, and two hash maps - one for all orders and one for all limits. I found some information about how an order book may be designed [here](https://web.archive.org/web/20110219163448/http://howtohft.wordpress.com/2011/02/15/how-to-build-a-fast-limit-order-book/). The order book is coded in C++ and compiled into a library. [pybind11](https://github.com/pybind/pybind11)  allows us to either create a shared object or wheel file which can then be installed, imported, and called from python.
 
-### To get started 
+### Getting started 
 1. clone the repository and `cd order_book`
 2. bring in the pybind11 dependency: `git clone git@github.com:pybind/pybind11.git`
 3. start a python virual enviornment: `pipenv shell`
@@ -9,7 +9,7 @@ This repo simulates an order book using a red black tree to hold pointers to lim
 5. create a python wheel and install it: `make wheel`
 6. start a python repl and: `import book`
 
-### Time, Space, and Data Structures
+### Space, Time, and Data Structures
 * let N represent the number of limits 
 * let K represent the average number of orders per limit
 * let J represent the number of matches required to process orders that crossed the spread
