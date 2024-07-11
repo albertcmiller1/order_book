@@ -2,19 +2,27 @@ import book
 
 if __name__ == "__main__":
     ob = book.OrderBook()
-    ob.add_order("buy", "albert_miller", 1, 33.55)
-    ob.get_limits_dll()
-    print(book.OrderBook().generate_order_id())
+    bid_order_id = ob.add_order(book.OrderType.bid, "albert", 6, 101)
+    ob.add_order(book.OrderType.ask, "albert", 6, 100)
+    
+    num_bid_orders = ob.num_orders(book.OrderType.bid)
+    num_ask_orders = ob.num_orders(book.OrderType.ask)
+    
+    num_bid_limits = ob.num_limits(book.OrderType.bid)
+    num_ask_limits = ob.num_limits(book.OrderType.ask)
+
+    lowest_ask  = ob.prominent_limit(book.OrderType.bid)
+    highest_bid = ob.prominent_limit(book.OrderType.ask)
+
+    ask_limits = ob.get_limits(book.OrderType.bid, 10)    
+    bid_limits = ob.get_limits(book.OrderType.ask, 10)    
+
+    order_is_in_queue = ob.order_in_queue(book.OrderType.bid, bid_order_id)
+
+    matches = ob.process()
+    print(matches)
 
 
 '''
-we should be able to add an order to the book 
-get the status of an order 
 cancel an order from the book 
-get the current status/spread of the book 
-number of orders / limits 
-
-
-drwxr-xr-x   9 almiller  staff     288 Jun 28 16:23 book-0.0.1.dist-info
--rwxr-xr-x   1 almiller  staff  203416 Jun 28 16:23 book.cpython-312-darwin.so
 '''

@@ -17,11 +17,13 @@ enum class OrderType {
 struct Order {
     const std::string order_id;
     const std::string user_id;
+    double limit_price;
     int shares;
     std::string entry_time;
-    Order(std::string o_id, std::string u_id, int s, std::string t): 
+    Order(std::string o_id, std::string u_id, double lp, int s, std::string t): 
         order_id(std::move(o_id)), 
         user_id(std::move(u_id)), 
+        limit_price(std::move(lp)), 
         shares(std::move(s)),
         entry_time(std::move(t)) {}
 };
@@ -80,6 +82,10 @@ public:
         const double &limit_price
     );
     std::vector<Match> process();
+    
+    bool order_in_queue(std::string &order_id);
+    void cancel_order(std::string &order_id);
+
 private: 
     // why cant i &type on get_or_create_limit
     template<typename Map, typename Set>
@@ -93,6 +99,12 @@ private:
     std::set<std::shared_ptr<Limit>, CompareLimit> bid_limits; 
     std::unordered_map<double, std::shared_ptr<Limit>> bid_limit_map;
     std::unordered_map<std::string, std::shared_ptr<Order>> bid_order_map;
+    
+
+
+
+
+
     
     std::set<std::shared_ptr<Limit>, CompareLimit> ask_limits; 
     std::unordered_map<double, std::shared_ptr<Limit>> ask_limit_map;

@@ -1,7 +1,5 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-
-
 #include "order_book.hpp"
 
 #define STRINGIFY(x) #x
@@ -22,16 +20,24 @@ PYBIND11_MODULE(book, m) {
         .value("bid", OrderType::bid)
         .value("ask", OrderType::ask);
 
-
     py::class_<OrderBook>(m, "OrderBook")
         .def(py::init<>())  
         .def("num_orders", &OrderBook::num_orders)
         .def("num_limits", &OrderBook::num_limits)
         .def("prominent_limit", &OrderBook::prominent_limit)
         .def("get_limits", &OrderBook::get_limits)
-        // .def("process", &OrderBook::process)
-        .def("add_order", &OrderBook::add_order);
-        // need to expose an enum class
+        .def("process", &OrderBook::process)
+        .def("add_order", &OrderBook::add_order)
+        .def("cancel_order", &OrderBook::cancel_order)
+        .def("order_in_queue", &OrderBook::order_in_queue);
+
+    py::class_<Match>(m, "Match")
+        .def(py::init<>())  
+        .def_readwrite("match_id", &Match::match_id)
+        .def_readwrite("bid_order_id", &Match::bid_order_id)
+        .def_readwrite("ask_order_id", &Match::ask_order_id)
+        .def_readwrite("shares", &Match::shares)
+        .def_readwrite("limit_price", &Match::limit_price);
 
     m.attr("__version__") = "0.0.1";
 }
