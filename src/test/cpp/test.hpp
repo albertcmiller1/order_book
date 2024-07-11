@@ -16,4 +16,7 @@ public:
 
     void ob_can_traverse_bid_limits();
     void ob_can_traverse_ask_limits();
+
+    void ob_can_check_if_order_in_queue();
+    void ob_can_cancel_an_order();
 };

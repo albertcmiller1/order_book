@@ -191,3 +191,17 @@ void Testing::ob_can_traverse_ask_limits(){
 
     std::cout << "[ PASSED ] ob_can_traverse_ask_limits" << std::endl;
 }
+
+void Testing::ob_can_cancel_an_order(){
+    OrderBook ob = OrderBook();
+    std::string order_id = ob.add_order(OrderType::bid, "user1", 10, 101);
+    
+    ob.cancel_order(order_id);
+
+
+    assert(ob.num_limits(OrderType::bid) == 0);
+    assert(ob.num_orders(OrderType::bid) == 0);
+    assert(ob.prominent_limit(OrderType::bid) == -1);
+
+    std::cout << "[ PASSED ] ob_can_cancel_an_order" << std::endl;
+}
