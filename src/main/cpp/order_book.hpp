@@ -87,7 +87,6 @@ public:
     void cancel_order(std::string &order_id);
 
 private: 
-    // why cant i &type on get_or_create_limit
     template<typename Map, typename Set>
     std::shared_ptr<Limit> get_or_create_limit(Map &limit_map, Set &set, OrderType type, double limit_price);
     std::shared_ptr<Limit> prominent_limit_ptr(OrderType type);
@@ -99,12 +98,6 @@ private:
     std::set<std::shared_ptr<Limit>, CompareLimit> bid_limits; 
     std::unordered_map<double, std::shared_ptr<Limit>> bid_limit_map;
     std::unordered_map<std::string, std::shared_ptr<Order>> bid_order_map;
-    
-
-
-
-
-
     
     std::set<std::shared_ptr<Limit>, CompareLimit> ask_limits; 
     std::unordered_map<double, std::shared_ptr<Limit>> ask_limit_map;
