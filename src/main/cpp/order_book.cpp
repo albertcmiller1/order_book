@@ -205,16 +205,14 @@ void OrderBook::cancel_order(std::string &order_id){
             this->bid_limits, 
             order_id
         );
-    } else if (this->ask_order_map.count(order_id)){
+    } else {
         this->remove_order(
             this->ask_order_map, 
             this->ask_limit_map, 
             this->ask_limits, 
             order_id
         );
-    } else {
-        throw std::invalid_argument("Issue trying to cancel an order.");
-    }
+    } 
 }
 
 template<typename OrderMap, typename LimitMap, typename Set>
@@ -231,6 +229,6 @@ void OrderBook::remove_order(OrderMap &order_map, LimitMap &limit_map, Set &limi
         limit_map.erase(order_ptr->limit_price);
         limits.erase(limit_ptr);
     }
-    
+
     order_map.erase(order_id); 
 }
