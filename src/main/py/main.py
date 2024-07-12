@@ -76,9 +76,7 @@ def add_random_order(ob):
         )
     
 
-all_matches = set()
-all_bid_orders = set()
-all_ask_orders = set()
+num_matches = 0
 
 if __name__ == "__main__":
     ob = book.OrderBook()
@@ -89,17 +87,7 @@ if __name__ == "__main__":
     while True: 
         cnt+=1
         order_type, order_id, matches = add_random_order(ob)
-        if order_type==book.OrderType.bid: 
-            all_bid_orders.add(order_id)
-        else: 
-            all_ask_orders.add(order_id)
-
-        for match in matches: 
-            all_matches.add(match.match_id)
-            if match.bid_order_id in all_bid_orders:
-                all_bid_orders.remove(match.bid_order_id)
-            if match.ask_order_id in all_ask_orders:
-                all_ask_orders.remove(match.ask_order_id)
+        num_matches += len(matches)
 
         total_matches += len(matches)
         if cnt%iterations==0:
@@ -109,10 +97,10 @@ if __name__ == "__main__":
             break 
 
     print(f"""
-    all_matches: {len(all_matches)}
+    all_matches * 2: {len(all_matches) * 2}
     all_bid_orders: {len(all_bid_orders)}
     all_ask_orders: {len(all_ask_orders)}
-    sum: {len(all_matches) + len(all_bid_orders) + len(all_ask_orders)}
+    sum: {(len(all_matches)*2) + len(all_bid_orders) + len(all_ask_orders)}
     """)
 
 
