@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f098af55453dabbde4cafc218f0e2969f4768a046096de0789fd5b189dce17d4"
+            "sha256": "07888de32a85637d8f4c53539705637f4c06a7fdf3ca48147acb94aa0ad243df"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -25,9 +25,9 @@
             "version": "==3.2.3"
         },
         "book": {
-            "file": "dist/book-0.0.14-cp312-cp312-macosx_13_0_arm64.whl",
+            "file": "dist/book-0.0.15-cp312-cp312-macosx_13_0_arm64.whl",
             "hashes": [
-                "sha256:f4aa500ad8ccc05b054f8b57f6dae7ada7e822ff0dd9bda59961d64032aec805"
+                "sha256:06f790c3697953f8b5f3a514c4e0d703b29bd14d0b85331c31ea03cceb69d8d5"
             ]
         },
         "dill": {

@@ -39,6 +39,9 @@ This repo simulates an order book using a red black tree to hold pointers to lim
 * what to do with extra money 
 * python api
 * intermediary class between the book and python
+* seeing some ob.get_limits(book.OrderType.ask, 10)[0] != ob.prominent_limit(book.OrderType.bid)
+* > could be formatting? 
+* much slower since introducing Money
 
 #### Future ideas
 * only run the bots during market hours

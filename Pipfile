@@ -8,7 +8,7 @@ pandas = "*"
 pytest = "*"
 pylint = "*"
 setuptools = "*"
-book = {file = "dist/book-0.0.14-cp312-cp312-macosx_13_0_arm64.whl"}
+book = {file = "dist/book-0.0.15-cp312-cp312-macosx_13_0_arm64.whl"}
 
 [dev-packages]
 

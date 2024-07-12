@@ -31,7 +31,7 @@ def print_book(ob, cnt, total_matchs, time_taken):
         highest_bid_limits: {[format_money(m) for m in ob.get_limits(book.OrderType.bid, 10)]}
 
         total_number_of_matches: {total_matchs:,}
-        all_orders + matches: {ob.num_orders(book.OrderType.bid) + ob.num_orders(book.OrderType.ask) + total_matches}
+        all_orders + (matches*2): {(ob.num_orders(book.OrderType.bid) + ob.num_orders(book.OrderType.ask) + total_matches*2):,}
         <------------- {time_taken:,} ---------------->
     """)
 
@@ -50,63 +50,27 @@ def add_random_order(ob):
     
     r1 = round(random.random()*10 % 3)
     r2 = int(round(random.random(), 2) * 10)
+    r3 = int(round(random.random(), 2) * 10)
     if r1==0:
-        return (
-            book.OrderType.bid, 
-            ob.add_order(book.OrderType.bid, "albert", 1, book.Money(highest_bid.getDollars(), highest_bid.getCents() + r2)), 
-            ob.process()
-        )
+        ob.add_order(book.OrderType.bid, "albert", 1, book.Money(highest_bid.getDollars(), highest_bid.getCents() + r2)), 
     elif r1==1: 
-        return (
-            book.OrderType.bid, 
-            ob.add_order(book.OrderType.bid, "albert", 1, book.Money(highest_bid.getDollars(), highest_bid.getCents() - r2)), 
-            ob.process()
-        )
+        ob.add_order(book.OrderType.bid, "albert", 1, book.Money(highest_bid.getDollars(), highest_bid.getCents() - r2)), 
     elif r1==2: 
-        return (
-            book.OrderType.ask, 
-            ob.add_order(book.OrderType.ask, "albert", 1, book.Money(lowest_ask.getDollars(), lowest_ask.getCents() + r2)), 
-            ob.process()
-        )
+        ob.add_order(book.OrderType.ask, "albert", 1, book.Money(lowest_ask.getDollars(), lowest_ask.getCents() + r2)), 
     else: 
-        return (
-            book.OrderType.ask, 
-            ob.add_order(book.OrderType.ask, "albert", 1, book.Money(lowest_ask.getDollars(), lowest_ask.getCents() - r2)), 
-            ob.process()
-        )
+        ob.add_order(book.OrderType.ask, "albert", 1, book.Money(lowest_ask.getDollars(), lowest_ask.getCents() - r2)), 
     
-
-num_matches = 0
 
 if __name__ == "__main__":
     ob = book.OrderBook()
-    cnt=0
+    cnt = total_matches = 0
     start_time = time.time()
-    iterations = 1000
-    total_matches = 0
+    iterations = 1000000
     while True: 
         cnt+=1
-        order_type, order_id, matches = add_random_order(ob)
-        num_matches += len(matches)
-
-        total_matches += len(matches)
+        add_random_order(ob)
+        total_matches += len(ob.process())
         if cnt%iterations==0:
             end_time = time.time()
             print_book(ob, cnt, total_matches, end_time - start_time)
             start_time = time.time()
-            break 
-
-    print(f"""
-    all_matches * 2: {len(all_matches) * 2}
-    all_bid_orders: {len(all_bid_orders)}
-    all_ask_orders: {len(all_ask_orders)}
-    sum: {(len(all_matches)*2) + len(all_bid_orders) + len(all_ask_orders)}
-    """)
-
-
-    '''
-    Issue: the sum of all bid and ask orders in the order book + all old matches should equal the number orders added (assuming no branching)?
-    Causes: 
-        > same order id getting generated? 
-        > doubles too close for compare? 
-    '''
