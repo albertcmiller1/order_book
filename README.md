@@ -35,6 +35,7 @@ This repo simulates an order book using a red black tree to hold pointers to lim
 * an ask matches with one or many bids when the incoming ask price is lower than the most prominent (highest) bids
 
 #### Todo 
+* fix log floating point doubles... make money class?
 * what to do with extra money 
 * python api
 * intermediary class between the book and python

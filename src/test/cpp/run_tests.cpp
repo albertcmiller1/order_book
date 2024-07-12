@@ -13,6 +13,7 @@ int main(){
     tests.ob_can_traverse_ask_limits();
     tests.ob_can_cancel_an_order_bid();
     tests.ob_can_cancel_an_order_ask();
+    tests.test_money();
 
     return 0;
 }

@@ -8,6 +8,39 @@
 #include <chrono>
 #include <set>
 #include <algorithm>
+#include <iomanip>
+#include <cmath>
+
+class Money {
+private:
+    long dollars;
+    int cents;
+    void normalize();
+    void setDollars(long dollars);
+    void setCents(int cents);
+public:
+    explicit Money(long dollars = 0, int cents = 0) : dollars(dollars), cents(cents) {
+        normalize();
+    }
+    long getDollars() const;
+    int getCents() const;
+    Money operator+(const Money& other) const;
+    Money operator-(const Money& other) const;
+    Money operator*(double factor) const;
+    Money operator/(double divisor) const;
+    bool operator<(const Money& other) const;
+    bool operator>(const Money& other) const;
+    bool operator<=(const Money& other) const;
+    bool operator>=(const Money& other) const;
+    bool operator==(const Money& other) const;
+};
+
+
+struct MoneyHasher{
+  std::size_t operator()(const Money& money) const{
+    return std::hash<long>()(money.getDollars()) ^ (std::hash<int>()(money.getCents()) << 1);
+  }
+};
 
 enum class OrderType { 
     bid, 
@@ -17,10 +50,10 @@ enum class OrderType {
 struct Order {
     const std::string order_id;
     const std::string user_id;
-    double limit_price;
+    Money limit_price;
     int shares;
     std::string entry_time;
-    Order(std::string o_id, std::string u_id, double lp, int s, std::string t): 
+    Order(std::string o_id, std::string u_id, Money lp, int s, std::string t): 
         order_id(std::move(o_id)), 
         user_id(std::move(u_id)), 
         limit_price(std::move(lp)), 
@@ -29,10 +62,10 @@ struct Order {
 };
 
 struct Limit {
-    const double limit_price;
+    const Money limit_price;
     const OrderType type;    
     std::deque<std::shared_ptr<Order>> orders;
-    Limit(double lp, OrderType t): 
+    Limit(Money lp, OrderType t): 
         limit_price(std::move(lp)), 
         type(std::move(t)) {}
 };
@@ -42,14 +75,14 @@ struct Match {
     std::string bid_order_id;
     std::string ask_order_id;
     int shares;
-    double limit_price;
+    Money limit_price;
     Match(): 
         match_id(std::move("Unknown")),
         bid_order_id(std::move("Unknown")),
         ask_order_id(std::move("Unknown")),
         shares(std::move(-1)),
         limit_price(std::move(-1)) {}
-    Match(std::string m_id, std::string b_id, std::string a_id, int s, double lp): 
+    Match(std::string m_id, std::string b_id, std::string a_id, int s, Money lp): 
         match_id(std::move(m_id)),
         bid_order_id(std::move(b_id)),
         ask_order_id(std::move(a_id)),
@@ -73,21 +106,21 @@ class OrderBook {
 public: 
     int num_orders(OrderType type);
     int num_limits(OrderType type);
-    double prominent_limit(OrderType type);
-    std::vector<double> get_limits(OrderType type, int n=10);
+    Money prominent_limit(OrderType type);
+    std::vector<Money> get_limits(OrderType type, int n=10);
     std::vector<Match> process();
     std::string add_order(
         const OrderType &order_type, 
         const std::string &user_id, 
         const int &shares, 
-        const double &limit_price
+        const Money limit_price
     );
     void cancel_order(std::string order_id);
     bool order_in_queue(std::string &order_id);
 
 private: 
     template<typename Map, typename Set>
-    std::shared_ptr<Limit> get_or_create_limit(Map &limit_map, Set &set, OrderType type, double limit_price);
+    std::shared_ptr<Limit> get_or_create_limit(Map &limit_map, Set &set, OrderType type, Money limit_price);
     
     template<typename OrderMap, typename LimitMap, typename Set>
     void remove_order(OrderMap &order_map, LimitMap &limit_map, Set &limits, std::string &order_id);
@@ -98,12 +131,13 @@ private:
     Match create_match(std::shared_ptr<Limit> ask_limit, std::shared_ptr<Limit> bid_limit);
     
     std::set<std::shared_ptr<Limit>, CompareLimit> bid_limits; 
-    std::unordered_map<double, std::shared_ptr<Limit>> bid_limit_map;
+    std::unordered_map<Money, std::shared_ptr<Limit>, MoneyHasher> bid_limit_map;
     std::unordered_map<std::string, std::shared_ptr<Order>> bid_order_map;
     
     std::set<std::shared_ptr<Limit>, CompareLimit> ask_limits; 
-    std::unordered_map<double, std::shared_ptr<Limit>> ask_limit_map;
+    std::unordered_map<Money, std::shared_ptr<Limit>, MoneyHasher> ask_limit_map;
     std::unordered_map<std::string, std::shared_ptr<Order>> ask_order_map;
 
     friend class Testing;
 };
+

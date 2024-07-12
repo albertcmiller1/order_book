@@ -5,6 +5,10 @@
 class Testing {
 public: 
     bool logging;
+    
+    template<typename V>
+    void compare_vectors(V &v1, V &v2);
+
     void ob_can_add_orders();
     void ob_can_match_one_order_equal_shares();
 
@@ -21,4 +25,6 @@ public:
     
     void ob_can_cancel_an_order_bid();
     void ob_can_cancel_an_order_ask();
+
+    void test_money();
 };

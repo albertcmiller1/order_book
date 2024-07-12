@@ -39,5 +39,11 @@ PYBIND11_MODULE(book, m) {
         .def_readwrite("shares", &Match::shares)
         .def_readwrite("limit_price", &Match::limit_price);
 
+    py::class_<Money>(m, "Money")
+        .def(py::init<const long &, const int>())
+        .def("getDollars", &Money::getDollars)
+        .def("getCents", &Money::getCents);
+        // add operators and default constructors
+
     m.attr("__version__") = "0.0.1";
 }

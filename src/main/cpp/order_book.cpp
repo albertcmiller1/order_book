@@ -4,7 +4,7 @@ std::string OrderBook::add_order(
     const OrderType &order_type, 
     const std::string &user_id, 
     const int &shares, 
-    const double &limit_price
+    const Money limit_price
 ){
     std::shared_ptr<Order> newOrderPtr = std::make_shared<Order>(this->generate_order_id(), user_id, limit_price, shares, this->get_cur_time());
     std::shared_ptr<Limit> limitPtr;
@@ -34,7 +34,7 @@ std::string OrderBook::add_order(
 }
 
 template<typename Map, typename Set>
-std::shared_ptr<Limit> OrderBook::get_or_create_limit(Map &limit_map, Set &set, OrderType type, double limit_price){
+std::shared_ptr<Limit> OrderBook::get_or_create_limit(Map &limit_map, Set &set, OrderType type, Money limit_price){
     if (limit_map.count(limit_price)){ 
         return limit_map[limit_price]; 
     } 
@@ -58,16 +58,16 @@ int OrderBook::num_orders(OrderType type){
     return orders.size();
 }
 
-double OrderBook::prominent_limit(OrderType type){
+Money OrderBook::prominent_limit(OrderType type){
     auto &limits = (type==OrderType::bid) ? this->bid_limits : this->ask_limits;
     if (!limits.empty()){
         return (*limits.begin())->limit_price;
     }
-    return -1;
+    return Money(-1, -1);
 }
 
-std::vector<double> OrderBook::get_limits(OrderType type, int n){
-    std::vector<double> soln;
+std::vector<Money> OrderBook::get_limits(OrderType type, int n){
+    std::vector<Money> soln;
     int num_limits = (type==OrderType::bid) ? this->num_limits(OrderType::bid) : this->num_limits(OrderType::ask);
     auto &limits   = (type==OrderType::bid) ? this->bid_limits : this->ask_limits;
     int sz = std::min(n, num_limits);
@@ -111,13 +111,13 @@ std::vector<Match> OrderBook::process(){
 }
 
 bool OrderBook::can_match(){
-    double high_bid = this->prominent_limit(OrderType::bid);
-    double low_ask = this->prominent_limit(OrderType::ask);
-    if (std::min(high_bid, low_ask) < 0){
+    Money high_bid = this->prominent_limit(OrderType::bid);
+    Money low_ask = this->prominent_limit(OrderType::ask);
+    if (std::min(high_bid.getDollars(), low_ask.getDollars()) < 0){
         return false;
     }
-    double spread = low_ask - high_bid;
-    if (spread <= 0){
+    Money spread = low_ask - high_bid;
+    if (spread <= Money(0,0)){
         return true;
     }
     return false;
@@ -130,7 +130,7 @@ Match OrderBook::create_match(std::shared_ptr<Limit> ask_limit, std::shared_ptr<
     auto bid_order_ptr = bid_limit->orders.front();
     bid_limit->orders.pop_front();
     
-    double match_price = std::min(ask_limit->limit_price, bid_limit->limit_price);
+    Money match_price = std::min(ask_limit->limit_price, bid_limit->limit_price);
     int matchable_shares = std::min(ask_order_ptr->shares, bid_order_ptr->shares);
 
     if (ask_order_ptr->shares > bid_order_ptr->shares){
@@ -210,4 +210,88 @@ void OrderBook::remove_order(OrderMap &order_map, LimitMap &limit_map, Set &limi
     }
 
     order_map.erase(order_id); 
+}
+
+
+// money
+void Money::normalize(){
+    if (cents >= 100) {
+        dollars += cents / 100;
+        cents %= 100;
+    } else if (cents <= -100) {
+        dollars += cents / 100;
+        cents = -(std::abs(cents) % 100);
+    }
+
+    if (dollars > 0 && cents < 0) {
+        dollars -= 1;
+        cents += 100;
+    } else if (dollars < 0 && cents > 0) {
+        dollars += 1;
+        cents -= 100;
+    }
+}
+
+long Money::getDollars() const {
+    return this->dollars;
+}
+
+int Money::getCents() const { 
+    return cents; 
+}
+void Money::setDollars(long dollars) {
+    this->dollars = dollars;
+    normalize();
+}
+void Money::setCents(int cents) {
+    this->cents = cents;
+    normalize();
+}
+
+Money Money::operator+(const Money& other) const {
+    return Money(dollars + other.dollars, cents + other.cents);
+}
+
+Money Money::operator-(const Money& other) const {
+    return Money(dollars - other.dollars, cents - other.cents);
+}
+
+Money Money::operator*(double factor) const {
+    long totalCents = (dollars * 100 + cents) * factor;
+    return Money(totalCents / 100, totalCents % 100);
+}
+
+Money Money::operator/(double divisor) const {
+    long totalCents = (dollars * 100 + cents) / divisor;
+    return Money(totalCents / 100, totalCents % 100);
+}
+
+bool Money::operator<(const Money& other) const {
+    if (dollars < other.dollars) {
+        return true;
+    } else if (dollars == other.dollars) {
+        return cents < other.cents;
+    }
+    return false;
+}
+
+bool Money::operator>(const Money& other) const {
+    if (dollars > other.dollars) {
+        return true;
+    } else if (dollars == other.dollars) {
+        return cents > other.cents;
+    }
+   return false;
+}
+
+bool Money::operator<=(const Money& other) const {
+    return !(*this > other);
+}
+
+bool Money::operator>=(const Money& other) const {
+    return !(*this < other);
+}
+
+bool Money::operator==(const Money& other) const {
+    return dollars == other.dollars && cents == other.cents;
 }
