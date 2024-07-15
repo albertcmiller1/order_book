@@ -30,7 +30,7 @@ std::string OrderBook::add_order(
         limitPtr->orders.push_back(newOrderPtr);
         return newOrderPtr->order_id;
     } 
-    throw std::invalid_argument("Order type must be instance of enum OrderType"); // will this crash python or reset the book?
+    throw std::invalid_argument("Order type must be instance of enum OrderType"); 
 }
 
 template<typename Map, typename Set>
