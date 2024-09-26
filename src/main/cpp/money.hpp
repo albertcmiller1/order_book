@@ -26,7 +26,6 @@ public:
     bool operator==(const Money& other) const;
 };
 
-
 struct MoneyHasher{
   std::size_t operator()(const Money& money) const{
     return std::hash<long>()(money.getDollars()) ^ (std::hash<int>()(money.getCents()) << 1);
