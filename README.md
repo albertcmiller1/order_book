@@ -40,9 +40,14 @@ This repo simulates an order book using a red black tree to hold pointers to lim
 * intermediary class between the book and python
 * much slower since introducing Money call 
 * create timers for add_order, cancel_order, and process()
+* add a ticker to the ob class parameters 
+* create a class which creates a thread pool, one thread for each book 
+* replace generate_order_id with just an increment. same for match id 
 
 #### Future ideas
 * only run the bots during market hours
 * small websocket show how much memory/cpu the process is consuming 
 * load balancer for incoming requests to distributed order_book processes 
 * [stock exchange design](https://www.youtube.com/watch?v=XuKs2kWH0mQ&ab_channel=System-Design)
+
+

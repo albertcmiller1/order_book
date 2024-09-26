@@ -5,12 +5,13 @@ name = "pypi"
 
 [packages]
 pandas = "*"
-pytest = "*"
-pylint = "*"
-setuptools = "*"
-book = {file = "dist/book-0.0.15-cp312-cp312-macosx_13_0_arm64.whl"}
+book = {file = "dist/book-0.0.18-cp312-cp312-macosx_13_0_arm64.whl"}
 
 [dev-packages]
+behave = "*"
+setuptools = "*"
+pytest = "*"
+pylint = "*"
 
 [requires]
 python_version = "3.12"

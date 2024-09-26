@@ -33,12 +33,10 @@ void Testing::ob_can_add_orders(){
     std::vector<Money> bid_limits = ob.get_limits(OrderType::bid, 2);
     this->compare_vectors(expected_bids, bid_limits);
 
-
     std::vector<Money> expected_asks {Money(101, 0), Money(102, 0), Money(103, 0), Money(104, 0)};
     std::vector<Money> ask_limits = ob.get_limits(OrderType::ask);
     this->compare_vectors(expected_asks, ask_limits);
     
-
     std::cout << "[ PASSED ] ob_can_add_orders" << std::endl;
 }
 

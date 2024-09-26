@@ -1,4 +1,4 @@
-import book, random, time
+import random, time, book
 
 class Stimulate:
     def __init__(self, order_book): 
@@ -61,7 +61,7 @@ class Stimulate:
         process_start = time.time()
         matches       = self.ob.process()
         self.total_matches += len(matches)
-        return len(matches), time.time() - process_start
+        return matches, time.time() - process_start
 
     def place_order(self, shares=1, dollars=10, cents=0, orderType=book.OrderType.bid, user="albert"):
         start = time.time()
@@ -93,23 +93,3 @@ class Stimulate:
         elif r1==1: return self.place_order(r3, highest_bid.getDollars(), highest_bid.getCents() - r2, bidOrderType)
         elif r1==2: return self.place_order(r3, lowest_ask.getDollars(), lowest_ask.getCents() + r2, askOrderType)
         else:       return self.place_order(r3, lowest_ask.getDollars(), lowest_ask.getCents() - r2, askOrderType)
-
-    def stimulate(self):
-        itr = total_loop_time = 0
-        iterations = 1000000
-        while True: 
-            itr+=1
-            order_id, add_time = self.add_random_order()
-            num_matches, processing_time = self.process_matches()
-            self.total_matches  += num_matches
-            self.total_add_time += add_time 
-            self.total_processing_time += processing_time
-            self.best_add_time  = min(self.best_add_time, add_time)
-            self.worst_add_time = max(self.worst_add_time, processing_time)
-            self.best_processing_time  = min(self.best_processing_time, processing_time)
-            self.worst_processing_time = max(self.worst_processing_time, processing_time)
-            total_loop_time += add_time
-            total_loop_time += processing_time
-            if itr%iterations==0:
-                self.print_book(itr, total_loop_time)
-                total_loop_time = 0
