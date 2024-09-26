@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 pandas = "*"
-book = {file = "dist/book-0.0.18-cp312-cp312-macosx_13_0_arm64.whl"}
+book = {file = "dist/book-0.0.19-cp312-cp312-macosx_13_0_arm64.whl"}
 
 [dev-packages]
 behave = "*"
