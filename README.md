@@ -46,6 +46,7 @@ This repo simulates an order book using a red black tree to hold pointers to lim
 
 #### Future ideas
 * only run the bots during market hours
+* on the python side, instantiate a unique book per each ticker
 * small websocket show how much memory/cpu the process is consuming 
 * load balancer for incoming requests to distributed order_book processes 
 * [stock exchange design](https://www.youtube.com/watch?v=XuKs2kWH0mQ&ab_channel=System-Design)

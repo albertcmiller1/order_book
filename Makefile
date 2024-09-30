@@ -15,7 +15,7 @@ wheel:
 	pipenv install dist/*
 
 run: 
-	python3 src/main/py/main.py   
+	python3 src/test/features/steps/common.py
 
 check: 
 	ls -l ~/.local/share/virtualenvs/order_book*/lib/python3*/site-packages | grep book
