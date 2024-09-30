@@ -16,20 +16,20 @@ def step_impl(context):
 @when('bids and asks are added')
 def step_impl(context):
     for _ in range(100):
-        context.stimulate.place_order(
-            shares=1, 
-            dollars=10, 
-            cents=0, 
-            orderType=book.OrderType.bid, 
+        context.ob.add_order(
+            book.OrderType.bid, 
+            "albert", 
+            10, 
+            book.Money(10, 0), 
         )
     for _ in range(10):
-        context.stimulate.place_order(
-            shares=1, 
-            dollars=10, 
-            cents=0, 
-            orderType=book.OrderType.ask, 
+        context.ob.add_order(
+            book.OrderType.ask, 
+            "albert", 
+            10, 
+            book.Money(10, 0), 
         )
-    context.matches, _ = context.stimulate.process_matches()
+    context.matches = context.ob.process()
 
 @then('the order book can corectly process matches')
 def step_impl(context):
