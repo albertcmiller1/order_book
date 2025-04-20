@@ -1,13 +1,15 @@
 #include "../../main/cpp/order_book.hpp"
 #include <algorithm>
 #include <vector>
+#include <cassert>
 
 class Testing {
-public: 
-    bool logging;
-    
+private: 
     template<typename V>
     void compare_vectors(V &v1, V &v2);
+
+public: 
+    bool logging;
 
     void ob_can_add_orders();
     void ob_can_match_one_order_equal_shares();

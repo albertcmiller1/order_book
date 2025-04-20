@@ -96,7 +96,7 @@ class Stimulate:
 
     def stimulate(self):
         itr = total_loop_time = 0
-        iterations = 1000000
+        iterations = 10000
         while True: 
             itr+=1
             order_id, add_time = self.add_random_order()

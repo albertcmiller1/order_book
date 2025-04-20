@@ -27,7 +27,7 @@ PYBIND11_MODULE(book, m) {
         .def("prominent_limit", &OrderBook::prominent_limit)
         .def("get_limits", &OrderBook::get_limits)
         .def("process", &OrderBook::process)
-        .def("add_order", &OrderBook::add_order)
+        .def("add_order", &OrderBook::add_order) // add kw args
         .def("cancel_order", &OrderBook::cancel_order)
         .def("order_in_queue", &OrderBook::order_in_queue);
 
