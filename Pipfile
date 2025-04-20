@@ -5,7 +5,10 @@ name = "pypi"
 
 [packages]
 pandas = "*"
-book = {file = "dist/book-0.0.19-cp312-cp312-macosx_13_0_arm64.whl"}
+book = {file = "dist/book-0.0.20-cp312-cp312-macosx_15_0_arm64.whl"}
+fastapi = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+websockets = "*"
 
 [dev-packages]
 behave = "*"

@@ -117,4 +117,6 @@ class Stimulate:
                 total_loop_time = 0
 
 if __name__ == "__main__":
-    Stimulate(book.OrderBook()).stimulate()
+    ob: book.OrderBook = book.OrderBook()
+    stimmy = Stimulate()
+    stimmy.stimulate()
