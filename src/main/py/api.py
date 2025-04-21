@@ -17,6 +17,9 @@ class API:
     def __init__(self): 
         self.books: Dict[str, book.OrderBook] = {}
 
+    def get_tickers(self) -> List[str]: 
+        return self.books.keys()
+
     def get_book(self, ticker: str, create: bool = True) -> Optional[book.OrderBook]: 
         if create and ticker not in self.books: 
             self.books[ticker]=book.OrderBook()
