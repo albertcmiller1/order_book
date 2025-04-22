@@ -86,18 +86,23 @@ const StockChart: React.FC<StockChartProps> = ({ symbol }) => {
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="time" />
-          <YAxis domain={['auto', 'auto']} />
-          <Tooltip />
+          <YAxis 
+            domain={['auto', 'auto']} 
+            tickFormatter={(value) => `$${value.toFixed(2)}`}
+          />
+          <Tooltip 
+            formatter={(value) => [`$${Number(value).toFixed(2)}`, 'Price']}
+            labelFormatter={(label) => `Date: ${label}`}
+          />
           <Legend />
           <Line
             type="monotone"
             dataKey="price"
-            stroke="#8884d8"
+            name="Price"
+            stroke="#2196f3"
             activeDot={{ r: 8 }}
+            strokeWidth={2}
           />
-          {chartData[0]?.volume !== undefined && (
-            <Line type="monotone" dataKey="volume" stroke="#82ca9d" />
-          )}
         </LineChart>
       </ResponsiveContainer>
     </Paper>

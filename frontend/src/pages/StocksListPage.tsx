@@ -9,7 +9,7 @@ import {
 import { Grid } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { Stock, Spread } from '../types';
-import { getStocks, getSpread, addStock } from '../services/api';
+import { getStocks, getSpread } from '../services/api';
 import websocketService from '../services/websocket';
 
 const StocksListPage: React.FC = () => {
@@ -97,22 +97,14 @@ const StocksListPage: React.FC = () => {
     setAddingStock(true);
     setAddError(null);
     
-    try {
-      await addStock({
-        symbol: newStock.symbol.toUpperCase(),
-        name: newStock.name,
-        description: newStock.description
-      });
-      
+    // Since we're using a sample data backend, no need to actually add stocks
+    // Just simulate a successful addition
+    setTimeout(() => {
       setOpenAddDialog(false);
       setNewStock({ symbol: '', name: '', description: '' });
-      fetchStocks(); // Refresh the stocks list
-    } catch (err) {
-      console.error('Error adding stock:', err);
-      setAddError('Failed to add stock');
-    } finally {
+      alert("In this demo version, new stocks cannot be added. Using preset sample data.");
       setAddingStock(false);
-    }
+    }, 1000);
   };
 
   const navigateToStock = (symbol: string) => {
