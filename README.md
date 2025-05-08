@@ -1,14 +1,6 @@
 # Fast Limit Order Book
 This repo simulates an order book using a red black tree to hold pointers to limit structures, and two hash maps - one for all orders and one for all limits. I found some information about how an order book may be designed [here](https://web.archive.org/web/20110219163448/http://howtohft.wordpress.com/2011/02/15/how-to-build-a-fast-limit-order-book/). The order book is coded in C++ and compiled into a library. [pybind11](https://github.com/pybind/pybind11)  allows us to either create a shared object or wheel file which can then be installed, imported, and called from python.
 
-### Getting started 
-1. clone the repository and `cd order_book`
-2. bring in the pybind11 dependency: `git clone git@github.com:pybind/pybind11.git`
-3. start a python virual enviornment: `pipenv shell`
-4. install python dependencies: `pipenv install`
-5. create a python wheel and install it: `make wheel`
-6. start a python repl and: `import book`
-
 ### Space, Time, and Data Structures
 * let N represent the number of limits 
 * let K represent the average number of orders per limit
@@ -17,6 +9,14 @@ This repo simulates an order book using a red black tree to hold pointers to lim
 * unordered hash map will be of size O(N), and take amortized O(1) to insert, delete, and update
 * to add an Order to the book: best case O(1) time, and worst case O(log(n))
 * to process J matches: best case O(J) time, worst case of O(J x (K+log(N))) 
+
+### Getting started 
+1. clone the repository and `cd order_book`
+2. bring in the pybind11 dependency: `git clone git@github.com:pybind/pybind11.git`
+3. start a python virual enviornment: `pipenv shell`
+4. install python dependencies: `pipenv install`
+5. create a python wheel and install it: `make wheel`
+6. start a python repl and: `import book`
 
 ### Using the Book 
 * instantiate the book: `ob = book.OrderBook()`

@@ -3,7 +3,7 @@ The frontend should be able to connect to a websocket which streams the spread a
 The frontend should also be able to call api rounds to place or cancel an order 
 '''
 import book, time, json, random
-from src.main.py.api import API
+from src.main.py.api import OrderBookService
 from fastapi import FastAPI, WebSocket, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from dataclasses import dataclass, fields, asdict
@@ -13,7 +13,7 @@ import asyncio
 from datetime import datetime
 
 app = FastAPI()
-api = API()
+obs = OrderBookService()
 
 # Add CORS middleware to allow frontend to connect
 app.add_middleware(
@@ -109,12 +109,12 @@ async def get_chart_data(symbol: str, timeframe: str = Query("1d")):
 
 @app.get("/market/{symbol}/spread")
 async def get_spread(symbol: str):
+    ob = obs.get_book(symbol)
     # Get or create order book for the symbol
-    ob = api.get_book(symbol)
     
     # Get highest bid and lowest ask
-    highest_bid = api.format_money(ob.prominent_limit(book.OrderType.bid)) 
-    lowest_ask = api.format_money(ob.prominent_limit(book.OrderType.ask))
+    highest_bid = obs.format_money(ob.prominent_limit(book.OrderType.bid)) 
+    lowest_ask = obs.format_money(ob.prominent_limit(book.OrderType.ask))
     
     if highest_bid < 0:  # Default values if no orders exist
         highest_bid = random.uniform(90, 100)
@@ -131,11 +131,11 @@ async def get_spread(symbol: str):
 
 @app.get("/market/{symbol}/book")
 async def get_order_book(symbol: str):
-    ob = api.get_book(symbol)
+    ob = obs.get_book(symbol)
     
     # Get order book entries
-    bid_limits = [api.format_money(m) for m in ob.get_limits(book.OrderType.bid, 10)]
-    ask_limits = [api.format_money(m) for m in ob.get_limits(book.OrderType.ask, 10)]
+    bid_limits = [obs.format_money(m) for m in ob.get_limits(book.OrderType.bid, 10)]
+    ask_limits = [obs.format_money(m) for m in ob.get_limits(book.OrderType.ask, 10)]
     
     bids = []
     asks = []
@@ -195,7 +195,7 @@ async def get_orders_for_user(userId: str):
 async def process(ob: book.OrderBook):
     matches: list[book.Match] = ob.process()
     for match in matches: 
-        api.print_match(match)
+        obs.print_match(match)
         # TODO: post in db
     return matches
 
@@ -216,7 +216,7 @@ async def place_order(order_data: dict):
     if not order:
         raise HTTPException(status_code=400, detail="Invalid Order")
     
-    ob = api.get_book(order.ticker)
+    ob = obs.get_book(order.ticker)
     order_id = ob.add_order(
         book.OrderType.bid if order.side == "bid" else book.OrderType.ask, 
         order.user, 
@@ -227,9 +227,9 @@ async def place_order(order_data: dict):
     # Add to our in-memory DB
     orders_db.append(order)
     
-    api.print_book(ob)
+    obs.print_book(ob)
     matches = await process(ob)
-    api.print_book(ob)
+    obs.print_book(ob)
     
     # Broadcast the updated order book to all connected clients
     await broadcast_updates(order.ticker)
@@ -263,9 +263,9 @@ async def broadcast_updates(ticker: str):
     """Broadcast updates to all connected clients."""
     if connected_clients:
         # Get spread data
-        ob = api.get_book(ticker)
-        highest_bid = api.format_money(ob.prominent_limit(book.OrderType.bid))
-        lowest_ask = api.format_money(ob.prominent_limit(book.OrderType.ask))
+        ob = obs.get_book(ticker)
+        highest_bid = obs.format_money(ob.prominent_limit(book.OrderType.bid))
+        lowest_ask = obs.format_money(ob.prominent_limit(book.OrderType.ask))
         
         if highest_bid < 0:  # Default values if no orders exist
             highest_bid = random.uniform(90, 100)

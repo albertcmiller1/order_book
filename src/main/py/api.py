@@ -13,7 +13,7 @@ import book
 from typing import Dict, List, Union
 from typing import get_type_hints, Optional
 
-class API: 
+class OrderBookService: 
     def __init__(self): 
         self.books: Dict[str, book.OrderBook] = {}
 
@@ -76,11 +76,11 @@ class API:
         ''')
 
 if __name__ == "__main__":
-    api = API()
-    tsla = api.get_book("TSLA")
-    order_id = api.place_order(tsla, 100, 100, 10, book.OrderType.bid, "albert")
-    order_id = api.place_order(tsla, 105, 100, 10, book.OrderType.ask, "albert")
-    api.print_book(tsla)
-    for match in api.process_matches(tsla): 
-        api.print_match(match)
-    api.print_book(tsla)
+    obs = OrderBookService()
+    tsla = obs.get_book("TSLA")
+    order_id = obs.place_order(tsla, 100, 100, 10, book.OrderType.bid, "albert")
+    order_id = obs.place_order(tsla, 105, 100, 10, book.OrderType.ask, "albert")
+    obs.print_book(tsla)
+    for match in obs.process_matches(tsla): 
+        obs.print_match(match)
+    obs.print_book(tsla)
